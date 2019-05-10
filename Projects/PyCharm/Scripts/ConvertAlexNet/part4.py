@@ -72,7 +72,7 @@ def testNetwork(testloader, model):
 	# Convert 2D image to 1D vector
 	img = img.resize_(1, 784)
 
-	# TODO: Calculate the class probabilities (softmax) for img
+	# Calculate the class probabilities (softmax) for img
 	ps = torch.exp(model(img))
 	print(ps)
 	# Plot the image and probabilities

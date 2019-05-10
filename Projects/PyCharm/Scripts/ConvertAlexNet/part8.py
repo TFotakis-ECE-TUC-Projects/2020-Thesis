@@ -5,7 +5,7 @@ from torchvision import datasets, transforms, models
 from Torchvision.alexnet2 import alexnet
 data_dir = 'Cat_Dog_data'
 
-# TODO: Define transforms for the training data and testing data
+# Define transforms for the training data and testing data
 train_transforms = transforms.Compose([
 	# transforms.RandomRotation(30),
 	transforms.RandomResizedCrop(224),
