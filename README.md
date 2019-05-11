@@ -15,6 +15,8 @@
 
 
 <!-- Document -->
+<img src="https://www.eduopinions.com/wp-content/uploads/2017/09/Technical-University-of-Crete-TUC-logo.png" height=180/>
+
 # [Technical University of Crete][tucPage]
 # Diploma Thesis
 # Reconfigurable-based Design and Implementation of AlexNet Deep Learning Network
