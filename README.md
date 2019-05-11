@@ -31,7 +31,7 @@
 
 ## *A thesis submitted in fulfillment of the requirements for the Diploma of Electrical and Computer Engineering in the [Microprocessor and Hardware Lab][mhlPage] of [School of Electrical and Computer Engineering][ecePage]*
 
-*October 10, 2018*
+*Todo: Add Date Here*
 ___
 
 ## [Technical University of Crete][tucPage]
@@ -103,4 +103,19 @@ In this section we outline the organization of this thesis.
 ## 7.1 Conclusions
 ## 7.2 Future Work
 
+<!-- Todo: Fix Reference Numbers -->
 # References
+[x] Alex Krizhevsky, Ilya Sutskever, Geoffrey E. Hinton: *ImageNet classification with deep convolutional neural networks*, (2017) Communications of the ACM. 60 (6): 84–90. doi:10.1145/3065386. ISSN 0001-0782. *url:* https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf
+
+# External Links
+[x] Udacity Intro to Deep Learning with PyTorch by Facebook AI. *url:* https://www.udacity.com/course/deep-learning-pytorch--ud188.
+
+[x] Kaggle. *url:* https://www.kaggle.com/.
+
+[x] MATLAB. *url:* https://www.mathworks.com/.
+
+[x] TensorFlow. *url:* https://www.tensorflow.org/.
+
+[x] Vivado Design Suite - HLx Editions. *url:* https://www.xilinx.com/products/design-tools/vivado.html.
+
+[x] ZCU102 User Guide. *url:* https://www.xilinx.com/support/documentation/boards_and_kits/zcu102/ug1182-zcu102-eval-bd.pdf.
