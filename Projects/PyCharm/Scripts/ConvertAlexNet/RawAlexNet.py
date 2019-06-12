@@ -256,7 +256,8 @@ def inference(model):
 		# transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 	])
 
-	dataset = datasets.ImageFolder(data_dir + '/train', transform=preprocess)
+	# dataset = datasets.ImageFolder(data_dir + '/train', transform=preprocess)
+	dataset = datasets.ImageFolder(data_dir + '/test', transform=preprocess)
 
 	for image, label in dataset.imgs:
 		pil = Image.open(image)
