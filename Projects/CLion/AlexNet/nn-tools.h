@@ -9,9 +9,6 @@ FloatMatrix *Conv2d(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias, uin
 				uint index = calc3DIndex(x->dims, i, j, k);
 				uint arrIndex = calc3DIndex(tmp->dims, i, j + padding, k + padding);
 				tmp->matrix[arrIndex] = x->matrix[index];
-				if (isnan(tmp->matrix[arrIndex])) {
-					printf("Sum is nan!\n");
-				}
 			}
 		}
 	}
@@ -36,9 +33,6 @@ FloatMatrix *Conv2d(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias, uin
 							uint weightsIndex = calc4DIndex(weights->dims, out_channel, in_channel, i, j);
 							uint arrIndex = calc3DIndex(tmp->dims, in_channel, i + imgStartH, j + imgStartW);
 							pixel += tmp->matrix[arrIndex] * weights->matrix[weightsIndex];
-							if (isnan(pixel)) {
-								printf("Sum is nan!\n");
-							}
 						}
 					}
 				}
