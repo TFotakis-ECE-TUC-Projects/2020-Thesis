@@ -1,13 +1,3 @@
-//
-// Created by tzanis on 6/10/19.
-//
-
-//#ifndef ALEXNET_IMAGEUTILS_H
-//#define ALEXNET_IMAGEUTILS_H
-//
-//#endif //ALEXNET_IMAGEUTILS_H
-
-
 // https://gist.github.com/PhirePhly/3080633
 // memdjpeg - A super simple example of how to decode a jpeg in memory
 // Kenneth Finnegan, 2012
@@ -24,16 +14,6 @@
 // 0.01		2012-07-09	11:18		Kenneth Finnegan
 //
 
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <syslog.h>
-#include <sys/stat.h>
-#include <dirent.h>
-#include <jpeglib.h>
-#include <string.h>
-
 
 typedef struct Image_t {
 	int height;
@@ -45,6 +25,30 @@ typedef struct Image_t {
 	char *filename;
 	u_int8_t ***channels;
 } Image;
+
+
+typedef struct filelist_t {
+	uint length;
+	char **list;
+} Filelist;
+
+
+void freeImageChannels(Image *image) {
+	for (int i = 0; i < image->depth; i++) {
+		for (int j = 0; j < image->height; j++) {
+			free(image->channels[i][j]);
+		}
+		free(image->channels[i]);
+	}
+	free(image->channels);
+}
+
+
+void freeImage(Image *image){
+	freeImageChannels(image);
+	free(image->filename);
+	free(image);
+}
 
 
 void readFileAndDecompress(Image *image) {
@@ -208,38 +212,6 @@ void readFileAndDecompress(Image *image) {
 }
 
 
-void convertToBuffer(Image *image) {
-	image->bmp_size = image->depth * image->width * image->height;
-	image->bmp_buffer = (unsigned char *) malloc(image->bmp_size * sizeof(unsigned char));
-
-	uint index = 0;
-	for (int y = 0; y < image->height; y++) {
-		for (int x = 0; x < image->width; x++) {
-			for (int d = 0; d < image->depth; d++) {
-				image->bmp_buffer[index] = image->channels[d][y][x];
-				index++;
-			}
-		}
-	}
-	syslog(LOG_INFO, "Done converting image to buffer.");
-}
-
-
-void writeToFile(Image *image) {
-	convertToBuffer(image);
-	// Write the decompressed bitmap out to a ppm file, just to make sure it worked.
-	int fd = open("output.ppm", O_CREAT | O_WRONLY, 0666);
-	char buf[1024];
-
-	int rc = sprintf(buf, "P6 %d %d 255\n", image->width, image->height);
-	write(fd, buf, rc); // Write the PPM image header before data
-	write(fd, image->bmp_buffer, image->bmp_size); // Write out all RGB pixel data
-
-	close(fd);
-	syslog(LOG_INFO, "Done writing image to ppm file.");
-}
-
-
 void initChannelsMatrix(Image *image) {
 	image->channels = (u_int8_t ***) malloc(image->depth * sizeof(u_int8_t *));
 	for (int i = 0; i < image->depth; ++i) {
@@ -262,7 +234,40 @@ void convertToMatrix(Image *image) {
 		}
 	}
 
+	free(image->bmp_buffer);
 	syslog(LOG_INFO, "Done converting raw image to uint8 matrix.");
+}
+
+
+void convertToBuffer(Image *image) {
+	image->bmp_size = image->depth * image->width * image->height;
+	image->bmp_buffer = (unsigned char *) malloc(image->bmp_size * sizeof(unsigned char));
+
+	uint index = 0;
+	for (int y = 0; y < image->height; y++) {
+		for (int x = 0; x < image->width; x++) {
+			for (int d = 0; d < image->depth; d++) {
+				image->bmp_buffer[index] = image->channels[d][y][x];
+				index++;
+			}
+		}
+	}
+	syslog(LOG_INFO, "Done converting image to buffer.");
+}
+
+
+void writeToFile(Image *image) {
+	convertToBuffer(image);
+	// Write the decompressed bitmap out to a ppm file, just to make sure it worked.
+	int fd = open("../output.ppm", O_CREAT | O_WRONLY, 0666);
+	char buf[1024];
+
+	int rc = sprintf(buf, "P6 %d %d 255\n", image->width, image->height);
+	write(fd, buf, rc); // Write the PPM image header before data
+	write(fd, image->bmp_buffer, image->bmp_size); // Write out all RGB pixel data
+
+	close(fd);
+	syslog(LOG_INFO, "Done writing image to ppm file.");
 }
 
 
@@ -270,22 +275,13 @@ char *concat(char *s1, char *s2) {
 	const size_t len1 = strlen(s1);
 	const size_t len2 = strlen(s2);
 	char *result = malloc(len1 + len2 + 1); // +1 for the null-terminator
-	// in real code you would check for errors in malloc here
 	memcpy(result, s1, len1);
 	memcpy(result + len1, s2, len2 + 1); // +1 to copy the null-terminator
 	return result;
 }
 
 
-typedef struct filelist_t {
-	uint length;
-	char **list;
-} Filelist;
-
-
-Filelist *getFileList(char *path) {
-	Filelist *filelist = (Filelist *) malloc(sizeof(Filelist));
-	filelist->length = 0;
+uint getFileCount(char *path) {
 	struct dirent *de;  // Pointer for directory entry
 
 	// opendir() returns a pointer of DIR type.
@@ -294,15 +290,14 @@ Filelist *getFileList(char *path) {
 	// opendir returns NULL if couldn't open directory
 	if (dr == NULL) {
 		fprintf(stderr, "Could not open current directory");
-		return NULL;
+		return -1;
 	}
 
 	// Refer http://pubs.opengroup.org/onlinepubs/7990989775/xsh/readdir.html
 	// for readdir()
+	uint count = 0;
 	while ((de = readdir(dr)) != NULL) {
-		if (!strcmp(de->d_name, ".") || !strcmp(de->d_name, "..")) {
-			continue;
-		}
+		if (!strcmp(de->d_name, ".") || !strcmp(de->d_name, "..")) continue;
 
 		char *innerPath = concat(path, de->d_name);
 
@@ -312,35 +307,40 @@ Filelist *getFileList(char *path) {
 			if (!strcmp(deInner->d_name, ".") || !strcmp(deInner->d_name, "..")) {
 				continue;
 			}
-			filelist->length++;
+			count++;
 		}
 		closedir(drInner);
 	}
 	closedir(dr);
 	free(de);
+	return count;
+}
 
+
+Filelist *getFileList(char *path) {
+	Filelist *filelist = (Filelist *) malloc(sizeof(Filelist));
+	filelist->length = getFileCount(path);
 	filelist->list = (char **) malloc(filelist->length * sizeof(char *));
-	uint count = 0;
-	dr = opendir(path);
+	uint index = 0;
+	DIR *dr = opendir(path);
+	struct dirent *de;
 	while ((de = readdir(dr)) != NULL) {
-		if (!strcmp(de->d_name, ".") || !strcmp(de->d_name, "..")) {
-			continue;
-		}
+		if (!strcmp(de->d_name, ".") || !strcmp(de->d_name, "..")) continue;
 
 		char *innerPath = concat(path, de->d_name);
 
 		DIR *drInner = opendir(innerPath);
 		struct dirent *deInner;
 		while ((deInner = readdir(drInner)) != NULL) {
-			if (!strcmp(deInner->d_name, ".") || !strcmp(deInner->d_name, "..")) {
-				continue;
-			}
+			if (!strcmp(deInner->d_name, ".") || !strcmp(deInner->d_name, "..")) continue;
 			char *tmp = concat(innerPath, "/");
-			filelist->list[count] = concat(tmp, deInner->d_name);
-			count++;
+			filelist->list[index] = concat(tmp, deInner->d_name);
+			index++;
 			free(tmp);
 		}
 		closedir(drInner);
+		free(innerPath);
+		free(deInner);
 	}
 	closedir(dr);
 	free(de);
@@ -372,7 +372,7 @@ Image *upScale(Image *image, uint dim) {
 
 				for (int l = 0; l < upscaleRatio; l++) {
 					for (int m = 0; m < upscaleRatio; m++) {
-						newImage->channels[k][l][m] = image->channels[k][i][j];
+						newImage->channels[k][i * upscaleRatio + l][j * upscaleRatio + m] = image->channels[k][i][j];
 					}
 				}
 
