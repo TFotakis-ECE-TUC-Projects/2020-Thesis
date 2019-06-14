@@ -1,9 +1,25 @@
+//#define WRITE_TRANSFORMED_IMAGE_TO_FILE
+//#define ENABLE_LOGGING
+#define SKIP_CHECKING
+
 #include <omp.h>
 #include <time.h>
+#include <math.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <syslog.h>
+#include <sys/stat.h>
+#include <dirent.h>
+#include <jpeglib.h>
+#include <string.h>
+
 #include "imageUtils.h"
-#include "terminalColors.h"
 #include "floatMatrix-tools.h"
 #include "nn-tools.h"
+#include "terminalColors.h"
+
 
 char *dataDir = "/home/tzanis/Workspace/Thesis/Projects/PyCharm/Data/ConvertAlexNet/Cat_Dog_data/test/";
 char *parametersPath = "/home/tzanis/Workspace/Thesis/Projects/PyCharm/Scripts/AlexNetParametersProcessing/binaryParameters.txt";
@@ -11,17 +27,14 @@ char *labelsPath = "/home/tzanis/Workspace/Thesis/Projects/PyCharm/Data/ConvertA
 
 
 typedef struct params_t {
-	uint parametersNum;
-	FloatMatrix *parametersWeights;
+	uint len;
+	FloatMatrix **matrix;
 } Params;
 
 
 uint timedif(struct timespec *start, struct timespec *stop) {
 	return ((int) ((stop->tv_sec - start->tv_sec) * 1000) + (int) ((stop->tv_nsec - start->tv_nsec) / 1000000));
 }
-
-
-uint sumTime = 0;
 
 
 char **loadLabels() {
@@ -48,45 +61,35 @@ Params *loadParameters() {
 	printf("- Loading parameters: ");
 	fflush(stdout);
 
+	FILE *f = fopen(parametersPath, "r");
 	Params *params = (Params *) malloc(sizeof(Params));
 
-	FILE *f = fopen(parametersPath, "r");
-	uint parametersNum;
-	fscanf(f, "%u\n", &parametersNum);
+	fscanf(f, "%u\n", &params->len);
+	params->matrix = (FloatMatrix **) malloc(params->len * sizeof(FloatMatrix *));
 
-	params->parametersNum = parametersNum;
-	params->parametersWeights = (FloatMatrix *) malloc(parametersNum * sizeof(FloatMatrix));
+	for (int p = 0; p < params->len; p++) {
+		FloatMatrix *matrix = (FloatMatrix *) malloc(sizeof(FloatMatrix));
 
-	for (int p = 0; p < parametersNum; p++) {
-		uint dimsNum;
-		fscanf(f, "%u", &dimsNum);
-
-		params->parametersWeights[p].dimsNum = dimsNum;
-		params->parametersWeights[p].dims = (uint *) malloc(dimsNum * sizeof(uint));
-
-		uint *dims = (uint *) malloc(dimsNum * sizeof(uint));
-		for (int i = 0; i < dimsNum; i++) {
-			fscanf(f, "%d", &dims[i]);
-			params->parametersWeights[p].dims[i] = dims[i];
+		fscanf(f, "%u", &matrix->dimsNum);
+		matrix->dims = (uint *) malloc(matrix->dimsNum * sizeof(uint));
+		for (int i = 0; i < matrix->dimsNum; i++) {
+			fscanf(f, "%d", &matrix->dims[i]);
 		}
 
 		uint rows = 1;
-		for (int i = 0; i < dimsNum - 1; i++) {
-			rows *= dims[i];
+		for (int i = 0; i < matrix->dimsNum - 1; i++) {
+			rows *= matrix->dims[i];
 		}
-		uint columns = dims[dimsNum - 1];
-
-		float *arr = (float *) malloc(rows * columns * sizeof(float));
-
+		uint columns = matrix->dims[matrix->dimsNum - 1];
+		matrix->matrix = (matrix_t *) malloc(rows * columns * sizeof(matrix_t));
 		uint index = 0;
-		uint len = rows * columns;
 		for (uint i = 0; i < rows; i++) {
 			for (uint j = 0; j < columns; j++) {
-				fscanf(f, "%f", &arr[index]);
+				fscanf(f, "%lf", &matrix->matrix[index]);
 				index++;
 			}
 		}
-		params->parametersWeights[p].matrix = arr;
+		params->matrix[p] = matrix;
 	}
 	printf("%s✓%s\n", KGRN, KNRM);
 	return params;
@@ -102,122 +105,128 @@ Image *imageTransform(char *path) {
 	convertToMatrix(image);
 
 	Image *newImage = imageResize(image, 256);
-	if (newImage != image) {
-		free(image->bmp_buffer);
-		for (int i = 0; i < image->depth; i++) {
-			for (int j = 0; j < image->height; j++) {
-				free(image->channels[i][j]);
-			}
-			free(image->channels[i]);
-		}
-		free(image);
-	}
-	image = newImage;
-	newImage = imageCenterCrop(image, 224);
-	for (int i = 0; i < image->depth; i++) {
-		for (int j = 0; j < image->height; j++) {
-			free(image->channels[i][j]);
-		}
-		free(image->channels[i]);
-	}
-	free(image);
+	if (newImage != image) freeImage(image);
 	image = newImage;
 
-//	writeToFile(image);
+	newImage = imageCenterCrop(image, 224);
+	freeImage(image);
+	image = newImage;
+
+#ifdef WRITE_TRANSFORMED_IMAGE_TO_FILE
+	writeToFile(image);
+#endif
 
 	syslog(LOG_INFO, "Done image manipulation.");
 	return image;
 }
 
 
-FloatMatrix *forward(Params *params, Image *image) {
-	FloatMatrix *x = ImageToFloatMatrix(image);
-
-	x = Conv2d(x, params->parametersWeights[0], params->parametersWeights[1], 3, 64, 11, 4, 2);
+FloatMatrix *forward(Params *params, FloatMatrix *x) {
+	printMinMaxSum(x, "Input \t| ");
+	x = Conv2d(x, params->matrix[0], params->matrix[1], 3, 64, 11, 4, 2);
+	printMinMaxSum(x, "Conv2d 1\t| ");
 	x = ReLU(x);
+	printMinMaxSum(x, "ReLU 1\t\t| ");
 	x = MaxPool2d(x, 3, 2);
+	printMinMaxSum(x, "MaxPool2d 1\t| ");
 
-	x = Conv2d(x, params->parametersWeights[2], params->parametersWeights[3], 64, 192, 5, 1, 2);
+	x = Conv2d(x, params->matrix[2], params->matrix[3], 64, 192, 5, 1, 2);
+	printMinMaxSum(x, "Conv2d 2\t| ");
 	x = ReLU(x);
+	printMinMaxSum(x, "ReLU 2\t\t| ");
 	x = MaxPool2d(x, 3, 2);
+	printMinMaxSum(x, "MaxPool2d 2\t| ");
 
-	x = Conv2d(x, params->parametersWeights[4], params->parametersWeights[5], 192, 384, 3, 1, 1);
+	x = Conv2d(x, params->matrix[4], params->matrix[5], 192, 384, 3, 1, 1);
+	printMinMaxSum(x, "Conv2d 3\t| ");
 	x = ReLU(x);
+	printMinMaxSum(x, "ReLU 3\t\t| ");
 
-	x = Conv2d(x, params->parametersWeights[6], params->parametersWeights[7], 384, 256, 3, 1, 1);
+	x = Conv2d(x, params->matrix[6], params->matrix[7], 384, 256, 3, 1, 1);
+	printMinMaxSum(x, "Conv2d 4\t| ");
 	x = ReLU(x);
+	printMinMaxSum(x, "ReLU 4\t\t| ");
 
-	x = Conv2d(x, params->parametersWeights[8], params->parametersWeights[9], 256, 256, 3, 1, 1);
+	x = Conv2d(x, params->matrix[8], params->matrix[9], 256, 256, 3, 1, 1);
+	printMinMaxSum(x, "Conv2d 5\t| ");
 	x = ReLU(x);
+	printMinMaxSum(x, "ReLU 5\t\t| ");
 	x = MaxPool2d(x, 3, 2);
+	printMinMaxSum(x, "MaxPool2d 5\t| ");
 
-	x = Linear(x, params->parametersWeights[10], params->parametersWeights[11], 256 * 6 * 6, 4096);
+	x = Linear(x, params->matrix[10], params->matrix[11], 256 * 6 * 6, 4096);
+	printMinMaxSum(x, "Linear 6\t| ");
 	x = ReLU(x);
+	printMinMaxSum(x, "ReLU 6\t\t| ");
 
-	x = Linear(x, params->parametersWeights[12], params->parametersWeights[13], 4096, 4096);
+	x = Linear(x, params->matrix[12], params->matrix[13], 4096, 4096);
+	printMinMaxSum(x, "Linear 7\t| ");
 	x = ReLU(x);
+	printMinMaxSum(x, "ReLU 7\t\t| ");
 
-	x = Linear(x, params->parametersWeights[14], params->parametersWeights[15], 4096, 1000);
+	x = Linear(x, params->matrix[14], params->matrix[15], 4096, 1000);
+	printMinMaxSum(x, "Linear 8\t| ");
 
-	x = LogSoftMax(x, 1);
+	x = LogSoftMax(x);
+	printMinMaxSum(x, "LogSoftMax\t| ");
 
 	syslog(LOG_INFO, "Done forward pass.");
 	return x;
 }
 
 
-void inference(char *path, Params *params, char **labels) {
+uint inference(char *path, Params *params, char **labels) {
 	struct timespec startTime, endTime;
 
 	Image *image = imageTransform(path);
+	FloatMatrix *x = ImageToFloatMatrix(image);
+	freeImageChannels(image);
+	free(image);
 
 	clock_gettime(CLOCK_REALTIME, &startTime);
 
-	FloatMatrix *x = forward(params, image);
+	x = forward(params, x);
 
 	clock_gettime(CLOCK_REALTIME, &endTime);
 
-	uint topClass = argmax(x);
-
 	uint timeNeeded = timedif(&startTime, &endTime);
-	sumTime += timeNeeded;
 
-	syslog(LOG_INFO, "- Image contains: %s%s%s\n\tResult in: %dms\n", KGRN, labels[topClass], KNRM, timeNeeded);
-	printf("- Image contains: %s%s%s\n\tResult in:\t\t\t\t%dms\n", KGRN, labels[topClass], KNRM, timeNeeded);
+	uint topClass = argmax(x);
+	printf("* Image contains: %s%s%s\n\tResult in:\t\t\t\t%d ms\n", KGRN, labels[topClass], KNRM, timeNeeded);
 
-	for (int i = 0; i < image->depth; i++) {
-		for (int j = 0; j < image->height; j++) {
-			free(image->channels[i][j]);
-		}
-		free(image->channels[i]);
-	}
-	free(image->channels);
-	free(image);
-	free(x->matrix);
-	free(x);
+	freeFloatMatrix(x);
+	return timeNeeded;
 }
 
 
 int main(int argc, char *argv[]) {
-	//	char *syslog_prefix = (char *) malloc(1024);
-	//	sprintf(syslog_prefix, "%s", argv[0]);
-	//	openlog(syslog_prefix, LOG_PERROR | LOG_PID, LOG_USER);
+#ifdef ENABLE_LOGGING
+	char *syslog_prefix = (char *) malloc(1024);
+	sprintf(syslog_prefix, "%s", argv[0]);
+	openlog(syslog_prefix, LOG_PERROR | LOG_PID, LOG_USER);
+#endif
 
-	//	if (argc != 2) {
-	//		fprintf(stderr, "USAGE: %s filename.jpg\n", argv[0]);
-	//		exit(EXIT_FAILURE);
-	//	}
+//	FloatMatrix *tmp = zero3DFloatMatrix(10, 10, 10);
+//	argmax(tmp);
+//	freeFloatMatrix(tmp);
+//	return EXIT_SUCCESS;
+
+	if (argc == 2) dataDir = argv[1];
 
 	Filelist *fileList = getFileList(dataDir);
-	syslog(LOG_INFO, "Found %u images.", fileList->length);
-
+	printf("- Loading file list: %s✓%s\n", KGRN, KNRM);
 	char **labels = loadLabels();
 	Params *params = loadParameters();
+	printf("- %sStarting inference...\n\n%s", KBLU, KNRM);
 
-//#pragma omp parallel for
+	uint sumTime = 0;
+#ifdef _OMP_H
+	//#pragma omp parallel for
+#endif
 	for (int i = 0; i < fileList->length; i++) {
-		inference(fileList->list[i], params, labels);
-		printf("\tAverage time per image:\t%d ms\n\n", sumTime / (i + 1));
+		printf("* Processing image: %s\n", fileList->list[i]);
+		sumTime += inference(fileList->list[i], params, labels);
+		printf("\tAverage time per image:\t%d ms\n\tImages Processed:\t\t%d\n\n", sumTime / (i + 1), i + 1);
 	}
 
 	return EXIT_SUCCESS;
