@@ -98,7 +98,7 @@ Params *loadParameters() {
 
 Image *imageTransform(char *path) {
 	Image *image = (Image *) malloc(sizeof(Image));
-	image->filename = path;
+	image->path = path;
 
 	readFileAndDecompress(image);
 
