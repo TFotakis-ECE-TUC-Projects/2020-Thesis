@@ -164,7 +164,8 @@ void readFileAndDecompress(Image *image) {
 	image->height = cinfo.output_height;
 	image->depth = cinfo.output_components;
 
-	// syslog(LOG_INFO, "Proc: Image is %d by %d with %d components", image->width, image->height, image->depth);
+	//	syslog(LOG_INFO, "Proc: Image is %d by %d with %d components",
+	//	       image->width, image->height, image->depth);
 
 	image->bmp_size = image->width * image->height * image->depth;
 	image->bmp_buffer = (unsigned char *) malloc(image->bmp_size);
@@ -333,7 +334,7 @@ void writeToFile(Image *image) {
  * Concatenates two strings, one after the other
  * @param s1: First string
  * @param s2: Second string
- * @return "s1s2" (e.g. s1 = "example ", s2 = "given", return = "example given")
+ * @returns "s1s2" (e.g. s1 = "example ", s2 = "given", return = "example given")
  */
 char *concat(char *s1, char *s2) {
 	/** Get strings lengths */
@@ -356,9 +357,23 @@ char *concat(char *s1, char *s2) {
 
 
 /**
+ * Checks if given directory entry is current folder or parent folder
+ * @param de
+ * @returns True if directory is current or parent folder
+ */
+boolean isCurrentOrParentFolder(struct dirent *de) {
+	/**
+	 * Current directory name is "."
+	 * Parent directory name is ".."
+	 */
+	return !strcmp(de->d_name, ".") || !strcmp(de->d_name, "..");
+}
+
+
+/**
  * Counts the files existing in the given path's directories
- * @param path
- * @return number of files found
+ * @param[in] path
+ * @returns number of files found
  */
 uint getFileCount(char *path) {
 	/** opendir() returns a pointer of DIR type. */
@@ -373,13 +388,13 @@ uint getFileCount(char *path) {
 	/** Initialize counter */
 	uint count = 0;
 
-	/** Pointer for directory entry */
+	/** Pointer for main directory entry */
 	struct dirent *de;
 
 	/** Read every folder contained in given path */
 	while ((de = readdir(dr)) != NULL) {
-		/** Ignore linux's current (.) and parent (..) folders */
-		if (!strcmp(de->d_name, ".") || !strcmp(de->d_name, "..")) continue;
+		/** Ignore linux's current and parent folders */
+		if (isCurrentOrParentFolder(de)) continue;
 
 		/** Create path for the found inner folder */
 		char *innerPath = concat(path, de->d_name);
@@ -392,8 +407,8 @@ uint getFileCount(char *path) {
 
 		/** Read every file in directory */
 		while ((deInner = readdir(drInner)) != NULL) {
-			/** Ignore linux's current (.) and parent (..) folders */
-			if (!strcmp(deInner->d_name, ".") || !strcmp(deInner->d_name, "..")) continue;
+			/** Ignore linux's current and parent folders */
+			if (isCurrentOrParentFolder(deInner)) continue;
 
 			/** Count up */
 			count++;
@@ -416,60 +431,127 @@ uint getFileCount(char *path) {
 }
 
 
+/**
+ * Reads a path and creates a Filelist which containes all files contained in
+ * the given path's children directories
+ * @param[in] path
+ * @returns Filelist *
+ */
 Filelist *getFileList(char *path) {
+	/** Allocate necessary memory */
 	Filelist *filelist = (Filelist *) malloc(sizeof(Filelist));
-	filelist->length = getFileCount(path);
-	filelist->list = (char **) malloc(filelist->length * sizeof(char *));
-	uint index = 0;
-	DIR *dr = opendir(path);
-	struct dirent *de;
-	while ((de = readdir(dr)) != NULL) {
-		if (!strcmp(de->d_name, ".") || !strcmp(de->d_name, "..")) continue;
 
+	/** Get the number of files contained in path */
+	filelist->length = getFileCount(path);
+
+	/** Allocate necessary memory to store all file paths */
+	filelist->list = (char **) malloc(filelist->length * sizeof(char *));
+
+	/** Initialize filelist->list index */
+	uint index = 0;
+
+	/** Open path's directory */
+	DIR *dr = opendir(path);
+
+	/** Pointer for main directory entry */
+	struct dirent *de;
+
+	/** Read every folder contained in given path */
+	while ((de = readdir(dr)) != NULL) {
+		/** Ignore linux's current and parent folders */
+		if (isCurrentOrParentFolder(de)) continue;
+
+		/** Create path for the found inner folder */
 		char *innerPath = concat(path, de->d_name);
 
+		/** Open inner folder */
 		DIR *drInner = opendir(innerPath);
+
+		/** Pointer for inner directory entry */
 		struct dirent *deInner;
+
+		/** Read every file in directory */
 		while ((deInner = readdir(drInner)) != NULL) {
-			if (!strcmp(deInner->d_name, ".") || !strcmp(deInner->d_name, "..")) continue;
+			/** Ignore linux's current and parent folders */
+			if (isCurrentOrParentFolder(deInner)) continue;
+
+			/** Append trailing slash to inner path */
 			char *tmp = concat(innerPath, "/");
+
+			/** Append found filename to inner path and store it to filelist */
 			filelist->list[index] = concat(tmp, deInner->d_name);
+
+			/** Increase index to point to the next cell */
 			index++;
+
+			/** Free useless temporary string */
 			free(tmp);
 		}
+
+		/** Close inner directory */
 		closedir(drInner);
+
+		/** Free useless innerPath string (it is not assigned anywhere */
 		free(innerPath);
+
+		/** Free useless deInner */
 		free(deInner);
 	}
+
+	/** Close main directory */
 	closedir(dr);
+
+	/** Free main directory entry */
 	free(de);
 
 	return filelist;
 }
 
 
+/**
+ * Upscales an image by copying each given image's pixel to squares of pixels
+ * preserving same ratio. Every input image's pixel gets divided by
+ * upscaleRatio x upscaleRatio pixels of the same value as the initial pixel.
+ * Applicable for every color profile.
+ * @param[in] image: the image to upscale
+ * @param[in] dim: the target minimum dimensions
+ * @returns an image upscaled to at least dim x dim dimensions
+ */
 Image *upScale(Image *image, uint dim) {
+	/**
+	 * Calculate the number of times each dimension (height, width) has to be
+	 * multiplied to get at least dim size
+	 */
 	uint x = dim / image->width + (dim % image->width ? 1 : 0);
 	uint y = dim / image->height + (dim % image->height ? 1 : 0);
 
+	/** Select the biggest multiplier */
 	uint upscaleRatio = x > y ? x : y;
 
+	/** Allocate memory for the new upscaled image */
 	Image *newImage = (Image *) malloc(sizeof(Image));
 
+	/** Initialize newImage's dimensions */
 	newImage->width = image->width * upscaleRatio;
 	newImage->height = image->height * upscaleRatio;
 	newImage->depth = image->depth;
 
+	/** Copy image's path to newImage for future usage */
 	newImage->path = (char *) malloc(strlen(image->path) * sizeof(char));
 	strcpy(newImage->path, image->path);
 
+	/** Allocate memory for newImage's channel matrix representation */
 	initChannelsMatrix(newImage);
 
+	/** For every color channel */
 	for (int k = 0; k < image->depth; k++) {
+		/** For every row */
 		for (int i = 0; i < image->height; i++) {
+			/** For every pixel in a row */
 			for (int j = 0; j < image->width; j++) {
-
+				/** Copy upscaleRatio times the pixel in height */
 				for (int l = 0; l < upscaleRatio; l++) {
+					/** Copy upscaleRatio times the pixel in width */
 					for (int m = 0; m < upscaleRatio; m++) {
 						newImage->channels[k][i * upscaleRatio + l][j * upscaleRatio + m] = image->channels[k][i][j];
 					}
@@ -484,31 +566,89 @@ Image *upScale(Image *image, uint dim) {
 }
 
 
-Image *downScale(Image *image, uint compressionRatio) {
+/**
+ * Downscales an image by creating a pixel from averaging squares of pixels
+ * preserving the same ratio. Every input image's dimension gets divided by the
+ * target dim and then the minimum of the two gets selected as compressionRatio.
+ * The compressionRatio x compressionRatio pixel squares are then averaged to
+ * create a new pixel.
+ * Applicable for every color profile.
+ * @param image: the image to downscale
+ * @param dim: the target dimension
+ * @return an image downscaled to at minimum dim x dim dimensions
+ */
+Image *downScale(Image *image, uint dim) {
+	/**
+	 * Calculate the number of times each dimension (height, width) has to be
+	 * compressed to get at minimum dim size
+	 */
+	uint x = image->width / dim;
+	uint y = image->height / dim;
+
+	/** Select the smallest divisor */
+	uint compressionRatio = x < y ? x : y;
+
+	/**
+	 * If compressionRatio = 1 then no compression is possible so return
+	 * original image
+	 */
+	if (compressionRatio == 1) return image;
+
+	/** Allocate memory for the new downscaled image */
 	Image *newImage = (Image *) malloc(sizeof(Image));
 
+	/** Initialize newImage's dimensions */
 	newImage->width = image->width / compressionRatio + (image->width % compressionRatio ? 1 : 0);
 	newImage->height = image->height / compressionRatio + (image->height % compressionRatio ? 1 : 0);
 	newImage->depth = image->depth;
 
+	/** Copy image's path to newImage for future usage */
 	newImage->path = (char *) malloc(strlen(image->path) * sizeof(char));
 	strcpy(newImage->path, image->path);
 
+	/** Allocate memory for newImage's channel matrix representation */
 	initChannelsMatrix(newImage);
 
+	/** For every color channel */
 	for (int k = 0; k < image->depth; k++) {
+		/** For every row */
 		for (int i = 0; i < newImage->height; i++) {
+			/** For every pixel in a row */
 			for (int j = 0; j < newImage->width; j++) {
+				/**
+				 * Initialize pixel to store the square of pixels' sum to calculate its average
+				 */
 				uint pixel = 0;
+
+				/**
+				 * Initialize counter to count the number of pixels summed so
+				 * that it will then be used to divide the pixel sum to get
+				 * its average
+				 */
 				uint count = 0;
 
+				/**
+				 * For compressionRatio pixels or the number of pixels left on
+				 * the height dimension
+				 */
 				for (int l = 0; l < compressionRatio && (i * compressionRatio + l) < image->height; l++) {
+					/**
+					 * For compressionRatio pixels or the number of pixels left on
+					 * the width dimension
+					 */
 					for (int m = 0; m < compressionRatio && (j * compressionRatio + m) < image->width; m++) {
+						/** Sum up all square's pixels */
 						pixel += image->channels[k][i * compressionRatio + l][j * compressionRatio + m];
+
+						/** Count up one pixel at a time */
 						count++;
 					}
 				}
 
+				/**
+				 * Calculate the pixels' average and store it to the newImage's
+				 * corresponding pixel
+				 */
 				newImage->channels[k][i][j] = pixel / count;
 			}
 		}
@@ -519,44 +659,59 @@ Image *downScale(Image *image, uint compressionRatio) {
 }
 
 
+/**
+ * Resizes an image to closest to dim x dim dimensions by upscaling or
+ * downscaling and preserving initial ratio
+ * @param[in] image: the image to resize
+ * @param[in] dim: the target dimensions
+ * @return resized image
+ */
 Image *imageResize(Image *image, uint dim) {
-	uint x = image->width / dim;
-	uint y = image->height / dim;
-
-	uint compressionRatio;
-	if (x < y) {
-		compressionRatio = x;
-	} else {
-		compressionRatio = y;
+	if (image->width < dim || image->height < dim) {
+		/** If image is smaller in at least one dimension than the target then upscale */
+		return upScale(image, dim);
+	} else if (image->width > dim && image->height > dim) {
+		/** If image is bigger in at both dimensions than the target then downscale */
+		return downScale(image, dim);
 	}
-
-	if (compressionRatio == 1) {
-		syslog(LOG_INFO, "No resizing needed.");
-		return image;
-	}
-
-	if (compressionRatio == 0) return upScale(image, dim);
-	return downScale(image, compressionRatio);
+	/** If at least one dimension is same as target, no resizing is needed */
+	return image;
 }
 
 
+/**
+ * Crops an image to given dim x dim dimensions from the center
+ * @param[in] image: the image to get cropped
+ * @param[in] dim: the target dimensions
+ * @return the cropped dim x dim image
+ */
 Image *imageCenterCrop(Image *image, uint dim) {
+	/** Allocate memory for the new cropped image */
 	Image *newImage = (Image *) malloc(sizeof(Image));
+
+	/** Initialize newImage's dimensions */
 	newImage->width = dim;
 	newImage->height = dim;
 	newImage->depth = image->depth;
 
+	/** Copy image's path to newImage for future usage */
 	newImage->path = (char *) malloc(strlen(image->path) * sizeof(char));
 	strcpy(newImage->path, image->path);
 
+	/** Allocate memory for newImage's channel matrix representation */
 	initChannelsMatrix(newImage);
 
+	/** Initialize starting points for each dimension */
 	int startY = (image->height - dim) / 2;
 	int startX = (image->width - dim) / 2;
 
+	/** For every color channel */
 	for (int k = 0; k < image->depth; k++) {
+		/** For dim rows */
 		for (int i = 0; i < dim; i++) {
+			/** For dim pixels in a row */
 			for (int j = 0; j < dim; j++) {
+				/** Copy original image's pixels to newImage */
 				newImage->channels[k][i][j] = image->channels[k][startY + i][startX + j];
 			}
 		}
