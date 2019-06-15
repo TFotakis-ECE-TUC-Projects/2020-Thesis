@@ -509,6 +509,33 @@ Filelist *getFileList(char *path) {
 
 
 /**
+ * Creates a new image and initializes it
+ * @param depth: new image's color profile
+ * @param height: new image's height
+ * @param width: new image's width
+ * @param path: new image's path
+ * @returns a new initialized image
+ */
+Image *createInitializedImage(uint depth, uint height, uint width, char *path) {
+	/** Allocate memory for the new image */
+	Image *image = (Image *) malloc(sizeof(Image));
+
+	/** Initialize new image's dimensions */
+	image->depth = depth;
+	image->height = height;
+	image->width = width;
+
+	/** Copy path to new image */
+	image->path = (char *) malloc(strlen(path) * sizeof(char));
+	strcpy(image->path, path);
+
+	/** Allocate memory for new image's channel matrix representation */
+	initChannelsMatrix(image);
+	return image;
+}
+
+
+/**
  * Upscales an image by copying each given image's pixel to squares of pixels
  * preserving same ratio. Every input image's pixel gets divided by
  * upscaleRatio x upscaleRatio pixels of the same value as the initial pixel.
@@ -528,20 +555,13 @@ Image *upScale(Image *image, uint dim) {
 	/** Select the biggest multiplier */
 	uint upscaleRatio = x > y ? x : y;
 
-	/** Allocate memory for the new upscaled image */
-	Image *newImage = (Image *) malloc(sizeof(Image));
-
-	/** Initialize newImage's dimensions */
-	newImage->width = image->width * upscaleRatio;
-	newImage->height = image->height * upscaleRatio;
-	newImage->depth = image->depth;
-
-	/** Copy image's path to newImage for future usage */
-	newImage->path = (char *) malloc(strlen(image->path) * sizeof(char));
-	strcpy(newImage->path, image->path);
-
-	/** Allocate memory for newImage's channel matrix representation */
-	initChannelsMatrix(newImage);
+	/** Create the newImage and initialize it */
+	Image *newImage = createInitializedImage(
+			image->depth,
+			image->height * upscaleRatio,
+			image->width * upscaleRatio,
+			image->path
+	);
 
 	/** For every color channel */
 	for (int k = 0; k < image->depth; k++) {
@@ -594,20 +614,13 @@ Image *downScale(Image *image, uint dim) {
 	 */
 	if (compressionRatio == 1) return image;
 
-	/** Allocate memory for the new downscaled image */
-	Image *newImage = (Image *) malloc(sizeof(Image));
-
-	/** Initialize newImage's dimensions */
-	newImage->width = image->width / compressionRatio + (image->width % compressionRatio ? 1 : 0);
-	newImage->height = image->height / compressionRatio + (image->height % compressionRatio ? 1 : 0);
-	newImage->depth = image->depth;
-
-	/** Copy image's path to newImage for future usage */
-	newImage->path = (char *) malloc(strlen(image->path) * sizeof(char));
-	strcpy(newImage->path, image->path);
-
-	/** Allocate memory for newImage's channel matrix representation */
-	initChannelsMatrix(newImage);
+	/** Create the newImage and initialize it */
+	Image *newImage = createInitializedImage(
+			image->depth,
+			image->height / compressionRatio + (image->height % compressionRatio ? 1 : 0),
+			image->width / compressionRatio + (image->width % compressionRatio ? 1 : 0),
+			image->path
+	);
 
 	/** For every color channel */
 	for (int k = 0; k < image->depth; k++) {
@@ -686,20 +699,8 @@ Image *imageResize(Image *image, uint dim) {
  * @return the cropped dim x dim image
  */
 Image *imageCenterCrop(Image *image, uint dim) {
-	/** Allocate memory for the new cropped image */
-	Image *newImage = (Image *) malloc(sizeof(Image));
-
-	/** Initialize newImage's dimensions */
-	newImage->width = dim;
-	newImage->height = dim;
-	newImage->depth = image->depth;
-
-	/** Copy image's path to newImage for future usage */
-	newImage->path = (char *) malloc(strlen(image->path) * sizeof(char));
-	strcpy(newImage->path, image->path);
-
-	/** Allocate memory for newImage's channel matrix representation */
-	initChannelsMatrix(newImage);
+	/** Create the newImage and initialize it */
+	Image *newImage = createInitializedImage(image->depth, dim, dim, image->path);
 
 	/** Initialize starting points for each dimension */
 	int startY = (image->height - dim) / 2;
