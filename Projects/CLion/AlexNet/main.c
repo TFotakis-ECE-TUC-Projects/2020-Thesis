@@ -1,6 +1,6 @@
 //#define WRITE_TRANSFORMED_IMAGE_TO_FILE
 //#define ENABLE_LOGGING
-#define SKIP_CHECKING
+//#define SKIP_CHECKING
 
 #include <omp.h>
 #include <time.h>
@@ -122,53 +122,33 @@ Image *imageTransform(char *path) {
 
 
 FloatMatrix *forward(Params *params, FloatMatrix *x) {
-	printMinMaxSum(x, "Input \t| ");
-	x = Conv2d(x, params->matrix[0], params->matrix[1], 3, 64, 11, 4, 2);
-	printMinMaxSum(x, "Conv2d 1\t| ");
-	x = ReLU(x);
-	printMinMaxSum(x, "ReLU 1\t\t| ");
-	x = MaxPool2d(x, 3, 2);
-	printMinMaxSum(x, "MaxPool2d 1\t| ");
+	x = Conv2d(x, params->matrix[0], params->matrix[1], 3, 64, 11, 4, 2, "Conv2d 1");
+	x = ReLU(x, "ReLU 1");
+	x = MaxPool2d(x, 3, 2, "MaxPool2d 1");
 
-	x = Conv2d(x, params->matrix[2], params->matrix[3], 64, 192, 5, 1, 2);
-	printMinMaxSum(x, "Conv2d 2\t| ");
-	x = ReLU(x);
-	printMinMaxSum(x, "ReLU 2\t\t| ");
-	x = MaxPool2d(x, 3, 2);
-	printMinMaxSum(x, "MaxPool2d 2\t| ");
+	x = Conv2d(x, params->matrix[2], params->matrix[3], 64, 192, 5, 1, 2, "Conv2d 2");
+	x = ReLU(x, "ReLU 2");
+	x = MaxPool2d(x, 3, 2, "MaxPool2d 2");
 
-	x = Conv2d(x, params->matrix[4], params->matrix[5], 192, 384, 3, 1, 1);
-	printMinMaxSum(x, "Conv2d 3\t| ");
-	x = ReLU(x);
-	printMinMaxSum(x, "ReLU 3\t\t| ");
+	x = Conv2d(x, params->matrix[4], params->matrix[5], 192, 384, 3, 1, 1, "Conv2d 3");
+	x = ReLU(x, "ReLU 3");
 
-	x = Conv2d(x, params->matrix[6], params->matrix[7], 384, 256, 3, 1, 1);
-	printMinMaxSum(x, "Conv2d 4\t| ");
-	x = ReLU(x);
-	printMinMaxSum(x, "ReLU 4\t\t| ");
+	x = Conv2d(x, params->matrix[6], params->matrix[7], 384, 256, 3, 1, 1, "Conv2d 4");
+	x = ReLU(x, "ReLU 4");
 
-	x = Conv2d(x, params->matrix[8], params->matrix[9], 256, 256, 3, 1, 1);
-	printMinMaxSum(x, "Conv2d 5\t| ");
-	x = ReLU(x);
-	printMinMaxSum(x, "ReLU 5\t\t| ");
-	x = MaxPool2d(x, 3, 2);
-	printMinMaxSum(x, "MaxPool2d 5\t| ");
+	x = Conv2d(x, params->matrix[8], params->matrix[9], 256, 256, 3, 1, 1, "Conv2d 5");
+	x = ReLU(x, "ReLU 5");
+	x = MaxPool2d(x, 3, 2, "MaxPool2d 5");
 
-	x = Linear(x, params->matrix[10], params->matrix[11], 256 * 6 * 6, 4096);
-	printMinMaxSum(x, "Linear 6\t| ");
-	x = ReLU(x);
-	printMinMaxSum(x, "ReLU 6\t\t| ");
+	x = Linear(x, params->matrix[10], params->matrix[11], 256 * 6 * 6, 4096, "Linear 6");
+	x = ReLU(x, "ReLU 6");
 
-	x = Linear(x, params->matrix[12], params->matrix[13], 4096, 4096);
-	printMinMaxSum(x, "Linear 7\t| ");
-	x = ReLU(x);
-	printMinMaxSum(x, "ReLU 7\t\t| ");
+	x = Linear(x, params->matrix[12], params->matrix[13], 4096, 4096, "Linear 7");
+	x = ReLU(x, "ReLU 7");
 
-	x = Linear(x, params->matrix[14], params->matrix[15], 4096, 1000);
-	printMinMaxSum(x, "Linear 8\t| ");
+	x = Linear(x, params->matrix[14], params->matrix[15], 4096, 1000, "Linear 8");
 
-	x = LogSoftMax(x);
-	printMinMaxSum(x, "LogSoftMax\t| ");
+	x = LogSoftMax(x, "LogSoftMax");
 
 	syslog(LOG_INFO, "Done forward pass.");
 	return x;

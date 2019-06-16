@@ -1,4 +1,4 @@
-FloatMatrix *Conv2d(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias, uint in_channels, uint out_channels, uint kernel_size, uint stride, uint padding) {
+FloatMatrix *Conv2d(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias, uint in_channels, uint out_channels, uint kernel_size, uint stride, uint padding, char *layerName) {
 	FloatMatrix *tmp = zero3DFloatMatrix(x->dims[0], x->dims[1] + 2 * padding, x->dims[2] + 2 * padding);
 #ifdef _OMP_H
 #pragma omp parallel for
@@ -46,21 +46,33 @@ FloatMatrix *Conv2d(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias, uin
 	freeFloatMatrix(tmp);
 
 	syslog(LOG_INFO, "Conv2D: Done with %u x %u x %u.", res->dims[0], res->dims[1], res->dims[2]);
+
+#ifndef SKIP_CHECKING
+	printf("%s | ", layerName);
+	printMinMaxSum(res);
+#endif
+
 	return res;
 }
 
 
-FloatMatrix *ReLU(FloatMatrix *x) {
+FloatMatrix *ReLU(FloatMatrix *x, char *layerName) {
 	uint xLen = flattenDimensions(x);
 	for (int i = 0; i < xLen; i++) {
 		x->matrix[i] = x->matrix[i] < 0 ? 0 : x->matrix[i];
 	}
 	syslog(LOG_INFO, "ReLU: Done.");
+
+#ifndef SKIP_CHECKING
+	printf("%s | ", layerName);
+	printMinMaxSum(x);
+#endif
+
 	return x;
 }
 
 
-FloatMatrix *MaxPool2d(FloatMatrix *x, uint kernel_size, uint stride) {
+FloatMatrix *MaxPool2d(FloatMatrix *x, uint kernel_size, uint stride, char *layerName) {
 	FloatMatrix *res = zero3DFloatMatrix(x->dims[0], (x->dims[1] - kernel_size) / stride + 1, (x->dims[2] - kernel_size) / stride + 1);
 #ifdef _OMP_H
 #pragma omp parallel for
@@ -87,11 +99,17 @@ FloatMatrix *MaxPool2d(FloatMatrix *x, uint kernel_size, uint stride) {
 	freeFloatMatrix(x);
 
 	syslog(LOG_INFO, "MaxPool2D: Done with %u x %u x %u.", res->dims[0], res->dims[1], res->dims[2]);
+
+#ifndef SKIP_CHECKING
+	printf("%s | ", layerName);
+	printMinMaxSum(res);
+#endif
+
 	return res;
 }
 
 
-FloatMatrix *Linear(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias, uint in_features, uint out_features) {
+FloatMatrix *Linear(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias, uint in_features, uint out_features, char *layerName) {
 	FloatMatrix *res = create1DFloatMatrix(out_features);
 #ifdef _OMP_H
 #pragma omp parallel for
@@ -104,11 +122,17 @@ FloatMatrix *Linear(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias, uin
 	freeFloatMatrix(x);
 
 	syslog(LOG_INFO, "Linear: Done with %u nodes.", res->dims[0]);
+
+#ifndef SKIP_CHECKING
+	printf("%s | ", layerName);
+	printMinMaxSum(res);
+#endif
+
 	return res;
 }
 
 
-FloatMatrix *LogSoftMax(FloatMatrix *x) {
+FloatMatrix *LogSoftMax(FloatMatrix *x, char *layerName) {
 	FloatMatrix *res = create1DFloatMatrix(flattenDimensions(x));
 	matrix_t sum = 0;
 	for (int i = 0; i < res->dims[0]; i++) {
@@ -121,5 +145,11 @@ FloatMatrix *LogSoftMax(FloatMatrix *x) {
 	freeFloatMatrix(x);
 
 	syslog(LOG_INFO, "LogSoftMax: Done.");
+
+#ifndef SKIP_CHECKING
+	printf("%s | ", layerName);
+	printMinMaxSum(res);
+#endif
+
 	return res;
 }
