@@ -162,7 +162,9 @@ FloatMatrix *create1DFloatMatrix(uint dim) {
  */
 void printMatrix(FloatMatrix *x) {
 	uint xLen = flattenDimensions(x);
-	for (int i = 0; i < xLen; i++) printf("index: %u | value: %lf\n", i, x->matrix[i]);
+	for (int i = 0; i < xLen; i++) {
+		printf("index: %u | value: %lf\n", i, x->matrix[i]);
+	}
 	printf("\n\n\n");
 }
 
@@ -215,7 +217,8 @@ FloatMatrix *ImageToFloatMatrix(Image *image) {
 	x->dims[2] = image->width;
 
 	/** Allocate matrix's buffer memory to store the given image */
-	x->matrix = (matrix_t *) malloc(image->depth * image->height * image->width * sizeof(matrix_t));
+	x->matrix = (matrix_t *) malloc(image->depth * image->height *
+			image->width * sizeof(matrix_t));
 
 	/** Initialize buffer's index */
 	uint index = 0;

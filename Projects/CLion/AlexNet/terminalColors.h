@@ -1,8 +1,8 @@
 /**
- * Contains definitions of terminal color characters
- * Use by printing the color character before the
- * string to be colored. Do not forget to reset the
- * buffer back to normal colors by using the KNRM
+ * Contains definitions of terminal color characters.
+ *
+ * Use by printing the color character before the string to be colored.
+ * Do not forget to reset the buffer back to normal colors by using the KNRM
  * character.
  *
  * Example:

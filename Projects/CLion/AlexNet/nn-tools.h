@@ -20,7 +20,7 @@ FloatMatrix *Conv2d(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias,
 	 * padded input
 	 */
 	FloatMatrix *tmp = zero3DFloatMatrix(x->dims[0], x->dims[1] + 2 * padding,
-			x->dims[2] + 2 * padding);
+	                                     x->dims[2] + 2 * padding);
 
 	/** If OpenMP is defined parallelize the for loop */
 #ifdef _OMP_H
@@ -42,7 +42,8 @@ FloatMatrix *Conv2d(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias,
 				 * Calculate the 1-dimensional representation's index of
 				 * the padded matrix
 				 */
-				uint arrIndex = calc3DIndex(tmp->dims, i, j + padding, k + padding);
+				uint arrIndex = calc3DIndex(tmp->dims, i, j + padding,
+				                            k + padding);
 
 				/** Copy input's pixel to padded matrix */
 				tmp->matrix[arrIndex] = x->matrix[index];
@@ -51,7 +52,8 @@ FloatMatrix *Conv2d(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias,
 	}
 
 	/** Allocate and initialize a 3D zeros matrix to store the result */
-	FloatMatrix *res = zero3DFloatMatrix(out_channels,
+	FloatMatrix *res = zero3DFloatMatrix(
+			out_channels,
 			(x->dims[1] + 2 * padding - kernel_size) / stride + 1,
 			(x->dims[2] + 2 * padding - kernel_size) / stride + 1);
 
@@ -84,14 +86,16 @@ FloatMatrix *Conv2d(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias,
 							 * Calculate the 1-dimensional representation's
 							 * index of the kernel's matrix
 							 */
-							uint weightsIndex = calc4DIndex(weights->dims,
+							uint weightsIndex = calc4DIndex(
+									weights->dims,
 									out_channel, in_channel, i, j);
 
 							/**
 							 * Calculate the 1-dimensional representation's
 							 * index of the padded matrix
 							 */
-							uint arrIndex = calc3DIndex(tmp->dims, in_channel,
+							uint arrIndex = calc3DIndex(
+									tmp->dims, in_channel,
 									i + imgStartH, j + imgStartW);
 
 							/** Calculate dot product of the two matrices */
@@ -119,7 +123,7 @@ FloatMatrix *Conv2d(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias,
 	freeFloatMatrix(tmp);
 
 	syslog(LOG_INFO, "Conv2D: Done with %u x %u x %u.", res->dims[0],
-			res->dims[1], res->dims[2]);
+	       res->dims[1], res->dims[2]);
 
 #ifndef SKIP_CHECKING
 	/** Print min max and sum of the whole matrix for debugging */
@@ -172,9 +176,10 @@ FloatMatrix *ReLU(FloatMatrix *x, char *layerName) {
 FloatMatrix *MaxPool2d(FloatMatrix *x, uint kernel_size, uint stride,
                        char *layerName) {
 	/** Allocate and initialize a 3D zeros matrix to store the result */
-	FloatMatrix *res = zero3DFloatMatrix(x->dims[0],
-	                                     (x->dims[1] - kernel_size) / stride + 1,
-	                                     (x->dims[2] - kernel_size) / stride + 1);
+	FloatMatrix *res = zero3DFloatMatrix(
+			x->dims[0],
+			(x->dims[1] - kernel_size) / stride + 1,
+			(x->dims[2] - kernel_size) / stride + 1);
 
 	/** If OpenMP is defined parallelize the for loop */
 #ifdef _OMP_H
@@ -225,7 +230,7 @@ FloatMatrix *MaxPool2d(FloatMatrix *x, uint kernel_size, uint stride,
 	freeFloatMatrix(x);
 
 	syslog(LOG_INFO, "MaxPool2D: Done with %u x %u x %u.", res->dims[0],
-			res->dims[1], res->dims[2]);
+	       res->dims[1], res->dims[2]);
 
 #ifndef SKIP_CHECKING
 	/** Print min max and sum of the whole matrix for debugging */

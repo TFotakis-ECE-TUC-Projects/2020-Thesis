@@ -236,10 +236,12 @@ void initChannelsMatrix(Image *image) {
 	image->channels = (u_int8_t ***) malloc(image->depth * sizeof(u_int8_t *));
 	for (int i = 0; i < image->depth; ++i) {
 		/** Initialize every color channel to store all image's rows */
-		image->channels[i] = (u_int8_t **) malloc(image->height * sizeof(u_int8_t *));
+		image->channels[i] = (u_int8_t **)
+				malloc(image->height * sizeof(u_int8_t *));
 		for (int j = 0; j < image->height; j++) {
 			/** Initialize every row to store all row's pixels */
-			image->channels[i][j] = (u_int8_t *) malloc(image->width * sizeof(u_int8_t));
+			image->channels[i][j] = (u_int8_t *)
+					malloc(image->width * sizeof(u_int8_t));
 		}
 	}
 }
@@ -260,7 +262,8 @@ void convertToMatrix(Image *image) {
 		for (int j = 0; j < image->width; j++) {
 			/** For every color channel */
 			for (int k = 0; k < image->depth; k++) {
-				image->channels[k][i][j] = image->bmp_buffer[k + j * image->depth + i * image->width * image->depth];
+				image->channels[k][i][j] = image->bmp_buffer
+				[k + j * image->depth + i * image->width * image->depth];
 			}
 		}
 	}
@@ -284,7 +287,8 @@ void convertToBuffer(Image *image) {
 	image->bmp_size = image->depth * image->width * image->height;
 
 	/** Allocate needed memory */
-	image->bmp_buffer = (unsigned char *) malloc(image->bmp_size * sizeof(unsigned char));
+	image->bmp_buffer = (unsigned char *)
+			malloc(image->bmp_size * sizeof(unsigned char));
 
 	uint index = 0;
 	/** For every row */
@@ -573,15 +577,16 @@ Image *upScale(Image *image, uint dim) {
 				for (int l = 0; l < upscaleRatio; l++) {
 					/** Copy upscaleRatio times the pixel in width */
 					for (int m = 0; m < upscaleRatio; m++) {
-						newImage->channels[k][i * upscaleRatio + l][j * upscaleRatio + m] = image->channels[k][i][j];
+						newImage->channels[k][i * upscaleRatio + l]
+						[j * upscaleRatio + m] = image->channels[k][i][j];
 					}
 				}
-
 			}
 		}
 	}
 
-	syslog(LOG_INFO, "Done upscaling image with %u ratio. New image width: %u, height: %u", upscaleRatio, newImage->width, newImage->height);
+	syslog(LOG_INFO, "Done upscaling image with %u ratio. New image width: %u, "
+	                 "height: %u", upscaleRatio, newImage->width, newImage->height);
 	return newImage;
 }
 
@@ -589,8 +594,8 @@ Image *upScale(Image *image, uint dim) {
 /**
  * Downscales an image by creating a pixel from averaging squares of pixels
  * preserving the same ratio. Every input image's dimension gets divided by the
- * target dim and then the minimum of the two gets selected as compressionRatio.
- * The compressionRatio x compressionRatio pixel squares are then averaged to
+ * target dim and then the minimum of the two gets selected as compRatio.
+ * The compRatio x compRatio pixel squares are then averaged to
  * create a new pixel.
  * Applicable for every color profile.
  * @param image: the image to downscale
@@ -606,19 +611,19 @@ Image *downScale(Image *image, uint dim) {
 	uint y = image->height / dim;
 
 	/** Select the smallest divisor */
-	uint compressionRatio = x < y ? x : y;
+	uint compRatio = x < y ? x : y;
 
 	/**
-	 * If compressionRatio = 1 then no compression is possible so return
+	 * If compRatio = 1 then no compression is possible so return
 	 * original image
 	 */
-	if (compressionRatio == 1) return image;
+	if (compRatio == 1) return image;
 
 	/** Create the newImage and initialize it */
 	Image *newImage = createInitializedImage(
 			image->depth,
-			image->height / compressionRatio + (image->height % compressionRatio ? 1 : 0),
-			image->width / compressionRatio + (image->width % compressionRatio ? 1 : 0),
+			image->height / compRatio + (image->height % compRatio ? 1 : 0),
+			image->width / compRatio + (image->width % compRatio ? 1 : 0),
 			image->path
 	);
 
@@ -629,7 +634,8 @@ Image *downScale(Image *image, uint dim) {
 			/** For every pixel in a row */
 			for (int j = 0; j < newImage->width; j++) {
 				/**
-				 * Initialize pixel to store the square of pixels' sum to calculate its average
+				 * Initialize pixel to store the square of pixels' sum to
+				 * calculate its average
 				 */
 				uint pixel = 0;
 
@@ -641,17 +647,17 @@ Image *downScale(Image *image, uint dim) {
 				uint count = 0;
 
 				/**
-				 * For compressionRatio pixels or the number of pixels left on
+				 * For compRatio pixels or the number of pixels left on
 				 * the height dimension
 				 */
-				for (int l = 0; l < compressionRatio && (i * compressionRatio + l) < image->height; l++) {
+				for (int l = 0; l < compRatio && (i * compRatio + l) < image->height; l++) {
 					/**
-					 * For compressionRatio pixels or the number of pixels left on
+					 * For compRatio pixels or the number of pixels left on
 					 * the width dimension
 					 */
-					for (int m = 0; m < compressionRatio && (j * compressionRatio + m) < image->width; m++) {
+					for (int m = 0; m < compRatio && (j * compRatio + m) < image->width; m++) {
 						/** Sum up all square's pixels */
-						pixel += image->channels[k][i * compressionRatio + l][j * compressionRatio + m];
+						pixel += image->channels[k][i * compRatio + l][j * compRatio + m];
 
 						/** Count up one pixel at a time */
 						count++;
@@ -667,7 +673,7 @@ Image *downScale(Image *image, uint dim) {
 		}
 	}
 
-	syslog(LOG_INFO, "Done compressing image with %u ratio.", compressionRatio);
+	syslog(LOG_INFO, "Done compressing image with %u ratio.", compRatio);
 	return newImage;
 }
 
