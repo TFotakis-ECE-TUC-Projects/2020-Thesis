@@ -1,7 +1,3 @@
-//#define WRITE_TRANSFORMED_IMAGE_TO_FILE
-//#define ENABLE_LOGGING
-//#define SKIP_CHECKING
-
 #include <omp.h>
 #include <time.h>
 #include <math.h>
@@ -14,6 +10,10 @@
 #include <dirent.h>
 #include <jpeglib.h>
 #include <string.h>
+
+#define WRITE_TRANSFORMED_IMAGE_TO_FILE
+#define ENABLE_LOGGING
+#define ENABLE_CHECKING
 
 #include "imageUtils.h"
 #include "floatMatrix-tools.h"

@@ -125,7 +125,7 @@ FloatMatrix *Conv2d(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias,
 	syslog(LOG_INFO, "Conv2D: Done with %u x %u x %u.", res->dims[0],
 	       res->dims[1], res->dims[2]);
 
-#ifndef SKIP_CHECKING
+#ifdef ENABLE_CHECKING
 	/** Print min max and sum of the whole matrix for debugging */
 	printf("%s | ", layerName);
 	printMinMaxSum(res);
@@ -153,7 +153,7 @@ FloatMatrix *ReLU(FloatMatrix *x, char *layerName) {
 	syslog(LOG_INFO, "ReLU: Done.");
 
 
-#ifndef SKIP_CHECKING
+#ifdef ENABLE_CHECKING
 	/** Print min max and sum of the whole matrix for debugging */
 	printf("%s | ", layerName);
 	printMinMaxSum(x);
@@ -232,7 +232,7 @@ FloatMatrix *MaxPool2d(FloatMatrix *x, uint kernel_size, uint stride,
 	syslog(LOG_INFO, "MaxPool2D: Done with %u x %u x %u.", res->dims[0],
 	       res->dims[1], res->dims[2]);
 
-#ifndef SKIP_CHECKING
+#ifdef ENABLE_CHECKING
 	/** Print min max and sum of the whole matrix for debugging */
 	printf("%s | ", layerName);
 	printMinMaxSum(res);
@@ -278,7 +278,7 @@ FloatMatrix *Linear(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias,
 
 	syslog(LOG_INFO, "Linear: Done with %u nodes.", res->dims[0]);
 
-#ifndef SKIP_CHECKING
+#ifdef ENABLE_CHECKING
 	/** Print min max and sum of the whole matrix for debugging */
 	printf("%s | ", layerName);
 	printMinMaxSum(res);
@@ -316,7 +316,7 @@ FloatMatrix *LogSoftMax(FloatMatrix *x, char *layerName) {
 
 	syslog(LOG_INFO, "LogSoftMax: Done.");
 
-#ifndef SKIP_CHECKING
+#ifdef ENABLE_CHECKING
 	/** Print min max and sum of the whole matrix for debugging */
 	printf("%s | ", layerName);
 	printMinMaxSum(res);
