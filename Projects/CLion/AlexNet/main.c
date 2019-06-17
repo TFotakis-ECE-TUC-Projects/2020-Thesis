@@ -21,12 +21,30 @@
 /** Enable checking of each layer's output matrix by printing matrix's Min, Max, Sum */
 //#define ENABLE_CHECKING
 
-/** Enable multiprocessing using OpenMP library */
-#define ENABLE_OPENMP
+/**
+ * Use multiprocessing with the OpenMP library.
+ * Assign to ENABLE_OPENMP flag the values 0, 1 or 2 corresponding to the
+ * actions described below.
+ *
+ * 0: No multiprocessing
+ *
+ * 1: Layer level multiprocessing (Process in parallel Conv2d, MaxPool2d and
+ * Linear network's operations)
+ *
+ * 2: Image level multiprocessing (Pass through the network in parallel
+ * multiple images)
+ */
+#define ENABLE_OPENMP 2
 
-#ifdef ENABLE_OPENMP
+
+/** Include omp.h only if OpenMP is used */
+#if ENABLE_OPENMP != 0
+
 #include <omp.h>
+
 #endif
+
+
 #include "imageUtils.h"
 #include "floatMatrix-tools.h"
 #include "nn-tools.h"
@@ -73,7 +91,8 @@ uint timedif(struct timespec *start, struct timespec *stop) {
 	 * Get the time difference in nanoseconds and convert it to milliseconds.
 	 * Add the above number to get the total milliseconds difference.
 	 */
-	return ((int) ((stop->tv_sec - start->tv_sec) * 1000) + (int) ((stop->tv_nsec - start->tv_nsec) / 1000000));
+	return ((int) ((stop->tv_sec - start->tv_sec) * 1000) +
+	        (int) ((stop->tv_nsec - start->tv_nsec) / 1000000));
 }
 
 
@@ -181,7 +200,8 @@ Image *imageTransform(char *path) {
 	Image *image = (Image *) malloc(sizeof(Image));
 
 	/** Copy the path to the image's path field */
-	image->path = path;
+	image->path = (char *) malloc(strlen(path) * sizeof(char));
+	strcpy(image->path, path);
 
 	/** Read the jpeg file and decompress it */
 	readFileAndDecompress(image);
@@ -216,6 +236,14 @@ Image *imageTransform(char *path) {
 }
 
 
+/**
+ * Runs the network's forward pass
+ * @param[in] params: the network's parameters sets
+ * @param[in] x: the input image to get classified
+ * @returns a FloatMatrix containing the network's classification estimates,
+ * that is an array of matrix_t numbers, one for each class, which shows how
+ * likely it is for the input image to be of a class in a logarithmic scale.
+ */
 FloatMatrix *forward(Params *params, FloatMatrix *x) {
 	x = Conv2d(x, params->matrix[0], params->matrix[1], 3, 64, 11, 4, 2, "Conv2d 1");
 	x = ReLU(x, "ReLU 1");
@@ -250,58 +278,121 @@ FloatMatrix *forward(Params *params, FloatMatrix *x) {
 }
 
 
+/**
+ * Takes an image and passes it through the network to classify it and print its
+ * label. It also measures the time in milliseconds for the forward pass to
+ * complete.
+ * @param[in] path: The image's path to pass the network
+ * @param[in] params: The network's parameters
+ * @param[in] labels: The network's classes' labels
+ * @returns the time needed in milliseconds for the forward pass to complete.
+ */
 uint inference(char *path, Params *params, char **labels) {
+	/** Define the timestamps */
 	struct timespec startTime, endTime;
 
+	/**
+	 * Get the path's jpeg image file transformed and ready for the network's
+	 * specifications
+	 */
 	Image *image = imageTransform(path);
-	FloatMatrix *x = ImageToFloatMatrix(image);
-	freeImageChannels(image);
-	free(image);
 
+	/**
+	 * Convert the transformed image to a FloatMatrix representation, which the
+	 * network can work with
+	 */
+	FloatMatrix *x = ImageToFloatMatrix(image);
+
+	/** Free the now useless image structure */
+	freeImage(image);
+
+	/** Get the starting timestamp */
 	clock_gettime(CLOCK_REALTIME, &startTime);
 
+	/** Pass the image through the network */
 	x = forward(params, x);
 
+	/** Get the finishing timestamp */
 	clock_gettime(CLOCK_REALTIME, &endTime);
 
+	/** Calculate the time needed for the forward pass to complete */
 	uint timeNeeded = timedif(&startTime, &endTime);
 
+	/** Find the class with the greatest likelihood and print its label */
 	uint topClass = argmax(x);
-	printf("* Image contains: %s%s%s\n\tResult in:\t\t\t\t%d ms\n", KGRN, labels[topClass], KNRM, timeNeeded);
+	printf("* Processed image: %s\n"
+	       "\tImage contains: %s%s%s\n"
+	       "\tResult in:\t\t\t\t%d ms\n",
+	       path, KGRN, labels[topClass], KNRM, timeNeeded);
 
+	/**
+	 * Free the forward pass's resulting FloatMatrix as it is no longer needed
+	 * to avoid memory leaks
+	 */
 	freeFloatMatrix(x);
 	return timeNeeded;
 }
 
 
+/**
+ * Classifies the images contained in the dataDir variable or in the given
+ * arguments when calling this program. Prints the class each image is
+ * classified to and the time needed for the classification process to complete.
+ * @param[in] argc: the arguments number
+ * @param[in] argv: the program's arguments
+ * @returns EXIT_SUCCESS (0) if no issue occured.
+ */
 int main(int argc, char *argv[]) {
 #ifdef ENABLE_LOGGING
+	/** Enable logging for debugging */
+	/** Allocate memory to hold this program's path */
 	char *syslog_prefix = (char *) malloc(1024);
+	/** Copy this program's path */
 	sprintf(syslog_prefix, "%s", argv[0]);
+	/** Enable logging */
 	openlog(syslog_prefix, LOG_PERROR | LOG_PID, LOG_USER);
 #endif
 
-//	FloatMatrix *tmp = zero3DFloatMatrix(10, 10, 10);
-//	argmax(tmp);
-//	freeFloatMatrix(tmp);
-//	return EXIT_SUCCESS;
-
+	/** If one argument given use it as a dataDir path */
 	if (argc == 2) dataDir = argv[1];
 
+	/** Get all files' paths contained in dataDir */
 	Filelist *fileList = getFileList(dataDir);
 	printf("- Loading file list: %s✓%s\n", KGRN, KNRM);
+
+	/** Load network's labels using the labelsPath's file */
 	char **labels = loadLabels();
+
+	/** Load networks parameters using the parametersPath's file */
 	Params *params = loadParameters();
+
 	printf("- %sStarting inference...\n\n%s", KBLU, KNRM);
 
+	/** Initialize the total time needed to process all files */
 	uint sumTime = 0;
-#ifdef ENABLE_OPENMP
-	//#pragma omp parallel for
+
+#if ENABLE_OPENMP == 2
+	/** Parallel inferences using multiple images. */
+	#pragma omp parallel for
 #endif
+	/** For every image in file list */
 	for (int i = 0; i < fileList->length; i++) {
-		printf("* Processing image: %s\n", fileList->list[i]);
+		/**
+		 * Pass the image through the network and add the time needed for the
+		 * network's completion to the total time. Finally, print the average
+		 * time needed per image and the number of images that have been
+		 * processed.
+		 */
 		sumTime += inference(fileList->list[i], params, labels);
-		printf("\tAverage time per image:\t%d ms\n\tImages Processed:\t\t%d\n\n", sumTime / (i + 1), i + 1);
+
+#if ENABLE_OPENMP == 1
+		/** This is valid only for no or for layer level multiprocessing */
+		printf("\tAverage time per image:\t%d ms\n", sumTime / (i + 1));
+		printf("\tImages Processed:\t\t%d\n\n", i + 1);
+#endif
+#if ENABLE_OPENMP == 2
+		printf("\n");
+#endif
 	}
 
 	return EXIT_SUCCESS;
