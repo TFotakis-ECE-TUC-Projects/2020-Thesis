@@ -23,7 +23,7 @@ FloatMatrix *Conv2d(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias,
 	                                     x->dims[2] + 2 * padding);
 
 	/** If OpenMP is defined parallelize the for loop */
-#ifdef _OMP_H
+#ifdef ENABLE_OPENMP
 #pragma omp parallel for
 #endif
 	/** For every channel */
@@ -61,7 +61,7 @@ FloatMatrix *Conv2d(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias,
 	freeFloatMatrix(x);
 
 	/** If OpenMP is defined parallelize the for loop */
-#ifdef _OMP_H
+#ifdef ENABLE_OPENMP
 #pragma omp parallel for
 #endif
 	/** For every output channel */
@@ -182,7 +182,7 @@ FloatMatrix *MaxPool2d(FloatMatrix *x, uint kernel_size, uint stride,
 			(x->dims[2] - kernel_size) / stride + 1);
 
 	/** If OpenMP is defined parallelize the for loop */
-#ifdef _OMP_H
+#ifdef ENABLE_OPENMP
 #pragma omp parallel for
 #endif
 	/** For every channel */
@@ -258,7 +258,7 @@ FloatMatrix *Linear(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias,
 	FloatMatrix *res = create1DFloatMatrix(out_features);
 
 	/** If OpenMP is defined parallelize the for loop */
-#ifdef _OMP_H
+#ifdef ENABLE_OPENMP
 #pragma omp parallel for
 #endif
 	/** For every output feature */
