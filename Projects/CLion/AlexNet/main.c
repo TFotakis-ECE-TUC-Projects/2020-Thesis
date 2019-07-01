@@ -34,7 +34,7 @@
  * 2: Image level multiprocessing (Pass through the network in parallel
  * multiple images)
  */
-#define ENABLE_OPENMP 2
+#define ENABLE_OPENMP 1
 
 
 /** Include omp.h only if OpenMP is used */
@@ -43,6 +43,15 @@
 #include <omp.h>
 
 #endif
+
+
+/**
+ * Define to use pretransformed images in .ppm ASCII files, resized to 224x224^ and cropped to 224x244.
+ */
+#define USE_PRETRANSFORMED_IMAGES
+
+
+//#define PRINT_TIMINGS
 
 
 #include "imageUtils.h"
@@ -56,7 +65,12 @@
  * On the dataDir should contain folders named after the label of the images
  * they contain.
  */
+#ifdef USE_PRETRANSFORMED_IMAGES
+char *dataDir = "/home/tzanis/Workspace/Thesis/Projects/PyCharm/Data/ConvertAlexNet/Cat_Dog_data/pretransformed/test/";
+#else
 char *dataDir = "/home/tzanis/Workspace/Thesis/Projects/PyCharm/Data/ConvertAlexNet/Cat_Dog_data/test/";
+#endif
+
 
 /**
  * The path where the parameters file exists. The Parameters file contains the
@@ -236,6 +250,25 @@ Image *imageTransform(char *path) {
 }
 
 
+FloatMatrix *loadPretransformedImage(char *path) {
+	FILE *f = fopen(path, "r");
+	fscanf(f, "P6\n224 224\n255\n");
+
+	FloatMatrix *x = zero3DFloatMatrix(3, 224, 224);
+	for (int w = 0; w < 224; w++) {
+		for (int h = 0; h < 224; h++) {
+			for (int c = 0; c < 3; c++) {
+				unsigned int color;
+				fscanf(f, "%u", &color);
+				uint index = calc3DIndex(x->dims, c, h, w);
+				x->matrix[index] = color / 255.0;
+			}
+		}
+	}
+	return x;
+}
+
+
 /**
  * Runs the network's forward pass
  * @param[in] params: the network's parameters sets
@@ -291,6 +324,9 @@ uint inference(char *path, Params *params, char **labels) {
 	/** Define the timestamps */
 	struct timespec startTime, endTime;
 
+#ifdef USE_PRETRANSFORMED_IMAGES
+	FloatMatrix *x = loadPretransformedImage(path);
+#else
 	/**
 	 * Get the path's jpeg image file transformed and ready for the network's
 	 * specifications
@@ -305,6 +341,7 @@ uint inference(char *path, Params *params, char **labels) {
 
 	/** Free the now useless image structure */
 	freeImage(image);
+#endif
 
 	/** Get the starting timestamp */
 	clock_gettime(CLOCK_REALTIME, &startTime);
@@ -321,10 +358,10 @@ uint inference(char *path, Params *params, char **labels) {
 	/** Find the class with the greatest likelihood and print its label */
 	uint topClass = argmax(x);
 	printf("* Processed image: %s\n"
-	       "\tImage contains: %s%s%s\n"
-	       "\tResult in:\t\t\t\t%d ms\n",
-	       path, KGRN, labels[topClass], KNRM, timeNeeded);
-
+	       "\tImage contains: %s%s%s\n", path, KGRN, labels[topClass], KNRM);
+#ifdef PRINT_TIMINGS
+	printf("\tResult in:\t\t\t\t%d ms\n", timeNeeded);
+#endif
 	/**
 	 * Free the forward pass's resulting FloatMatrix as it is no longer needed
 	 * to avoid memory leaks
@@ -386,9 +423,11 @@ int main(int argc, char *argv[]) {
 		sumTime += inference(fileList->list[i], params, labels);
 
 #if ENABLE_OPENMP == 1
+	#ifdef PRINT_TIMINGS
 		/** This is valid only for no or for layer level multiprocessing */
 		printf("\tAverage time per image:\t%d ms\n", sumTime / (i + 1));
 		printf("\tImages Processed:\t\t%d\n\n", i + 1);
+	#endif
 #endif
 #if ENABLE_OPENMP == 2
 		printf("\n");
