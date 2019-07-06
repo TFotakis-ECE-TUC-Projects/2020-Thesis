@@ -178,14 +178,14 @@ void printMinMaxSum(FloatMatrix *x) {
 	matrix_t min = 10000000000000000000.0;
 	matrix_t max = -10000000000000000000.0;
 	for (int i = 0; i < flattenDimensions(x); i++) {
-		sum += x->matrix[i];
+		sum += fabs(x->matrix[i]);
 		if (isnan(sum)) {
 			printf("Sum is nan!\n");
 		}
 		min = min < x->matrix[i] ? min : x->matrix[i];
 		max = max > x->matrix[i] ? max : x->matrix[i];
 	}
-	printf("Sum: %lf, Min: %lf, Max: %lf\n", sum, min, max);
+	printf("Sum: %.16lf, Min: %.16lf, Max: %.16lf\n", sum, min, max);
 }
 
 
