@@ -1,7 +1,10 @@
 import torch.utils.model_zoo as model_zoo
+import numpy
 
 
 def joinNumArray(arr):
+	if type(arr) is numpy.ndarray:
+		return ' '.join(f"{el:.30f}" for el in arr)
 	return ' '.join(str(el) for el in arr)
 
 
@@ -27,7 +30,7 @@ for k in state_dict.keys():
 		string += joinMatrix(state_dict[k]) + '\n'
 
 
-with open("binaryParameters.txt", 'w') as fp:
+with open("binaryParametersBig.txt", 'w') as fp:
 	fp.write(string)
 
 print("Done")
