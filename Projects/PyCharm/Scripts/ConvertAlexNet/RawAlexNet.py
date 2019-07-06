@@ -10,8 +10,15 @@ from torchvision import datasets
 from torchvision import transforms
 from torchvision.models import alexnet
 
+USE_PRETRANSFORMED_IMAGES = True
 
-data_dir = '../../Data/ConvertAlexNet/Cat_Dog_data'
+if USE_PRETRANSFORMED_IMAGES:
+	data_dir = '../../Data/ConvertAlexNet/Cat_Dog_data/pretransformed'
+# data_dir = '../../Data/ConvertAlexNet/Cat_Dog_data/pretransformedBinary'
+# data_dir = '../../Data/ConvertAlexNet/Cat_Dog_data/solidColors'
+else:
+	data_dir = '../../Data/ConvertAlexNet/Cat_Dog_data'
+
 LABELS_FILE = '../../Data/ConvertAlexNet/labels.json'
 model_urls = {'alexnet': 'https://download.pytorch.org/models/alexnet-owt-4df8aa71.pth'}
 
@@ -206,71 +213,170 @@ class RawAlexNet:
 		return self.forward(x)
 
 
+def printX(x):
+	# return
+	print("Sum: ", float(x.abs().sum()), " Min: ", float(x.min()), " Max: ", float(x.max()))
+
+
 class PyTorchAlexNet(nn.Module):
 	def __init__(self, pretrained=False, num_classes=1000):
 		super(PyTorchAlexNet, self).__init__()
-		self.features = nn.Sequential(
-			nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=2),
-			nn.ReLU(inplace=True),
-			nn.MaxPool2d(kernel_size=3, stride=2),
-			nn.Conv2d(64, 192, kernel_size=5, padding=2),
-			nn.ReLU(inplace=True),
-			nn.MaxPool2d(kernel_size=3, stride=2),
-			nn.Conv2d(192, 384, kernel_size=3, padding=1),
-			nn.ReLU(inplace=True),
-			nn.Conv2d(384, 256, kernel_size=3, padding=1),
-			nn.ReLU(inplace=True),
-			nn.Conv2d(256, 256, kernel_size=3, padding=1),
-			nn.ReLU(inplace=True),
-			nn.MaxPool2d(kernel_size=3, stride=2),
-		)
-		self.avgpool = nn.AdaptiveAvgPool2d((6, 6))
-		self.classifier = nn.Sequential(
-			nn.Dropout(),
-			nn.Linear(256 * 6 * 6, 4096),
-			nn.ReLU(inplace=True),
-			nn.Dropout(),
-			nn.Linear(4096, 4096),
-			nn.ReLU(inplace=True),
-			nn.Linear(4096, num_classes),
-			nn.LogSoftmax(dim=1)
-		)
+		self.l1 = nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=2)
+		self.l2 = nn.ReLU(inplace=True)
+		self.l3 = nn.MaxPool2d(kernel_size=3, stride=2)
+		self.l4 = nn.Conv2d(64, 192, kernel_size=5, padding=2)
+		self.l5 = nn.ReLU(inplace=True)
+		self.l6 = nn.MaxPool2d(kernel_size=3, stride=2)
+		self.l7 = nn.Conv2d(192, 384, kernel_size=3, padding=1)
+		self.l8 = nn.ReLU(inplace=True)
+		self.l9 = nn.Conv2d(384, 256, kernel_size=3, padding=1)
+		self.l10 = nn.ReLU(inplace=True)
+		self.l11 = nn.Conv2d(256, 256, kernel_size=3, padding=1)
+		self.l12 = nn.ReLU(inplace=True)
+		self.l13 = nn.MaxPool2d(kernel_size=3, stride=2)
+		self.l14 = nn.Linear(256 * 6 * 6, 4096)
+		self.l15 = nn.ReLU(inplace=True)
+		self.l16 = nn.Linear(4096, 4096)
+		self.l17 = nn.ReLU(inplace=True)
+		self.l18 = nn.Linear(4096, num_classes)
+
 		if pretrained:
 			self.load_state_dict(model_zoo.load_url(model_urls['alexnet']))
 
 	def forward(self, x):
-		x = x.reshape(1, x.shape[0], x.shape[1], x.shape[2])
-		x = self.features(x)
-		x = self.avgpool(x)
+		printX(x)
+		x = self.l1(x)
+		printX(x)
+		x = self.l2(x)
+		printX(x)
+		x = self.l3(x)
+		printX(x)
+		x = self.l4(x)
+		printX(x)
+		x = self.l5(x)
+		printX(x)
+		x = self.l6(x)
+		printX(x)
+		x = self.l7(x)
+		printX(x)
+		x = self.l8(x)
+		printX(x)
+		x = self.l9(x)
+		printX(x)
+		x = self.l10(x)
+		printX(x)
+		x = self.l11(x)
+		printX(x)
+		x = self.l12(x)
+		printX(x)
+		x = self.l13(x)
+		printX(x)
 		x = x.view(x.size(0), 256 * 6 * 6)
-		x = self.classifier(x)
+		printX(x)
+		x = self.l14(x)
+		printX(x)
+		x = self.l15(x)
+		printX(x)
+		x = self.l16(x)
+		printX(x)
+		x = self.l17(x)
+		printX(x)
+		x = self.l18(x)
+		printX(x)
 		return x
+
+
+def roundToDecimals(x, decimals):
+	return int(x * (10 ** decimals)) / (10 ** decimals)
+
+
+def openPPM(path):
+	with open(path, 'rb') as f:
+		line = f.readline()
+		if line.decode('ascii') != 'P6\n':
+			return
+		line = f.readline()
+		while line.decode('ascii')[0] == '#':
+			line = f.readline()
+
+		width, height = [int(el) for el in line.split()]
+		maxValue = int(f.readline())
+		x = torch.zeros((1, 3, height, width), dtype=torch.float)
+		for h in range(height):
+			for w in range(width):
+				for c in range(3):
+					b = f.read(1)
+					# while b.decode('ascii') == '\n':
+					# 	b = f.read(1)
+					num = int.from_bytes(b, byteorder='big')
+					num = num / maxValue
+					x[0, c, h, w] = round(num, 10)
+	return x
+
+
+def writeToFile(x):
+	with open('output.txt', 'a+') as f:
+		f.write(' '.join(f'{el:.10f}' for el in x.flatten().tolist()) + '\n')
 
 
 def inference(model):
 	labelNames = list(json.loads(open(LABELS_FILE, 'r').read()).values())
-	preprocess = transforms.Compose([
-		transforms.Resize(256),
-		transforms.CenterCrop(224),
-		transforms.ToTensor(),
-		# transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-	])
+	if USE_PRETRANSFORMED_IMAGES:
+		preprocess = transforms.Compose([
+			transforms.ToTensor(),
+		])
+	else:
+		preprocess = transforms.Compose([
+			transforms.Resize(256),
+			transforms.CenterCrop(224),
+			transforms.ToTensor(),
+			# transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+		])
 
-	# dataset = datasets.ImageFolder(data_dir + '/train', transform=preprocess)
 	dataset = datasets.ImageFolder(data_dir + '/test', transform=preprocess)
 
+	f = open('output.txt', 'w+')
 	for image, label in dataset.imgs:
-		pil = Image.open(image)
-		pil_processed = preprocess(pil)
-		fc_out = model(pil_processed)
-		top_class = fc_out.argmax()
-		print(dataset.classes[label] + ': ' + labelNames[top_class])
+		# x = Image.open(image)
+		# x = preprocess(x).unsqueeze(0)
+
+		x = openPPM(image)
+		x = model(x)
+		top_class = x.argmax()
+
+		f.write(' '.join(f'{el:.10f}' for el in x.flatten().tolist()) + '\n')
+
+		print(image.split('/')[-1] + ': ' + labelNames[top_class])
+	f.close()
+
+
+def loadCustomStateDict(model):
+	stateDict = {}
+	with open("/home/tzanis/Workspace/Thesis/Projects/PyCharm/Scripts/AlexNetParametersProcessing/binaryParametersBig.txt") as f:
+		parNum = int(f.readline())
+		for key in model.state_dict().keys():
+			dims = [int(el) for el in f.readline().split()]
+			dimsNum = dims[0]
+			dims = dims[1:]
+			rows = 1
+			for i in range(dimsNum - 1):
+				rows *= dims[i]
+			arr = [[float(el) for el in f.readline().split()] for _ in range(rows)]
+			arr = np.array(arr)
+			arr = arr.reshape(dims)
+			stateDict[key] = torch.tensor(arr)
+	model.load_state_dict(stateDict)
 
 
 def main():
-	# model = PyTorchAlexNet(pretrained=True)
+	model = PyTorchAlexNet()
 	# model = alexnet(pretrained=True)
-	model = RawAlexNet()
+	# model.double()
+	loadCustomStateDict(model)
+	model.eval()
+
+	# model = RawAlexNet()
+
 	inference(model)
 
 
