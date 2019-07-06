@@ -66,7 +66,9 @@
  * they contain.
  */
 #ifdef USE_PRETRANSFORMED_IMAGES
-char *dataDir = "/home/tzanis/Workspace/Thesis/Projects/PyCharm/Data/ConvertAlexNet/Cat_Dog_data/pretransformed/test/";
+char *dataDir = "/home/tzanis/Workspace/Thesis/Projects/PyCharm/Data/ConvertAlexNet/Cat_Dog_data/pretransformedBinary/test/";
+//char *dataDir = "/home/tzanis/Workspace/Thesis/Projects/PyCharm/Data/ConvertAlexNet/Cat_Dog_data/pretransformed/test/";
+//char *dataDir = "/home/tzanis/Workspace/Thesis/Projects/PyCharm/Data/ConvertAlexNet/Cat_Dog_data/solidColors/test/";
 #else
 char *dataDir = "/home/tzanis/Workspace/Thesis/Projects/PyCharm/Data/ConvertAlexNet/Cat_Dog_data/test/";
 #endif
@@ -76,7 +78,7 @@ char *dataDir = "/home/tzanis/Workspace/Thesis/Projects/PyCharm/Data/ConvertAlex
  * The path where the parameters file exists. The Parameters file contains the
  * network's weights and biases
  */
-char *parametersPath = "/home/tzanis/Workspace/Thesis/Projects/PyCharm/Scripts/AlexNetParametersProcessing/binaryParameters.txt";
+char *parametersPath = "/home/tzanis/Workspace/Thesis/Projects/PyCharm/Scripts/AlexNetParametersProcessing/binaryParametersBig.txt";
 
 /**
  * The path where the labels file exists. The labels file contains the labels
@@ -250,18 +252,57 @@ Image *imageTransform(char *path) {
 }
 
 
+double roundToDecimals(double num, uint decimals){
+	return roundl(num * pow(10, decimals)) / pow(10, decimals);
+}
+
+
 FloatMatrix *loadPretransformedImage(char *path) {
 	FILE *f = fopen(path, "r");
-	fscanf(f, "P6\n224 224\n255\n");
+
+	char buff[16];
+	//read image format
+	if (!fgets(buff, sizeof(buff), f)) {
+		perror(path);
+		exit(1);
+	}
+
+	//check the image format
+	if (buff[0] != 'P' || buff[1] != '6') {
+		fprintf(stderr, "Invalid image format (must be 'P6')\n");
+		exit(1);
+	}
+
+	int character, width, height, depth;
+	//check for comments
+	character = getc(f);
+	while (character == '#') {
+		while (getc(f) != '\n') ;
+		character = getc(f);
+	}
+
+	ungetc(character, f);
+	//read image size information
+	if (fscanf(f, "%d %d", &width, &height) != 2) {
+		fprintf(stderr, "Invalid image size (error loading '%s')\n", path);
+		exit(1);
+	}
+
+	//read rgb component
+	if (fscanf(f, "%d", &depth) != 1) {
+		fprintf(stderr, "Invalid rgb component (error loading '%s')\n", path);
+		exit(1);
+	}
+	unsigned char color;
+	fread(&color, 1, 1, f);
 
 	FloatMatrix *x = zero3DFloatMatrix(3, 224, 224);
-	for (int w = 0; w < 224; w++) {
-		for (int h = 0; h < 224; h++) {
+	for (int h = 0; h < 224; h++) {
+		for (int w = 0; w < 224; w++) {
 			for (int c = 0; c < 3; c++) {
-				unsigned int color;
-				fscanf(f, "%u", &color);
+				fread(&color, 1, 1, f);
 				uint index = calc3DIndex(x->dims, c, h, w);
-				x->matrix[index] = color / 255.0;
+				x->matrix[index] = roundToDecimals(color / 255.0, 10);
 			}
 		}
 	}
@@ -304,12 +345,32 @@ FloatMatrix *forward(Params *params, FloatMatrix *x) {
 
 	x = Linear(x, params->matrix[14], params->matrix[15], 4096, 1000, "Linear 8");
 
-	x = LogSoftMax(x, "LogSoftMax");
-
+//	x = LogSoftMax(x, "LogSoftMax");
 	syslog(LOG_INFO, "Done forward pass.");
 	return x;
 }
 
+FILE *f;
+
+void writeOutputToFile(FloatMatrix *x) {
+	uint xLen = flattenDimensions(x);
+	for (int i = 0; i < xLen; i++) {
+		fprintf(f, "%.10lf ", x->matrix[i]);
+	}
+	fprintf(f, "\n");
+}
+
+
+char *getFilename(char *path) {
+	char delim[] = "/";
+	char *tmp = strtok(path, delim);
+	char *filename;
+	while(tmp != NULL) {
+		filename = tmp;
+		tmp = strtok(NULL, delim);
+	}
+	return filename;
+}
 
 /**
  * Takes an image and passes it through the network to classify it and print its
@@ -357,8 +418,11 @@ uint inference(char *path, Params *params, char **labels) {
 
 	/** Find the class with the greatest likelihood and print its label */
 	uint topClass = argmax(x);
-	printf("* Processed image: %s\n"
-	       "\tImage contains: %s%s%s\n", path, KGRN, labels[topClass], KNRM);
+
+	writeOutputToFile(x);
+
+	char *filename = getFilename(path);
+	printf("%s: %s\n", filename, labels[topClass]);
 #ifdef PRINT_TIMINGS
 	printf("\tResult in:\t\t\t\t%d ms\n", timeNeeded);
 #endif
@@ -407,6 +471,8 @@ int main(int argc, char *argv[]) {
 
 	/** Initialize the total time needed to process all files */
 	uint sumTime = 0;
+
+	f = fopen("../output.txt", "w+");
 
 #if ENABLE_OPENMP == 2
 	/** Parallel inferences using multiple images. */
