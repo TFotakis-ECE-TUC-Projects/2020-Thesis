@@ -435,6 +435,10 @@ uint getFileCount(char *path) {
 }
 
 
+int compare(char **a, char **b) {
+	return strcmp(*a, *b);
+}
+
 /**
  * Reads a path and creates a Filelist which containes all files contained in
  * the given path's children directories
@@ -507,6 +511,8 @@ Filelist *getFileList(char *path) {
 
 	/** Free main directory entry */
 	free(de);
+
+	qsort(filelist->list, filelist->length, sizeof(char *), (int (*)(const void *, const void *)) compare);
 
 	return filelist;
 }
