@@ -66,7 +66,9 @@ In this section we outline the organization of this thesis.
 
 # Chapter 2
 ## Theoretical Background
-*Todo: Add Chapter summary here*
+In this chapter Machine Learning's and Convolutional Neural Networks' theoretical background is described in detail.
+
+
 
 ## 2.1 Machine Learning
 ## 2.2 Convolutional Neural Network
@@ -97,6 +99,10 @@ In this section we outline the organization of this thesis.
 # Chapter 5
 ## FPGA Implementation
 
+
+
+
+
 # Chapter 6
 ## Results
 
@@ -117,6 +123,8 @@ In this section we outline the organization of this thesis.
 [x] MATLAB. *url:* https://www.mathworks.com/.
 
 [x] TensorFlow. *url:* https://www.tensorflow.org/.
+
+[x] PyTorch. *url:* https://pytorch.org/.
 
 [x] Vivado Design Suite - HLx Editions. *url:* https://www.xilinx.com/products/design-tools/vivado.html.
 
