@@ -109,7 +109,6 @@ FloatMatrix *Conv2d(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias,
 				 */
 				uint resIndex = calc3DIndex(res->dims, out_channel, oh, ow);
 
-				// Todo: Check if averaging is needed
 				/**
 				 * Assign biased dot product result on the corresponding
 				 * output pixel
@@ -121,6 +120,247 @@ FloatMatrix *Conv2d(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias,
 
 	/** Free the temporary FloatMatrix */
 	freeFloatMatrix(tmp);
+
+	syslog(LOG_INFO, "Conv2D: Done with %u x %u x %u.", res->dims[0],
+	       res->dims[1], res->dims[2]);
+
+#ifdef ENABLE_CHECKING
+	/** Print min max and sum of the whole matrix for debugging */
+	printf("%s | ", layerName);
+	printMinMaxSum(res);
+#endif
+
+	return res;
+}
+
+
+/**
+ * Calculates the 2-dimensional convolution of FloatMatrix x and filters stored
+ * in FloatMatrix weights, biased by FloatMatrix bias.
+ * @param[in] x: The input FloatMatrix to convolute
+ * @param[in] weights: The kernels to convolute with
+ * @param[in] bias: The bias of the convolution
+ * @param[in] in_channels: The number of x's channels
+ * @param[in] out_channels: The number of output channels
+ * @param[in] kernel_size: The kernels' dimensions
+ * @param[in] stride: The amount of pixels to skip for each convolution
+ * @param[in] padding: The circular padding applied to the input before convoluting
+ * @param[in] layerName: This layer's name
+ * @returns a FloatMatrix pointer containing the convolution's result
+ */
+FloatMatrix *Conv2dReLUWithPrePadding(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias,
+                        uint in_channels, uint out_channels, uint kernel_size,
+                        uint stride, uint padding, char *layerName) {
+	/**
+	 * Allocate and initialize a 3D zeros matrix to store the circularly
+	 * padded input
+	 */
+	FloatMatrix *tmp = zero3DFloatMatrix(x->dims[0], x->dims[1] + 2 * padding,
+	                                     x->dims[2] + 2 * padding);
+
+	/** If OpenMP is defined parallelize the for loop */
+#if ENABLE_OPENMP == 1
+#pragma omp parallel for
+#endif
+	/** For every channel */
+	for (int i = 0; i < x->dims[0]; i++) {
+		/** For every row */
+		for (int j = 0; j < x->dims[1]; j++) {
+			/** For every row's pixel */
+			for (int k = 0; k < x->dims[2]; k++) {
+				/**
+				 * Calculate the 1-dimensional representation's index of
+				 * the input matrix
+				 */
+				uint index = calc3DIndex(x->dims, i, j, k);
+
+				/**
+				 * Calculate the 1-dimensional representation's index of
+				 * the padded matrix
+				 */
+				uint arrIndex = calc3DIndex(tmp->dims, i, j + padding,
+				                            k + padding);
+
+				/** Copy input's pixel to padded matrix */
+				tmp->matrix[arrIndex] = x->matrix[index];
+			}
+		}
+	}
+
+	/** Allocate and initialize a 3D zeros matrix to store the result */
+	FloatMatrix *res = zero3DFloatMatrix(
+			out_channels,
+			(x->dims[1] + 2 * padding - kernel_size) / stride + 1,
+			(x->dims[2] + 2 * padding - kernel_size) / stride + 1);
+
+	/** Free the input FloatMatrix */
+	freeFloatMatrix(x);
+
+	/** If OpenMP is defined parallelize the for loop */
+#if ENABLE_OPENMP == 1
+#pragma omp parallel for
+#endif
+	/** For every output channel */
+	for (int out_channel = 0; out_channel < out_channels; out_channel++) {
+		/** For every output row */
+		for (int oh = 0; oh < res->dims[1]; oh++) {
+			/** For every output row's pixel */
+			for (int ow = 0; ow < res->dims[2]; ow++) {
+				/** Calculate starting coordinates on the padded matrix */
+				uint imgStartH = oh * stride;
+				uint imgStartW = ow * stride;
+
+				/** Initialize output pixel */
+				matrix_t pixel = bias->matrix[out_channel];
+				/** For every input channel */
+				for (int in_channel = 0; in_channel < in_channels; in_channel++) {
+					/** For kernel_size rows on padded matrix */
+					for (int i = 0; i < kernel_size; i++) {
+						/** For kernel_size pixels on each padded matrix's row */
+						for (int j = 0; j < kernel_size; j++) {
+							/**
+							 * Calculate the 1-dimensional representation's
+							 * index of the kernel's matrix
+							 */
+							uint weightsIndex = calc4DIndex(
+									weights->dims,
+									out_channel, in_channel, i, j);
+
+							/**
+							 * Calculate the 1-dimensional representation's
+							 * index of the padded matrix
+							 */
+							uint arrIndex = calc3DIndex(
+									tmp->dims, in_channel,
+									i + imgStartH, j + imgStartW);
+
+							/** Calculate dot product of the two matrices */
+							pixel += tmp->matrix[arrIndex] * weights->matrix[weightsIndex];
+						}
+					}
+				}
+				/**
+				 * Calculate the 1-dimensional representation's index of the
+				 * output matrix
+				 */
+				uint resIndex = calc3DIndex(res->dims, out_channel, oh, ow);
+
+				/**
+				 * Assign biased dot product result on the corresponding
+				 * output pixel
+				 */
+				res->matrix[resIndex] = pixel > 0 ? pixel : 0;
+			}
+		}
+	}
+
+	/** Free the temporary FloatMatrix */
+	freeFloatMatrix(tmp);
+
+	syslog(LOG_INFO, "Conv2D: Done with %u x %u x %u.", res->dims[0],
+	       res->dims[1], res->dims[2]);
+
+#ifdef ENABLE_CHECKING
+	/** Print min max and sum of the whole matrix for debugging */
+	printf("%s | ", layerName);
+	printMinMaxSum(res);
+#endif
+
+	return res;
+}
+
+
+/**
+ * Calculates the 2-dimensional convolution of FloatMatrix x and filters stored
+ * in FloatMatrix weights, biased by FloatMatrix bias.
+ * @param[in] x: The input FloatMatrix to convolute
+ * @param[in] weights: The kernels to convolute with
+ * @param[in] bias: The bias of the convolution
+ * @param[in] in_channels: The number of x's channels
+ * @param[in] out_channels: The number of output channels
+ * @param[in] kernel_size: The kernels' dimensions
+ * @param[in] stride: The amount of pixels to skip for each convolution
+ * @param[in] padding: The circular padding applied to the input before convoluting
+ * @param[in] layerName: This layer's name
+ * @returns a FloatMatrix pointer containing the convolution's result
+ */
+FloatMatrix *Conv2dReLU(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias,
+                                 uint in_channels, uint out_channels, uint kernel_size,
+                                 uint stride, uint padding, char *layerName) {
+	/** Allocate and initialize a 3D zeros matrix to store the result */
+	FloatMatrix *res = zero3DFloatMatrix(
+			out_channels,
+			(x->dims[1] + 2 * padding - kernel_size) / stride + 1,
+			(x->dims[2] + 2 * padding - kernel_size) / stride + 1);
+
+	/** If OpenMP is defined parallelize the for loop */
+#if ENABLE_OPENMP == 1
+#pragma omp parallel for
+#endif
+	/** For every output channel */
+	for (int out_channel = 0; out_channel < out_channels; out_channel++) {
+		/** For every output row */
+		for (int oh = 0; oh < res->dims[1]; oh++) {
+			int imgStartH = oh * stride - padding;
+
+			uint iStart = imgStartH < 0 ? padding : 0;
+			uint iEnd = imgStartH + kernel_size >= x->dims[1] ? kernel_size - (imgStartH + kernel_size - x->dims[1]) : kernel_size;
+
+			/** For every output row's pixel */
+			for (int ow = 0; ow < res->dims[2]; ow++) {
+				/** Calculate starting coordinates on the padded matrix */
+				int imgStartW = ow * stride - padding;
+
+				uint jStart = imgStartW < 0 ? padding : 0;
+				uint jEnd = imgStartW + kernel_size >= x->dims[2] ? kernel_size - (imgStartW + kernel_size - x->dims[2]) : kernel_size;
+
+				/** Initialize output pixel */
+				matrix_t pixel = bias->matrix[out_channel];
+				/** For every input channel */
+				for (int in_channel = 0; in_channel < in_channels; in_channel++) {
+					/** For kernel_size rows on padded matrix */
+					for (int i = iStart; i < iEnd; i++) {
+						/** For kernel_size pixels on each padded matrix's row */
+						for (int j = jStart; j < jEnd; j++) {
+							uint imgH = i + imgStartH;
+							uint imgW = j + imgStartW;
+
+							/**
+							 * Calculate the 1-dimensional representation's
+							 * index of the kernel's matrix
+							 */
+							uint weightsIndex = calc4DIndex(
+									weights->dims,
+									out_channel, in_channel, i, j);
+
+							/**
+							 * Calculate the 1-dimensional representation's
+							 * index of the padded matrix
+							 */
+							uint arrIndex = calc3DIndex(x->dims, in_channel, imgH, imgW);
+
+							/** Calculate dot product of the two matrices */
+							pixel += x->matrix[arrIndex] * weights->matrix[weightsIndex];
+						}
+					}
+				}
+				/**
+				 * Calculate the 1-dimensional representation's index of the
+				 * output matrix
+				 */
+				uint resIndex = calc3DIndex(res->dims, out_channel, oh, ow);
+
+				/**
+				 * Assign biased dot product result on the corresponding
+				 * output pixel
+				 */
+				res->matrix[resIndex] = pixel > 0 ? pixel : 0;
+			}
+		}
+	}
+
+	/** Free the temporary FloatMatrix */
+	freeFloatMatrix(x);
 
 	syslog(LOG_INFO, "Conv2D: Done with %u x %u x %u.", res->dims[0],
 	       res->dims[1], res->dims[2]);
