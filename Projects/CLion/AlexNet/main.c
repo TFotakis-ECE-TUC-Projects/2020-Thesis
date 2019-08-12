@@ -319,22 +319,22 @@ FloatMatrix *loadPretransformedImage(char *path) {
  * likely it is for the input image to be of a class in a logarithmic scale.
  */
 FloatMatrix *forward(Params *params, FloatMatrix *x) {
-	x = Conv2d(x, params->matrix[0], params->matrix[1], 3, 64, 11, 4, 2, "Conv2d 1");
-	x = ReLU(x, "ReLU 1");
+	x = Conv2dReLU(x, params->matrix[0], params->matrix[1], 3, 64, 11, 4, 2, "Conv2d 1");
+//	x = ReLU(x, "ReLU 1");
 	x = MaxPool2d(x, 3, 2, "MaxPool2d 1");
 
-	x = Conv2d(x, params->matrix[2], params->matrix[3], 64, 192, 5, 1, 2, "Conv2d 2");
-	x = ReLU(x, "ReLU 2");
+	x = Conv2dReLU(x, params->matrix[2], params->matrix[3], 64, 192, 5, 1, 2, "Conv2d 2");
+//	x = ReLU(x, "ReLU 2");
 	x = MaxPool2d(x, 3, 2, "MaxPool2d 2");
 
-	x = Conv2d(x, params->matrix[4], params->matrix[5], 192, 384, 3, 1, 1, "Conv2d 3");
-	x = ReLU(x, "ReLU 3");
+	x = Conv2dReLU(x, params->matrix[4], params->matrix[5], 192, 384, 3, 1, 1, "Conv2d 3");
+//	x = ReLU(x, "ReLU 3");
 
-	x = Conv2d(x, params->matrix[6], params->matrix[7], 384, 256, 3, 1, 1, "Conv2d 4");
-	x = ReLU(x, "ReLU 4");
+	x = Conv2dReLU(x, params->matrix[6], params->matrix[7], 384, 256, 3, 1, 1, "Conv2d 4");
+//	x = ReLU(x, "ReLU 4");
 
-	x = Conv2d(x, params->matrix[8], params->matrix[9], 256, 256, 3, 1, 1, "Conv2d 5");
-	x = ReLU(x, "ReLU 5");
+	x = Conv2dReLU(x, params->matrix[8], params->matrix[9], 256, 256, 3, 1, 1, "Conv2d 5");
+//	x = ReLU(x, "ReLU 5");
 	x = MaxPool2d(x, 3, 2, "MaxPool2d 5");
 
 	x = Linear(x, params->matrix[10], params->matrix[11], 256 * 6 * 6, 4096, "Linear 6");
