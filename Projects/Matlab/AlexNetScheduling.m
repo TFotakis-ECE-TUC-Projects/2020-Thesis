@@ -2,85 +2,91 @@ clear;
 % close all;
 clc;
 
-
 %% Definitions
 % c: cycles per operation
-global c p
+global c p chip_frequency logScale printTimings
 c.memRead = 1;
 c.mul = 1;
 c.add = 1;
 c.branch = 1;
 c.memWrite = 1;
 c.useTimings = 0;
-
+chip_frequency = 100e6;
+logScale = 1;
+fprintf("Chip Frequency: %d MHz\n\n", chip_frequency / 1e6);
 
 %% Network
-p.conv1 = 1;
-p.conv2 = 1;
-p.conv3 = 1;
-p.conv4 = 1;
-p.conv5 = 1;
-p.maxpool1 = 1;
-p.maxpool2 = 1;
-p.maxpool3 = 1;
-p.linear1 = 1;
-p.linear2 = 1;
-p.linear3 = 1;
-
-subplot(3,2,1)
-n1 = CreateNetwork();
-n1 = ScheduleSerial(n1);
-PrintSchedule(n1.arr, 'Serial');
-
-subplot(3,2,2)
-n2 = CreateNetwork();
-n2 = SchedulePipelined(n2);
-PrintSchedule(n2.arr, 'Pipelined 1x');
-
-p.conv1 = 11*11;
-p.conv2 = 5*5;
-p.conv3 = 3*3;
-p.conv4 = 3*3;
-p.conv5 = 3*3;
-p.maxpool1 = 3*3;
-p.maxpool2 = 3*3;
-p.maxpool3 = 3*3;
-p.linear1 = 1024;
-p.linear2 = 1024;
-p.linear3 = 1024;
-
-subplot(3,2,3)
-n3 = CreateNetwork();
-n3 = ScheduleSerial(n3);
-PrintSchedule(n3.arr, 'Serial Kernels Parallelism');
-
-subplot(3,2,4)
-n4 = CreateNetwork();
-n4 = SchedulePipelined(n4);
-PrintSchedule(n4.arr, 'Pipelined Kernels Parallelism');
-
-p.conv1 = 11*11*3;
-p.conv2 = 5*5*64;
-p.conv3 = 3*3*192;
-p.conv4 = 3*3*384;
-p.conv5 = 3*3*256;
-p.maxpool1 = 3*3;
-p.maxpool2 = 3*3;
-p.maxpool3 = 3*3;
-p.linear1 = 1024;
-p.linear2 = 1024;
-p.linear3 = 1024;
-
-subplot(3,2,5)
-n5 = CreateNetwork();
-n5 = ScheduleSerial(n5);
-PrintSchedule(n5.arr, 'Serial K*OC Parallelism');
-
-subplot(3,2,6)
-n6 = CreateNetwork();
-n6 = SchedulePipelined(n6);
-PrintSchedule(n6.arr, 'Pipelined K*OC Parallelism');
-
+for i = 0:1
+	figure(i + 1)
+	logScale = i;
+	printTimings = i;
+	
+	p.conv1 = 1;
+	p.conv2 = 1;
+	p.conv3 = 1;
+	p.conv4 = 1;
+	p.conv5 = 1;
+	p.maxpool1 = 1;
+	p.maxpool2 = 1;
+	p.maxpool3 = 1;
+	p.linear1 = 1;
+	p.linear2 = 1;
+	p.linear3 = 1;
+	
+	subplot(3,2,1)
+	n1 = CreateNetwork();
+	n1 = ScheduleSerial(n1);
+	PrintSchedule(n1.arr, 'Serial');
+	
+	subplot(3,2,2)
+	n2 = CreateNetwork();
+	n2 = SchedulePipelined(n2);
+	PrintSchedule(n2.arr, 'Pipelined 1x');
+	
+	p.conv1 = 11*11;
+	p.conv2 = 5*5;
+	p.conv3 = 3*3;
+	p.conv4 = 3*3;
+	p.conv5 = 3*3;
+	p.maxpool1 = 3*3;
+	p.maxpool2 = 3*3;
+	p.maxpool3 = 3*3;
+	p.linear1 = 1024;
+	p.linear2 = 1024;
+	p.linear3 = 1024;
+	
+	subplot(3,2,3)
+	n3 = CreateNetwork();
+	n3 = ScheduleSerial(n3);
+	PrintSchedule(n3.arr, 'Serial Kernels Parallelism');
+	
+	subplot(3,2,4)
+	n4 = CreateNetwork();
+	n4 = SchedulePipelined(n4);
+	PrintSchedule(n4.arr, 'Pipelined Kernels Parallelism');
+	
+	p.conv1 = 11*11*3;
+	p.conv2 = 5*5*64;
+	p.conv3 = 3*3*192;
+	p.conv4 = 3*3*384;
+	p.conv5 = 3*3*256;
+	p.maxpool1 = 3*3;
+	p.maxpool2 = 3*3;
+	p.maxpool3 = 3*3;
+	p.linear1 = 1024;
+	p.linear2 = 1024;
+	p.linear3 = 1024;
+	
+	subplot(3,2,5)
+	n5 = CreateNetwork();
+	n5 = ScheduleSerial(n5);
+	PrintSchedule(n5.arr, 'Serial K*OC Parallelism');
+	
+	subplot(3,2,6)
+	n6 = CreateNetwork();
+	n6 = SchedulePipelined(n6);
+	PrintSchedule(n6.arr, 'Pipelined K*OC Parallelism');
+end
 
 %% Layer Functions
 function n = CreateNetwork()
@@ -234,7 +240,6 @@ ret.to = oc;
 ret.name = name;
 end
 
-
 %% Calc Funcitons
 function n = ScheduleSerial(n)
 n.arr(1).st = 0;
@@ -302,18 +307,32 @@ end
 
 
 function PrintSchedule(arr, figureName)
+global chip_frequency logScale printTimings
 cla;
 lineWidth = 10;
-% figure('Name', figureName,'NumberTitle','off')
-title(figureName);
-xlabel('Clock cycles');
-ylim([0 12]);
-% xlim([0 7e8]);
-set(gca, 'ytick', [])
-hold on;
 
 a = [[arr(:).st]; [arr(:).en]];
-b = [11:-1:1; 11:-1:1];
-plot(a, b, 'LineWidth', lineWidth);
-text([arr(:).st], 11:-1:1, string({arr(:).name}))
+b = [length(arr):-1:1; length(arr):-1:1];
+s = [arr(:).st];
+plotFunc = @plot;
+if logScale
+	a = a + (a == 0);
+	plotFunc = @semilogx;
+	s = s + (s == 0);
+end
+plotFunc(a, b, 'LineWidth', lineWidth);
+text(s, length(arr):-1:1, string({arr(:).name}))
+
+title(figureName);
+xlabel('Clock cycles');
+set(gca, 'ytick', []);
+
+if logScale
+	set(gca,'XTick', 10.^(0:9));
+	xlim([0 1e9]);
+end
+
+if printTimings
+	fprintf("%s: %.2f ms\n", figureName, (arr(end).en / chip_frequency) * 1e3)
+end
 end
