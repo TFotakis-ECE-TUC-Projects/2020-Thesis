@@ -1,0 +1,18 @@
+*/*
+!*.gitignore
+
+# Project Files
+!*.xpr
+
+# Project sources
+!*/*.srcs
+
+# Ignore all but .xci files (responsible for ip instantiation) under ip folder
+**/*.srcs/*/ip/*/*
+!**/*.srcs/*/ip/*/*.xci
+
+# Ignore all but HDL and Waveform Configuration files under folders other than 'ip'
+**/*.srcs/*/*/*
+!**/*.srcs/*/*/*.v
+!**/*.srcs/*/*/*.vhd
+!**/*.srcs/*/*/*.wcfg
