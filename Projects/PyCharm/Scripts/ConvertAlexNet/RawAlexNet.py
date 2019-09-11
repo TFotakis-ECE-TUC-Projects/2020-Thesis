@@ -13,7 +13,7 @@ from torchvision.models import alexnet
 USE_PRETRANSFORMED_IMAGES = True
 
 if USE_PRETRANSFORMED_IMAGES:
-	data_dir = '../../Data/ConvertAlexNet/Cat_Dog_data/pretransformed'
+	data_dir = '../../Data/ConvertAlexNet/Cat_Dog_data/pretransformedBinary'
 # data_dir = '../../Data/ConvertAlexNet/Cat_Dog_data/pretransformedBinary'
 # data_dir = '../../Data/ConvertAlexNet/Cat_Dog_data/solidColors'
 else:
@@ -214,7 +214,7 @@ class RawAlexNet:
 
 
 def printX(x):
-	# return
+	return
 	print("Sum: ", float(x.abs().sum()), " Min: ", float(x.min()), " Max: ", float(x.max()))
 
 
@@ -319,6 +319,9 @@ def writeToFile(x):
 		f.write(' '.join(f'{el:.10f}' for el in x.flatten().tolist()) + '\n')
 
 
+makeIntegers = False
+
+
 def inference(model):
 	labelNames = list(json.loads(open(LABELS_FILE, 'r').read()).values())
 	if USE_PRETRANSFORMED_IMAGES:
@@ -335,24 +338,30 @@ def inference(model):
 
 	dataset = datasets.ImageFolder(data_dir + '/test', transform=preprocess)
 
-	f = open('output.txt', 'w+')
+	# f = open('output.txt', 'w+')
 	for image, label in dataset.imgs:
-		# x = Image.open(image)
-		# x = preprocess(x).unsqueeze(0)
+		x = Image.open(image)
+		x = preprocess(x).unsqueeze(0)
+		if makeIntegers:
+			x = x * 255
+			x = torch.ceil(x)
 
-		x = openPPM(image)
+		# x = openPPM(image)
 		x = model(x)
 		top_class = x.argmax()
 
-		f.write(' '.join(f'{el:.10f}' for el in x.flatten().tolist()) + '\n')
+		# f.write(' '.join(f'{el:.10f}' for el in x.flatten().tolist()) + '\n')
 
 		print(image.split('/')[-1] + ': ' + labelNames[top_class])
-	f.close()
+	# f.close()
 
 
 def loadCustomStateDict(model):
+	multiplier = 1000
+	count = 1
+
 	stateDict = {}
-	with open("/home/tzanis/Workspace/Thesis/Projects/PyCharm/Scripts/AlexNetParametersProcessing/binaryParametersBig.txt") as f:
+	with open("/home/tzanis/Workspace/Thesis/Projects/PyCharm/Scripts/AlexNetParametersProcessing/output/binaryParameters.txt") as f:
 		parNum = int(f.readline())
 		for key in model.state_dict().keys():
 			dims = [int(el) for el in f.readline().split()]
@@ -363,6 +372,15 @@ def loadCustomStateDict(model):
 				rows *= dims[i]
 			arr = [[float(el) for el in f.readline().split()] for _ in range(rows)]
 			arr = np.array(arr)
+			# print(key, ' - Max: ', arr.max(), ', Min: ', arr.min())
+			if makeIntegers:
+				if key.__contains__('bias'):
+					arr = np.multiply(arr, 255 * (multiplier ** count))
+					count += 1
+				else:
+					arr = np.multiply(arr, multiplier)
+				arr = np.ceil(arr)
+
 			arr = arr.reshape(dims)
 			stateDict[key] = torch.tensor(arr)
 	model.load_state_dict(stateDict)
