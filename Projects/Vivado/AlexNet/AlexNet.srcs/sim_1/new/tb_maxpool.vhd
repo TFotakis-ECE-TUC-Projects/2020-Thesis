@@ -10,7 +10,7 @@ architecture tb of tb_maxpool is
 
 constant input_size: positive := 9;
 
-signal Din: bus_array(8 downto 0);
+signal Din: bus_array(8 downto 0)(31 downto 0);
 signal Dout: std_logic_vector (31 downto 0);
 
 begin
