@@ -7,7 +7,7 @@ use work.bus_array_pkg.all;
 entity max_layer is
 	generic	(input_size: positive := 9);
 	Port (
-		Din: in bus_array(input_size - 1 downto 0)(31 downto 0);
+		Din: in bus_array(input_size - 1 downto 0);
 		Dout: out STD_LOGIC_VECTOR (31 downto 0)
 	);
 end max_layer;
@@ -17,7 +17,7 @@ architecture Structural of max_layer is
 	constant modules: positive := integer(floor(real(input_size) / 2.0));
 	constant outputs: positive := integer(ceil(real(input_size) / 2.0));
 
-	signal m: bus_array(outputs - 1 downto 0)(31 downto 0);
+	signal m: bus_array(outputs - 1 downto 0);
 begin
 	Max_mod:
 	for i in 0 to modules - 1 generate
