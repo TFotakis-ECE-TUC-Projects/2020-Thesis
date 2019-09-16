@@ -50,6 +50,8 @@ end Int_Structural_Unsigned;
 
 
 architecture Float_Structural of comp_less_than is
+	signal tmp: STD_LOGIC_VECTOR(7 DOWNTO 0);
+	signal tmp_valid: STD_LOGIC;
 begin
 	ip_float_less_than:
 	entity work.float_less_than
@@ -58,6 +60,10 @@ begin
 			s_axis_a_tdata => In0,
 			s_axis_b_tvalid => '1',
 			s_axis_b_tdata => In1,
-			m_axis_result_tdata(0) => Dout
+			m_axis_result_tvalid => tmp_valid,
+			m_axis_result_tdata => tmp
 		);
+
+
+	Dout <= tmp(0);
 end Float_Structural;
