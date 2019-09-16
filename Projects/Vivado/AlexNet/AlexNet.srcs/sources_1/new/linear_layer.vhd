@@ -9,10 +9,10 @@ entity linear_layer is
 		output_size: positive := 1
 	);
 	Port (
-		Din: in bus_array(input_size - 1 downto 0)(31 downto 0);
-		Weights: in bus_2d_array(output_size - 1 downto 0)(input_size - 1 downto 0)(31 downto 0);
-		Bias: in bus_array(output_size - 1 downto 0)(31 downto 0);
-		Dout: out bus_array(output_size - 1 downto 0)(31 downto 0)
+		Din: in bus_array(input_size - 1 downto 0);
+		Weights: in bus_array(output_size * input_size - 1 downto 0);
+		Bias: in bus_array(output_size - 1 downto 0);
+		Dout: out bus_array(output_size - 1 downto 0)
 	);
 end linear_layer;
 
@@ -28,7 +28,7 @@ begin
 			)
 			Port Map (
 				Din => Din,
-				Weights => Weights(i),
+				Weights => Weights((i + 1) * input_size - 1 downto i * input_size),
 				Bias => Bias(i),
 				Dout => Dout(i)
 			);
