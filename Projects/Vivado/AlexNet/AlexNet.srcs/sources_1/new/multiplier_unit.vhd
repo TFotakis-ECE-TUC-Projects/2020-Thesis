@@ -8,12 +8,11 @@ use work.bus_array_pkg.all;
 
 entity multiplier_unit is
 	Generic (
-		use_float: boolean := true;
-		output_width: positive := 32
+		use_float: boolean := true
 	);
 	Port (
 		Din: in bus_array (1 downto 0);
-		Dout: out std_logic_vector (output_width - 1 downto 0)
+		Dout: out std_logic_vector (63 downto 0)
 	);
 end multiplier_unit;
 
@@ -35,7 +34,8 @@ begin
 				s_axis_b_tvalid => '1',
 				s_axis_b_tdata => Din(1),
 				-- m_axis_result_tvalid => tmp_valid,
-				m_axis_result_tdata => Dout
+				m_axis_result_tdata => Dout(31 downto 0)
 			);
+		Dout(63 downto 32) <= (others => '0');
 	end generate;
 end Structural;
