@@ -18,20 +18,20 @@ end linear_unit;
 
 
 architecture Structural_no_ReLU of linear_unit is
-	signal mul_out: bus_array(input_size - 1 downto 0);
+	signal mul_out, unused_mul_out: bus_array(input_size - 1 downto 0);
 begin
 	multipliers:
 	for i in 0 to input_size - 1 generate
 		mul_unit:
 		entity work.multiplier_unit
 			Generic Map (
-				use_float => use_float,
-				output_width => 32
+				use_float => use_float
 			)
 			Port Map (
 				Din(0) => Din(i),
 				Din(1) => Weights(i),
-				Dout => mul_out(i)
+				Dout(31 downto 0) => mul_out(i),
+				Dout(63 downto 32) => unused_mul_out(i)
 			);
 	end generate;
 
