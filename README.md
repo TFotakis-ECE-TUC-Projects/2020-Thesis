@@ -48,12 +48,12 @@ Thesis Committee:
 	- [3.4 AlexNet](#34-alexnet)
 	- [3.5 Thesis Approach](#35-thesis-approach)
 - [Chapter 4: AlexNet Robustness Analysis](#chapter-4-alexnet-robustness-analysis)
-- [4.1 Algorithms:](#41-algorithms)
-	- [Algorithm [x]: Convolution](#algorithm-x-convolution)
-	- [Algorithm [x]: ReLU](#algorithm-x-relu)
-	- [Algorithm [x]: Max Pooling](#algorithm-x-max-pooling)
-	- [Algorithm [x]: Linear](#algorithm-x-linear)
-	- [Algorithm [x]: Log SoftMax](#algorithm-x-log-softmax)
+	- [4.1 Algorithms:](#41-algorithms)
+		- [Algorithm [x]: Convolution](#algorithm-x-convolution)
+		- [Algorithm [x]: ReLU](#algorithm-x-relu)
+		- [Algorithm [x]: Max Pooling](#algorithm-x-max-pooling)
+		- [Algorithm [x]: Linear](#algorithm-x-linear)
+		- [Algorithm [x]: Log SoftMax](#algorithm-x-log-softmax)
 - [Chapter 5: FPGA Implementation](#chapter-5-fpga-implementation)
 - [Chapter 6: Results](#chapter-6-results)
 - [Chapter 7: Conclusions and Future Work](#chapter-7-conclusions-and-future-work)
@@ -125,9 +125,9 @@ In this chapter Machine Learning's and Convolutional Neural Networks' theoretica
 ## 3.4 AlexNet
 ## 3.5 Thesis Approach
 # Chapter 4: AlexNet Robustness Analysis
-# 4.1 Algorithms:
+## 4.1 Algorithms:
 <!-- Todo: Fix Reference Numbers -->
-## Algorithm [x]: Convolution
+### Algorithm [x]: Convolution
 ```
 procedure Convolution (image, kernels, bias, stride, padding)
 	Hout ← (image.height + 2 * padding - kernels.size) / stride + 1
@@ -165,7 +165,7 @@ procedure Convolution (image, kernels, bias, stride, padding)
 				res(out_channel, oh, ow) ← pixel + bias(out_channel)
 	return res
 ```
-## Algorithm [x]: ReLU
+### Algorithm [x]: ReLU
 ```
 procedure ReLU (input):
 	for i:=1 to input.length do
@@ -175,7 +175,7 @@ procedure ReLU (input):
 			res(i) ← 0
 	return res
 ```
-## Algorithm [x]: Max Pooling
+### Algorithm [x]: Max Pooling
 ```
 procedure Max Pooling (image, kernel_size, stride):
 	Hout ← (image.height - kernel_size) / stride + 1
@@ -200,7 +200,7 @@ procedure Max Pooling (image, kernel_size, stride):
 				res(channel, oh, ow) ← max
 	return res
 ```
-## Algorithm [x]: Linear
+### Algorithm [x]: Linear
 ```
 procedure Linear (input, kernels, bias):
 	for i:=1 to kernels.number do
@@ -209,7 +209,7 @@ procedure Linear (input, kernels, bias):
 			res(i) ← res(i) + input(j) * kernels(i, j)
 	return res
 ```
-## Algorithm [x]: Log SoftMax
+### Algorithm [x]: Log SoftMax
 ```
 procedure Log SoftMax (input):
 	sum = 0
