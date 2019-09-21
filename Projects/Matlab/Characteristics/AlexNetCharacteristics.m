@@ -2,6 +2,10 @@ clear;
 close all;
 clc;
 
+global SAVE_PLOTS USE_SUBPLOTS
+SAVE_PLOTS = true;
+USE_SUBPLOTS = false;
+
 PlotLayerCharacteristics(224, 55, 3, 96, 11, 4, 2, 'FilterFirst', 'Conv1')
 PlotLayerCharacteristics(55, 27, 96, 96, 3, 2, 0, 'FilterFirst', 'MaxPool1')
 PlotLayerCharacteristics(27, 27, 96, 256, 5, 1, 2, 'FilterFirst', 'Conv2')
