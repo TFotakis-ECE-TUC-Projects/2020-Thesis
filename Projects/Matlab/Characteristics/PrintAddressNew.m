@@ -28,6 +28,6 @@ xlabel('Columns');
 ylabel('Rows');
 
 if ~USE_SUBPLOTS && SAVE_PLOTS
-	saveas(gcf, strcat('output/noSubplots/AlexNet-Characteristics-', figureName, '.png'));
+	saveas(gcf, strcat('output/noSubplots/', figureName, '.png'));
 end
 end
