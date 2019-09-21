@@ -235,7 +235,12 @@ MaxPool 1 | ![](Documentation/Assets/FPGA-Implementation/Characteristics/MaxPool
 MaxPool 2 | ![](Documentation/Assets/FPGA-Implementation/Characteristics/MaxPool2-pixel-frequency.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/MaxPool2-pixel-histogram.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/MaxPool2-output-creation-time.png)
 MaxPool 3 | ![](Documentation/Assets/FPGA-Implementation/Characteristics/MaxPool3-pixel-frequency.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/MaxPool3-pixel-histogram.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/MaxPool3-output-creation-time.png)
 ## 5.2 Scheduling
-![AlexNet-Scheduling](Documentation/Assets/FPGA-Implementation/Scheduling/AlexNet-Scheduling.png)  
+Architecture | Serial | Pipelined
+:---: | :---: | :---:
+No Parallelism | ![](Documentation/Assets/FPGA-Implementation/Scheduling/Serial.png) | ![](Documentation/Assets/FPGA-Implementation/Scheduling/Pipelined-1x.png)
+Kernel Parallelism | ![](Documentation/Assets/FPGA-Implementation/Scheduling/Serial-Kernels-Parallelism.png) | ![](Documentation/Assets/FPGA-Implementation/Scheduling/Pipelined-Kernels-Parallelism.png)
+Kernel & Channels Parallelism | ![](Documentation/Assets/FPGA-Implementation/Scheduling/Serial-K-x-OC-Parallelism.png) | ![](Documentation/Assets/FPGA-Implementation/Scheduling/Pipelined-K-x-OC-Parallelism.png)
+
 Chip Frequency: 100 MHz  
 Serial: 7501.22 ms  
 Pipelined 1x: 2842.86 ms  
