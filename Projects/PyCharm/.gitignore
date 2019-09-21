@@ -1,1 +1,4 @@
 output
+**/Data/**/*.png
+**/Data/**/*.jpg
+**/Data/**/*.ppm
