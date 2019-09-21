@@ -4,7 +4,7 @@ clc;
 
 %% Definitions
 % c: cycles per operation
-global c p chip_frequency logScale printTimings
+global c p chip_frequency logScale printTimings USE_SUBPLOTS SAVE_PLOTS
 c.memRead = 1;
 c.mul = 1;
 c.add = 1;
@@ -14,6 +14,8 @@ c.useTimings = 0;
 chip_frequency = 100e6;
 logScale = 0;
 printTimings = 1;
+USE_SUBPLOTS = false;
+SAVE_PLOTS = true;
 fprintf("Chip Frequency: %d MHz\n\n", chip_frequency / 1e6);
 
 
@@ -30,12 +32,22 @@ p.linear1 = 1;
 p.linear2 = 1;
 p.linear3 = 1;
 
-subplot(3,2,1)
+
+if USE_SUBPLOTS
+	subplot(3,2,1);
+else
+	figure();
+end
 n1 = CreateNetwork();
 n1 = ScheduleSerial(n1);
 PrintSchedule(n1.arr, 'Serial');
 
-subplot(3,2,2)
+
+if USE_SUBPLOTS
+	subplot(3,2,2);
+else
+	figure();
+end
 n2 = CreateNetwork();
 n2 = SchedulePipelined(n2);
 PrintSchedule(n2.arr, 'Pipelined 1x');
@@ -52,12 +64,21 @@ p.linear1 = 1024;
 p.linear2 = 1024;
 p.linear3 = 1024;
 
-subplot(3,2,3)
+
+if USE_SUBPLOTS
+	subplot(3,2,3);
+else
+	figure();
+end
 n3 = CreateNetwork();
 n3 = ScheduleSerial(n3);
 PrintSchedule(n3.arr, 'Serial Kernels Parallelism');
 
-subplot(3,2,4)
+if USE_SUBPLOTS
+	subplot(3,2,4);
+else
+	figure();
+end
 n4 = CreateNetwork();
 n4 = SchedulePipelined(n4);
 PrintSchedule(n4.arr, 'Pipelined Kernels Parallelism');
@@ -74,12 +95,25 @@ p.linear1 = 1024;
 p.linear2 = 1024;
 p.linear3 = 1024;
 
-subplot(3,2,5)
+
+if USE_SUBPLOTS
+	subplot(3,2,5);
+else
+	figure();
+end
 n5 = CreateNetwork();
 n5 = ScheduleSerial(n5);
-PrintSchedule(n5.arr, 'Serial K*OC Parallelism');
+PrintSchedule(n5.arr, 'Serial K x OC Parallelism');
 
-subplot(3,2,6)
+if USE_SUBPLOTS
+	subplot(3,2,6);
+else
+	figure();
+end
 n6 = CreateNetwork();
 n6 = SchedulePipelined(n6);
-PrintSchedule(n6.arr, 'Pipelined K*OC Parallelism');
+PrintSchedule(n6.arr, 'Pipelined K x OC Parallelism');
+
+if USE_SUBPLOTS && SAVE_PLOTS
+	saveas('output/withSubplots/Scheduling.png');
+end

@@ -1,7 +1,7 @@
 function PrintSchedule(arr, figureName)
-global chip_frequency logScale printTimings
+global chip_frequency logScale printTimings USE_SUBPLOTS SAVE_PLOTS
 %cla;
-lineWidth = 10;
+lineWidth = 15;
 
 a = [[arr(:).st]; [arr(:).en]];
 b = [length(arr):-1:1; length(arr):-1:1];
@@ -27,5 +27,9 @@ end
 
 if printTimings
 	fprintf("%s: %.2f ms\n", figureName, (arr(end).en / chip_frequency) * 1e3)
+end
+
+if ~USE_SUBPLOTS && SAVE_PLOTS
+	saveas(gca, strcat('output/noSubplots/', regexprep(figureName, ' +', '-'), '.png'))
 end
 end
