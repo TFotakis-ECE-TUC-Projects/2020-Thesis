@@ -17,7 +17,7 @@ end top_linear_unit;
 architecture Structural of top_linear_unit is
 begin
 	linear:
-	entity work.linear_unit
+	entity work.linear_unit(Structural_no_ReLU)
 		Generic Map (
 			use_float => true,
 			input_size => 2
