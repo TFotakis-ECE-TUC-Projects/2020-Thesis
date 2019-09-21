@@ -56,14 +56,6 @@ Thesis Committee:
 		- [Algorithm [x]: Log SoftMax](#algorithm-x-log-softmax)
 - [Chapter 5: FPGA Implementation](#chapter-5-fpga-implementation)
 	- [5.1 Characteristics](#51-characteristics)
-		- [Convolution 1](#convolution-1)
-		- [Convolution 2](#convolution-2)
-		- [Convolution 3](#convolution-3)
-		- [Convolution 4](#convolution-4)
-		- [Convolution 5](#convolution-5)
-		- [Max Pooling 1](#max-pooling-1)
-		- [Max Pooling 2](#max-pooling-2)
-		- [Max Pooling 3](#max-pooling-3)
 	- [5.2 Scheduling](#52-scheduling)
 - [Chapter 6: Results](#chapter-6-results)
 - [Chapter 7: Conclusions and Future Work](#chapter-7-conclusions-and-future-work)
@@ -232,38 +224,16 @@ procedure Log SoftMax (input):
 ```
 # Chapter 5: FPGA Implementation
 ## 5.1 Characteristics
-### Convolution 1
-Pixel usage frequency | Pixel usage frequency histogram | Output creation time
-:---:|:---:|:---:
-![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv1-pixel-frequency.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv1-pixel-histogram.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv1-output-creation-time.png)
-### Convolution 2
-Pixel usage frequency | Pixel usage frequency histogram | Output creation time
-:---:|:---:|:---:
-![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv2-pixel-frequency.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv2-pixel-histogram.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv2-output-creation-time.png)
-### Convolution 3
-Pixel usage frequency | Pixel usage frequency histogram | Output creation time
-:---:|:---:|:---:
-![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv3-pixel-frequency.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv3-pixel-histogram.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv3-output-creation-time.png)
-### Convolution 4
-Pixel usage frequency | Pixel usage frequency histogram | Output creation time
-:---:|:---:|:---:
-![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv4-pixel-frequency.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv4-pixel-histogram.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv4-output-creation-time.png)
-### Convolution 5
-Pixel usage frequency | Pixel usage frequency histogram | Output creation time
-:---:|:---:|:---:
-![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv5-pixel-frequency.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv5-pixel-histogram.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv5-output-creation-time.png)
-### Max Pooling 1
-Pixel usage frequency | Pixel usage frequency histogram | Output creation time
-:---:|:---:|:---:
-![](Documentation/Assets/FPGA-Implementation/Characteristics/MaxPool1-pixel-frequency.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/MaxPool1-pixel-histogram.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/MaxPool1-output-creation-time.png)
-### Max Pooling 2
-Pixel usage frequency | Pixel usage frequency histogram | Output creation time
-:---:|:---:|:---:
-![](Documentation/Assets/FPGA-Implementation/Characteristics/MaxPool2-pixel-frequency.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/MaxPool2-pixel-histogram.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/MaxPool2-output-creation-time.png)
-### Max Pooling 3
-Pixel usage frequency | Pixel usage frequency histogram | Output creation time
-:---:|:---:|:---:
-![](Documentation/Assets/FPGA-Implementation/Characteristics/MaxPool3-pixel-frequency.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/MaxPool3-pixel-histogram.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/MaxPool3-output-creation-time.png)
+Module | Pixel usage frequency | Pixel usage frequency histogram | Output creation time
+:---:|:---:|:---:|:---:
+Conv 1 | ![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv1-pixel-frequency.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv1-pixel-histogram.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv1-output-creation-time.png)
+Conv 2 | ![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv2-pixel-frequency.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv2-pixel-histogram.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv2-output-creation-time.png)
+Conv 3 | ![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv3-pixel-frequency.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv3-pixel-histogram.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv3-output-creation-time.png)
+Conv 4 | ![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv4-pixel-frequency.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv4-pixel-histogram.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv4-output-creation-time.png)
+Conv 5 | ![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv5-pixel-frequency.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv5-pixel-histogram.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/Conv5-output-creation-time.png)
+MaxPool 1 | ![](Documentation/Assets/FPGA-Implementation/Characteristics/MaxPool1-pixel-frequency.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/MaxPool1-pixel-histogram.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/MaxPool1-output-creation-time.png)
+MaxPool 2 | ![](Documentation/Assets/FPGA-Implementation/Characteristics/MaxPool2-pixel-frequency.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/MaxPool2-pixel-histogram.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/MaxPool2-output-creation-time.png)
+MaxPool 3 | ![](Documentation/Assets/FPGA-Implementation/Characteristics/MaxPool3-pixel-frequency.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/MaxPool3-pixel-histogram.png) | ![](Documentation/Assets/FPGA-Implementation/Characteristics/MaxPool3-output-creation-time.png)
 ## 5.2 Scheduling
 ![AlexNet-Scheduling](Documentation/Assets/FPGA-Implementation/Scheduling/AlexNet-Scheduling.png)  
 Chip Frequency: 100 MHz  
