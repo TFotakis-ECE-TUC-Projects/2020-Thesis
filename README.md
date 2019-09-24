@@ -32,12 +32,13 @@ Thesis Committee:
 	- [1.3 Thesis Outline](#13-thesis-outline)
 - [Chapter 2: Theoretical Background](#chapter-2-theoretical-background)
 	- [2.1 Machine Learning](#21-machine-learning)
-	- [2.2 Convolutional Neural Network](#22-convolutional-neural-network)
-	- [2.3 Structure of Convolutional Neural Network](#23-structure-of-convolutional-neural-network)
+	- [2.2 Artificial Neural Network](#22-artificial-neural-network)
+	- [2.3 Convolutional Neural Network](#23-convolutional-neural-network)
+	- [2.4 Structure of Convolutional Neural Network](#24-structure-of-convolutional-neural-network)
 		- [2.3.1 Convolution Layer](#231-convolution-layer)
 		- [2.3.2 Pooling](#232-pooling)
 		- [2.3.3 Activation Function](#233-activation-function)
-	- [2.4 Typical Architecture of AlexNet](#24-typical-architecture-of-alexnet)
+	- [2.5 Typical Architecture of AlexNet](#25-typical-architecture-of-alexnet)
 - [Chapter 3: Related Work](#chapter-3-related-work)
 	- [3.1 Google Brain Project](#31-google-brain-project)
 		- [3.1.1 DistBelief](#311-distbelief)
@@ -73,6 +74,7 @@ Thesis Committee:
 - [Algorithm [x]: Linear](#algorithm-x-linear)
 - [Algorithm [x]: Log Soft Max](#algorithm-x-log-soft-max)
 # List of Abbreviations
+<!-- spell-checker: disable -->
 Abbreviation	| Meaning
 --- 			| ---
 AI				| **A**rtificial **I**ntelligence  
@@ -80,6 +82,7 @@ ANN				| **A**rtificial **N**eural **N**etwork
 B-RAM			| **B**lock **R**andom **A**ccess **M**emory
 CNN				| **C**onvolutional **N**eural **N**etwork
 CPU				| **C**entral **P**rocessor **U**nit  
+CS				| **C**omputer **S**cience  
 D-RAM			| **D**ynamic **R**andom **A**ccess **M**emory
 DNN				| **D**eep **N**eural **N**etwork  
 DP				| **D**eep **L**earning  
@@ -97,6 +100,7 @@ ReLU			| **R**ectified **L**inear **U**nit
 SDK				| **S**oftware **D**evelopment **K**it
 SLC				| **S**econd **L**evel **C**odebook
 TPU				| **T**ensor **P**rocessor **U**nit  
+<!-- spell-checker: enable -->
 # Chapter 1: Introduction
 ## 1.1 Motivation
 ## 1.2 Scientific Contributions
@@ -109,14 +113,36 @@ In this section this thesis organization is outlined.
 * **Chapter 6:** Chapter 6 description
 * **Chapter 7:** Chapter 7 description
 # Chapter 2: Theoretical Background
-In this chapter Machine Learning's and Convolutional Neural Networks' theoretical background is described in detail.
+The theoretical background of Machine Learning and Convolutional Neural Networks is being described below in detail.
+
 ## 2.1 Machine Learning
-## 2.2 Convolutional Neural Network
-## 2.3 Structure of Convolutional Neural Network
+Machine Learning (ML), the name of which was first proposed in 1959 by Arthur Samuel [1], is a subset of Artificial Intelligence (AI) and a Computer Science (CS) field that studies algorithms and statistical models capable of performing specific tasks, such as prediction or decision making, without being explicitly programmed. Instead, sample data are used, also known as "training data", in order for the machine to "learn" to distinguish useful patterns on the input data capable of creating the needed output, e.g. decision or prediction. There are numerous approaches [2] on the learning algorithms types, as well as on the model types used to get trained.
+
+Such algorithm types, at the time of writing, include, but are not limited to:
+- Supervised Learning: Algorithms that learn using "labeled" sample data, data that contain both the inputs and their desired outputs to be used for classification and regression.
+- Unsupervised Learning: In contrast with the Supervised Learning, "unlabeled" sample data are used to discover structures that could group or cluster them.
+- Reinforcement Learning: Algorithms responsible for taking actions in an environment, often also described as software agents, in order to maximize a specific metric, many of which use dynamic programming techniques.
+- Feature Learning: Algorithms that by combining or even discarding features from the input samples, try to create a new more useful set of features. One of the most popular algorithm of this category is Principal Components Analysis (PCA).
+- Anomaly Detection: Algorithms that try to identify outlier samples, which are characterized by their significant difference compared to the majority of the data used. Such algorithms are often used in noise reduction, data mining and even security and defence systems.
+- Association Rule Learning: Algorithms that aim to discover strong relationships between features.
+Such model types, at the time of writing, include, but are not limited to:
+- Artificial Neural Networks (ANN): Also known as Connectionist Systems, imitate the biological brain's neural networks.
+- Decision Trees: Used to make assumptions about the input items target value (the decision tree's leaves) via its observations (the decision tree's branches). When the target takes continuous values the Decision Tree is called a Regression Tree.
+- Support Vector Machines (SVM): Used for classification and regression, mostly popular as non-probabilistic, binary, linear classifiers. They can also be used for non-linear classification using the "kernel trick".
+- Bayesian Networks: Represented as directed acyclic graphs, they can include probabilistic relationships.
+
+<!-- Todo: Add some applications of ML, e.g. image recognition, speech recognition, ec -->
+## 2.2 Artificial Neural Network
+It is widely accepted that the brain's greatest ability is pattern recognition, which ability is used to combine "data" from the organism's senses in a way to better understand its environment. Artificial Neural Networks (ANN), a highly popular sub-field of Machine Learning, try to imitate the brain's structure in order to solve such problems, a structure that has been developing and proving its capabilities for thousands of years.
+<!-- Todo: Add Basic components, e.g. neurons, activations, etc -->
+<!-- Todo: Explain what is a DNN -->
+<!-- Todo: Add NN architectures types, e.g. CNN, RNN, LSTM, etc  -->
+## 2.3 Convolutional Neural Network
+## 2.4 Structure of Convolutional Neural Network
 ### 2.3.1 Convolution Layer
 ### 2.3.2 Pooling
 ### 2.3.3 Activation Function
-## 2.4 Typical Architecture of AlexNet
+## 2.5 Typical Architecture of AlexNet
 # Chapter 3: Related Work
 ## 3.1 Google Brain Project
 ### 3.1.1 DistBelief
@@ -254,9 +280,11 @@ Pipelined K*OC Parallelism: 3.48 ms
 ## 7.2 Future Work
 # References
 <!-- Todo: Fix Reference Numbers -->
+[1] Samuel, Arthur (1959). "Some Studies in Machine Learning Using the Game of Checkers". IBM Journal of Research and Development. 3 (3): 210–229. CiteSeerX 10.1.1.368.2254. doi:10.1147/rd.33.0210. *url:* https://ieeexplore.ieee.org/document/5392560.  
 [x] Alex Krizhevsky, Ilya Sutskever, Geoffrey E. Hinton: *ImageNet classification with deep convolutional neural networks*, (2017) Communications of the ACM. 60 (6): 84–90. doi:10.1145/3065386. ISSN 0001-0782. *url:* https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf.  
 # External Links
 <!-- Todo: Fix Reference Numbers -->
+[2] Machine learning - Wikipedia, (23 September 2019) *url:* https://en.wikipedia.org/wiki/Machine_learning#Approaches.
 [x] Udacity Intro to Deep Learning with PyTorch by Facebook AI. *url:* https://www.udacity.com/course/deep-learning-pytorch--ud188.  
 [x] Kaggle. *url:* https://www.kaggle.com/.  
 [x] MATLAB. *url:* https://www.mathworks.com/.  
