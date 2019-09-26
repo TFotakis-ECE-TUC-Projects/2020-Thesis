@@ -116,22 +116,21 @@ In this section this thesis organization is outlined.
 The theoretical background of Machine Learning and Convolutional Neural Networks is being described below.
 
 ## 2.1 Machine Learning
-Machine Learning (ML), the name of which was first proposed in 1959 by Arthur Samuel [1], is a subset of Artificial Intelligence (AI) and a Computer Science (CS) field that studies algorithms and statistical models capable of performing specific tasks, such as prediction or decision making, without being explicitly programmed. Instead, sample data are used, also known as "training data", for the machine to "learn" to distinguish useful patterns on the input data capable of creating the needed output, e.g. decision or prediction. There are numerous approaches [2] on the learning algorithms types, as well as on the model types used to get trained.
+Machine Learning (ML), the name of which was first proposed in 1959 by Arthur Samuel [1], is a subset of Artificial Intelligence (AI) and a Computer Science (CS) field that studies algorithms and statistical models capable of performing specific tasks, such as prediction or decision making, without being explicitly programmed. Instead, sample data are used, also known as "training data", for the machine to "learn" to distinguish useful patterns on the input data capable of creating the needed output, e.g., decision or prediction. There are numerous approaches [2] on the learning algorithms types, as well as on the model types used to get trained.
 
 Such algorithm types, at the time of writing, include, but are not limited to:
 - Supervised Learning: Algorithms that learn by using "labeled" sample data, data that contain both the inputs and their desired outputs to be used for classification and regression.
 - Unsupervised Learning: In contrast with the Supervised Learning, "unlabeled" sample data are used to discover structures that could group or cluster them.
 - Reinforcement Learning: Algorithms responsible for taking actions in an environment, often also described as software agents, to maximize a specific metric, many of which use dynamic programming techniques.
-- Feature Learning: Algorithms that by combining or even discarding features from the input samples, try to create a new more useful set of features. One of the most popular algorithms of this category is Principal Components Analysis (PCA).
-- Anomaly Detection: Algorithms that try to identify outlier samples, which are characterized by their significant difference compared to the majority of the data used. Such algorithms are often used in noise reduction, data mining and even security and defense systems.
+- Feature Learning: Algorithms that by combining or even discarding features from the input samples, try to create a new, more useful set of features. One of the most popular algorithms of this category is Principal Components Analysis (PCA).
+- Anomaly Detection: Algorithms that try to identify outlier samples, which are characterized by their significant difference compared to the majority of the data used. Such algorithms are often used in noise reduction, data mining, and even security and defense systems.
 - Association Rule Learning: Algorithms that aim to discover strong relationships between features.
 Such model types, at the time of writing, include, but are not limited to:
 - Artificial Neural Networks (ANN): Also known as Connectionist Systems, imitate the biological brain's neural networks.
 - Decision Trees: Used to make assumptions about the input items target value (the decision tree's leaves) via its observations (the decision tree's branches). When the target takes continuous values, the Decision Tree is called a Regression Tree.
-- Support Vector Machines (SVM): Used for classification and regression, mostly popular as non-probabilistic, binary, linear classifiers. They can also be used for non-linear classification using the "kernel trick".
+- Support Vector Machines (SVM): Used for classification and regression, mostly famous as non-probabilistic, binary, linear classifiers. They can also be used for non-linear classification using the "kernel trick".
 - Bayesian Networks: Represented as directed acyclic graphs, they can include probabilistic relationships.
-
-<!-- Todo: Add some applications of ML, e.g. image recognition, speech recognition, etc -->
+<!-- Todo: Add some applications of ML, e.g., image recognition, speech recognition, etc. -->
 ## 2.2 Artificial Neural Network
 It is widely accepted that the brain's greatest ability is pattern recognition, which ability is used to combine "data" from the organism's senses in a way to better understand its environment. Artificial Neural Networks (ANN), a highly popular sub-field of Machine Learning, try to imitate the brain's structure to solve such problems, a structure that has been developing and proving its capabilities for thousands of years.
 <!-- Todo: Add Basic components, e.g. neurons, activations, etc -->
