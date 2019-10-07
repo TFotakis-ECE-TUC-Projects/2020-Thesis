@@ -125,14 +125,24 @@ Such algorithm types, at the time of writing, include, but are not limited to:
 - Feature Learning: Algorithms that by combining or even discarding features from the input samples, try to create a new, more useful set of features. One of the most popular algorithms of this category is Principal Components Analysis (PCA).
 - Anomaly Detection: Algorithms that try to identify outlier samples, which are characterized by their significant difference compared to the majority of the data used. Such algorithms are often used in noise reduction, data mining, and even security and defense systems.
 - Association Rule Learning: Algorithms that aim to discover strong relationships between features.
+
 Such model types, at the time of writing, include, but are not limited to:
 - Artificial Neural Networks (ANN): Also known as Connectionist Systems, imitate the biological brain's neural networks.
-- Decision Trees: Used to make assumptions about the input items target value (the decision tree's leaves) via its observations (the decision tree's branches). When the target takes continuous values, the Decision Tree is called a Regression Tree.
+- Decision Trees: Used to make assumptions about the input items' target value (the decision tree's leaves) via its observations (the decision tree's branches). When the target takes continuous values, the Decision Tree is called a Regression Tree.
 - Support Vector Machines (SVM): Used for classification and regression, mostly famous as non-probabilistic, binary, linear classifiers. They can also be used for non-linear classification using the "kernel trick".
 - Bayesian Networks: Represented as directed acyclic graphs, they can include probabilistic relationships.
-<!-- Todo: Add some applications of ML, e.g., image recognition, speech recognition, etc. -->
+
+Nowadays, most industries have already used Machine Learning in some sort, indicating the significance and variety of its capabilities. It is estimated [3] that by the year 2021, A.I. and M.L. spending will reach $57.6 Billion. Its applications include but are not limited to [4] [5], web page ranking, image recognition, email filtering and spam detection, database mining, handwriting recognition, speech recognition, natural language processing, computer vision, image/video/text/speech generation, personalized marketing, travelling, dynamic pricing, healthcare, facial & fingerprint recognition and intrusion detection.
 ## 2.2 Artificial Neural Network
-It is widely accepted that the brain's greatest ability is pattern recognition, which ability is used to combine "data" from the organism's senses in a way to better understand its environment. Artificial Neural Networks (ANN), a highly popular sub-field of Machine Learning, try to imitate the brain's structure to solve such problems, a structure that has been developing and proving its capabilities for thousands of years.
+It is widely accepted that the brain's greatest ability is pattern recognition, which is used to combine "data" from the organism's senses in a way to better understand its environment. Artificial Neural Networks (ANN), a highly popular sub-field of Machine Learning, try to imitate the brain's structure to solve such problems, a structure that has been developing and proving its capabilities for thousands of years.
+
+While ANNs are inspired by the biological neural networks, they are not identical. A neural network is a collection of connected neurons, through which electrical signals from sensor organs or other neurons are passed and processed. A biological neuron is comprised of four main parts; Dendrites, Cell body, Axon and Synaptic terminals (Figure 1). A Dendrite and its Dendritic branches are used as the neuron's input, where sensors or other neurons get connected. A neuron can have multiple Dendrites. The neuron's cell body collects all the input signals and applies an "activation" function to create the output signal. Afterwards, the output signal is transported through the Axon and then distributed to the next neurons through the Synaptic terminals. The Synaptic terminals to Dendrites connections are called Synapses.
+
+![](Documentation/Assets/Biological-Neuron.png)  
+Figure 1. Standard structure of a biological neuron. [URL](https://nurseslabs.com/nervous-system/)
+
+Similarly to the biological neural networks, an ANN can be represented as a graph, whose vertices represent the biological neurons' cell bodies and its edges the biological synapses. The electrical signal used in biological neurons is represented as a real number and their outputs are calculated by some non-linear function of the inputs' weighted sum. Each edge typically has a weight set during the training process, which amplifies or weakens the edge's signal. 
+
 <!-- Todo: Add Basic components, e.g. neurons, activations, etc -->
 <!-- Todo: Explain what is a DNN -->
 <!-- Todo: Add NN architectures types, e.g. CNN, RNN, LSTM, etc  -->
@@ -283,7 +293,11 @@ Pipelined K*OC Parallelism: 3.48 ms
 [x] Alex Krizhevsky, Ilya Sutskever, Geoffrey E. Hinton: *ImageNet classification with deep convolutional neural networks*, (2017) Communications of the ACM. 60 (6): 84–90. doi:10.1145/3065386. ISSN 0001-0782. *url:* https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf.  
 # External Links
 <!-- Todo: Fix Reference Numbers -->
-[2] Machine learning - Wikipedia, (23 September 2019) *url:* https://en.wikipedia.org/wiki/Machine_learning#Approaches.
+[2] Machine learning - Wikipedia, (23 September 2019) *url:* https://en.wikipedia.org/wiki/Machine_learning#Approaches.  
+[5] Roundup Of Machine Learning Forecasts And Market Estimates, 2018
+[3] Machine Learning – Applications *url:* https://www.geeksforgeeks.org/machine-learning-introduction/  
+[4] Top Machine Learning Applications in 2019 *url:* https://www.geeksforgeeks.org/top-machine-learning-applications-in-2019/  
+ *url:* https://www.forbes.com/sites/louiscolumbus/2018/02/18/roundup-of-machine-learning-forecasts-and-market-estimates-2018/#536446aa2225  
 [x] Udacity Intro to Deep Learning with PyTorch by Facebook AI. *url:* https://www.udacity.com/course/deep-learning-pytorch--ud188.  
 [x] Kaggle. *url:* https://www.kaggle.com/.  
 [x] MATLAB. *url:* https://www.mathworks.com/.  
