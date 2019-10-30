@@ -12,11 +12,9 @@
 
 #define FILE_SYSTEM_USE_STRFUNC 1
 
+#define IMAGES_DIR "tzanis/images"
 #define PARAMS_FILE "tzanis/alexnet.bin"
 #define LABELS_FILE "tzanis/labels.txt"
-#define IMAGE_FILE "tzanis/images/cat.16.ppm"
-//#define IMAGE_FILE "tzanis/cat.16.ppm"
-//#define IMAGE_FILE "tzanis/cat.ppm"
 
 
 /**
@@ -97,18 +95,17 @@ int main() {
     int res = mount_sd();
     if (res) return XST_FAILURE;
 
+    Filelist *imagesPaths = getFileList(IMAGES_DIR);
+
     char **labels = loadLabels(LABELS_FILE);
     Params *params = params = loadParameters(PARAMS_FILE);
 
 
     printf("\n-----------------------\n");
     printf("- Starting Inference...\n\n");
-    inference(IMAGE_FILE, params, labels);
-    inference(IMAGE_FILE, params, labels);
-    inference(IMAGE_FILE, params, labels);
-    inference(IMAGE_FILE, params, labels);
-    inference(IMAGE_FILE, params, labels);
-    inference(IMAGE_FILE, params, labels);
+    for(int i = 0; i < imagesPaths->length; i++){
+        inference(imagesPaths->list[i], params, labels);
+    }
     printf("\n- Inference finished successfully!\n");
     printf("-----------------------\n\n");
 
