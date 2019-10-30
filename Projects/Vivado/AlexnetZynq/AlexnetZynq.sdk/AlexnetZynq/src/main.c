@@ -14,9 +14,9 @@
 
 #define PARAMS_FILE "tzanis/alexnet.bin"
 #define LABELS_FILE "tzanis/labels.txt"
-//#define IMAGE_FILE "tzanis/images/cat.16.ppm"
+#define IMAGE_FILE "tzanis/images/cat.16.ppm"
 //#define IMAGE_FILE "tzanis/cat.16.ppm"
-#define IMAGE_FILE "tzanis/cat.ppm"
+//#define IMAGE_FILE "tzanis/cat.ppm"
 
 
 /**
