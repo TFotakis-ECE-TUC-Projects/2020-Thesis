@@ -368,3 +368,6 @@ Image *createInitializedImage(uint depth, uint height, uint width, char *path) {
 	initChannelsMatrix(image);
 	return image;
 }
+
+
+

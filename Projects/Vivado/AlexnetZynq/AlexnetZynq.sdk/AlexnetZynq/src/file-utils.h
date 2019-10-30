@@ -1,10 +1,3 @@
-/*
- * file-utils.h
- *
- *  Created on: Oct 28, 2019
- *      Author: tzanis
- */
-
 #ifndef SRC_FILE_UTILS_H_
 #define SRC_FILE_UTILS_H_
 
@@ -40,6 +33,32 @@ float readFloat(FIL *f){
 }
 
 
+FIL open_file(char *path) {
+	FIL f;
+	printf("- Opening File \"%s\": ", path);
+	FRESULT fRes = f_open(&f, path, FA_OPEN_EXISTING | FA_READ);
+	if(fRes != FR_OK){
+		printf("%sError %d.%s\n", KRED,  fRes, KNRM);
+		exit(XST_FAILURE);
+	}
+	printf("%sSuccess%s\n", KGRN, KNRM);
+	return f;
+}
+
+
+int close_file(FIL f) {
+//	printf("- Closing File %s: ", filename);
+	printf("- Closing File: ");
+	FRESULT fRes = f_close(&f);
+	if(fRes != FR_OK) {
+		printf("%sError %d.%s\n", KRED,  fRes, KNRM);
+		exit(XST_FAILURE);
+	}
+	printf("%sSuccess%s\n", KGRN, KNRM);
+	return XST_SUCCESS;
+}
+
+
 /**
  * Loads the network's parameters using the file defined on the parametersPath
  * global variable.
@@ -47,15 +66,7 @@ float readFloat(FIL *f){
  */
 Params *loadParameters(char *filename) {
 	/** Open the parameters file */
-	FRESULT fRes;
-	FIL f;
-
-	printf("- Opening File \"%s\": ", filename);
-	if((fRes = f_open(&f, filename, FA_OPEN_EXISTING | FA_READ)) != FR_OK){
-		printf("%sError %d.%s\n", KRED,  fRes, KNRM);
-		return 0;
-	}
-	printf("%sSuccess%s\n", KGRN, KNRM);
+	FIL f = open_file(filename);
 
 	printf("- Loading parameters: 00%%");
 	/** Allocate the needed memory to store the Params structure */
@@ -95,7 +106,7 @@ Params *loadParameters(char *filename) {
 		matrix->matrix = (matrix_t *) malloc(xLen * sizeof(matrix_t));
 		if (matrix->matrix == NULL) {
 			printf("Error. Not enough memory!\n");
-			return NULL;
+			exit(XST_FAILURE);
 		}
 
 		/** For every parameter */
@@ -112,15 +123,107 @@ Params *loadParameters(char *filename) {
 	printf("\b\b\b");
 	printf("%sSuccess%s\n", KGRN, KNRM);
 
-	printf("- Closing File %s: ", filename);
-	fRes = f_close(&f);
-	if(fRes != FR_OK) {
-		printf("%sError %d.%s\n", KRED,  fRes, KNRM);
-		return NULL;
+	close_file(f);
+
+	return params;
+}
+
+
+/**
+ * Loads the network's classes' labels using the file defined on the labelsPath
+ * global variable.
+ * @returns an array of strings containing the loaded labels.
+ */
+char **loadLabels(char *labelsPath) {
+	/** Open the labels file */
+	FIL f = open_file(labelsPath);
+
+	printf("- Loading labels: ");
+
+	char *s;
+	char buff[200];
+
+	/** Read the number of labels contained in this file */
+	uint labelsNum;
+	s = f_gets(buff, sizeof(buff), &f);
+	sscanf(s, "%u\n", &labelsNum);
+
+	/** Allocate the needed memory to store the labels array */
+	char **labels = (char **) malloc(labelsNum * sizeof(char *));
+
+	/** For every label in the file */
+	for (int i = 0; i < labelsNum; i++) {
+		/** Allocate memory for each label string */
+		labels[i] = (char *) malloc(150 * sizeof(char));
+
+		/** Read the label and store it to the allocated string */
+		s = f_gets(buff, sizeof(buff), &f);
+		sscanf(s, "%[^\n]\n", labels[i]);
 	}
 	printf("%sSuccess%s\n", KGRN, KNRM);
 
-	return params;
+	close_file(f);
+
+	return labels;
+}
+
+
+FloatMatrix *loadImage(char *path) {
+	FIL f = open_file(path);
+	printf("- Loading image \"%s\": ", path);
+	char *s;
+	char buff[16];
+
+	// check the image format
+	s = f_gets(buff, sizeof(buff), &f);
+	if (!s || buff[0] != 'P' || buff[1] != '6') {
+		printf("%sInvalid image format (must be 'P6')%s\n", KRED, KNRM);
+		exit(XST_FAILURE);
+	}
+
+	int character, width, height, depth;
+	// check for comments
+	s = f_gets(buff, sizeof(buff), &f);
+	character = buff[0];
+	while (character == '#') {
+		s = f_gets(buff, sizeof(buff), &f);
+		character = buff[0];
+	}
+
+	// read image size information
+	if (sscanf(s, "%d %d", &width, &height) != 2) {
+		printf("%sInvalid image size (error loading '%s')%s\n", KRED, path, KNRM);
+		exit(XST_FAILURE);
+	}
+
+	// read RGB component
+	s = f_gets(buff, sizeof(buff), &f);
+	if (sscanf(s, "%d", &depth) != 1) {
+		printf("%sInvalid RGB component (error loading '%s')%s\n", KRED, path, KNRM);
+		exit(XST_FAILURE);
+	}
+
+	uint8_t color;
+	uint bytes_read;
+	f_read(&f, &color, 1, &bytes_read);
+
+	FloatMatrix *x = zero3DFloatMatrix(3, height, width);
+	for (int h = 0; h < height; h++) {
+		for (int w = 0; w < width; w++) {
+			for (int c = 0; c < 3; c++) {
+				f_read(&f, &color, 1, &bytes_read);
+				uint index = calc3DIndex(x->dims, c, h, w);
+				// matrix_t num = roundToDecimals(color / 255.0, 10);
+				matrix_t num = color / 255.0;
+				x->matrix[index] = num;
+			}
+		}
+	}
+	printf("%sSuccess%s\n", KGRN, KNRM);
+
+	close_file(f);
+
+	return x;
 }
 
 
@@ -134,7 +237,7 @@ int mount_sd(){
 	fRes = f_mount(&fatfs, "0:/", 0);
 	if(fRes != FR_OK) {
 		printf("%sError %d.%s\n", KRED,  fRes, KNRM);
-		return XST_FAILURE;
+		exit(XST_FAILURE);
 	}
 	printf("%sSuccess%s\n", KGRN, KNRM);
 	return XST_SUCCESS;

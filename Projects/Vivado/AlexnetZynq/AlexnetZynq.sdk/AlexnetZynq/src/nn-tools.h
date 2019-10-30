@@ -1,3 +1,6 @@
+#include "math.h"
+
+
 /**
  * Calculates the 2-dimensional convolution of FloatMatrix x and filters stored
  * in FloatMatrix weights, biased by FloatMatrix bias.
@@ -22,10 +25,6 @@ FloatMatrix *Conv2d(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias,
 	FloatMatrix *tmp = zero3DFloatMatrix(x->dims[0], x->dims[1] + 2 * padding,
 	                                     x->dims[2] + 2 * padding);
 
-	/** If OpenMP is defined parallelize the for loop */
-#if ENABLE_OPENMP == 1
-#pragma omp parallel for
-#endif
 	/** For every channel */
 	for (int i = 0; i < x->dims[0]; i++) {
 		/** For every row */
@@ -60,10 +59,6 @@ FloatMatrix *Conv2d(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias,
 	/** Free the input FloatMatrix */
 	freeFloatMatrix(x);
 
-	/** If OpenMP is defined parallelize the for loop */
-#if ENABLE_OPENMP == 1
-#pragma omp parallel for
-#endif
 	/** For every output channel */
 	for (int out_channel = 0; out_channel < out_channels; out_channel++) {
 		/** For every output row */
@@ -121,10 +116,10 @@ FloatMatrix *Conv2d(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias,
 	/** Free the temporary FloatMatrix */
 	freeFloatMatrix(tmp);
 
-	syslog(LOG_INFO, "Conv2D: Done with %u x %u x %u.", res->dims[0],
+#ifdef ENABLE_CHECKING
+	printf("Conv2D: Done with %u x %u x %u.", res->dims[0],
 	       res->dims[1], res->dims[2]);
 
-#ifdef ENABLE_CHECKING
 	/** Print min max and sum of the whole matrix for debugging */
 	printf("%s | ", layerName);
 	printMinMaxSum(res);
@@ -158,10 +153,6 @@ FloatMatrix *Conv2dReLUWithPrePadding(FloatMatrix *x, FloatMatrix *weights, Floa
 	FloatMatrix *tmp = zero3DFloatMatrix(x->dims[0], x->dims[1] + 2 * padding,
 	                                     x->dims[2] + 2 * padding);
 
-	/** If OpenMP is defined parallelize the for loop */
-#if ENABLE_OPENMP == 1
-#pragma omp parallel for
-#endif
 	/** For every channel */
 	for (int i = 0; i < x->dims[0]; i++) {
 		/** For every row */
@@ -196,10 +187,6 @@ FloatMatrix *Conv2dReLUWithPrePadding(FloatMatrix *x, FloatMatrix *weights, Floa
 	/** Free the input FloatMatrix */
 	freeFloatMatrix(x);
 
-	/** If OpenMP is defined parallelize the for loop */
-#if ENABLE_OPENMP == 1
-#pragma omp parallel for
-#endif
 	/** For every output channel */
 	for (int out_channel = 0; out_channel < out_channels; out_channel++) {
 		/** For every output row */
@@ -257,10 +244,11 @@ FloatMatrix *Conv2dReLUWithPrePadding(FloatMatrix *x, FloatMatrix *weights, Floa
 	/** Free the temporary FloatMatrix */
 	freeFloatMatrix(tmp);
 
-	syslog(LOG_INFO, "Conv2D: Done with %u x %u x %u.", res->dims[0],
-	       res->dims[1], res->dims[2]);
 
 #ifdef ENABLE_CHECKING
+	printf("Conv2D: Done with %u x %u x %u.", res->dims[0],
+	       res->dims[1], res->dims[2]);
+
 	/** Print min max and sum of the whole matrix for debugging */
 	printf("%s | ", layerName);
 	printMinMaxSum(res);
@@ -293,10 +281,6 @@ FloatMatrix *Conv2dReLU(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias,
 			(x->dims[1] + 2 * padding - kernel_size) / stride + 1,
 			(x->dims[2] + 2 * padding - kernel_size) / stride + 1);
 
-	/** If OpenMP is defined parallelize the for loop */
-#if ENABLE_OPENMP == 1
-#pragma omp parallel for
-#endif
 	/** For every output channel */
 	for (int out_channel = 0; out_channel < out_channels; out_channel++) {
 		/** For every output row */
@@ -362,10 +346,11 @@ FloatMatrix *Conv2dReLU(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias,
 	/** Free the temporary FloatMatrix */
 	freeFloatMatrix(x);
 
-	syslog(LOG_INFO, "Conv2D: Done with %u x %u x %u.", res->dims[0],
-	       res->dims[1], res->dims[2]);
 
 #ifdef ENABLE_CHECKING
+	printf("Conv2D: Done with %u x %u x %u.", res->dims[0],
+		       res->dims[1], res->dims[2]);
+
 	/** Print min max and sum of the whole matrix for debugging */
 	printf("%s | ", layerName);
 	printMinMaxSum(res);
@@ -390,10 +375,10 @@ FloatMatrix *ReLU(FloatMatrix *x, char *layerName) {
 		/** If value is negative, assign zero */
 		x->matrix[i] = x->matrix[i] < 0 ? 0 : x->matrix[i];
 	}
-	syslog(LOG_INFO, "ReLU: Done.");
-
 
 #ifdef ENABLE_CHECKING
+	printf("ReLU: Done.");
+
 	/** Print min max and sum of the whole matrix for debugging */
 	printf("%s | ", layerName);
 	printMinMaxSum(x);
@@ -421,10 +406,6 @@ FloatMatrix *MaxPool2d(FloatMatrix *x, uint kernel_size, uint stride,
 			(x->dims[1] - kernel_size) / stride + 1,
 			(x->dims[2] - kernel_size) / stride + 1);
 
-	/** If OpenMP is defined parallelize the for loop */
-#if ENABLE_OPENMP == 1
-#pragma omp parallel for
-#endif
 	/** For every channel */
 	for (int i = 0; i < x->dims[0]; i++) {
 		/** For every output row */
@@ -469,10 +450,10 @@ FloatMatrix *MaxPool2d(FloatMatrix *x, uint kernel_size, uint stride,
 	/** Free the input FloatMatrix */
 	freeFloatMatrix(x);
 
-	syslog(LOG_INFO, "MaxPool2D: Done with %u x %u x %u.", res->dims[0],
+#ifdef ENABLE_CHECKING
+	printf("MaxPool2D: Done with %u x %u x %u.", res->dims[0],
 	       res->dims[1], res->dims[2]);
 
-#ifdef ENABLE_CHECKING
 	/** Print min max and sum of the whole matrix for debugging */
 	printf("%s | ", layerName);
 	printMinMaxSum(res);
@@ -497,10 +478,6 @@ FloatMatrix *Linear(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias,
 	/** Allocate and create a 1D matrix to store the result */
 	FloatMatrix *res = create1DFloatMatrix(out_features);
 
-	/** If OpenMP is defined parallelize the for loop */
-#if ENABLE_OPENMP == 1
-#pragma omp parallel for
-#endif
 	/** For every output feature */
 	for (int i = 0; i < weights->dims[0]; i++) {
 		/** Initialize output feature with its bias */
@@ -516,9 +493,9 @@ FloatMatrix *Linear(FloatMatrix *x, FloatMatrix *weights, FloatMatrix *bias,
 	/** Free the input FloatMatrix */
 	freeFloatMatrix(x);
 
-	syslog(LOG_INFO, "Linear: Done with %u nodes.", res->dims[0]);
-
 #ifdef ENABLE_CHECKING
+	printf("Linear: Done with %u nodes.", res->dims[0]);
+
 	/** Print min max and sum of the whole matrix for debugging */
 	printf("%s | ", layerName);
 	printMinMaxSum(res);
@@ -554,9 +531,9 @@ FloatMatrix *LogSoftMax(FloatMatrix *x, char *layerName) {
 	/** Free the input FloatMatrix */
 	freeFloatMatrix(x);
 
-	syslog(LOG_INFO, "LogSoftMax: Done.");
-
 #ifdef ENABLE_CHECKING
+	printf("LogSoftMax: Done.");
+
 	/** Print min max and sum of the whole matrix for debugging */
 	printf("%s | ", layerName);
 	printMinMaxSum(res);
