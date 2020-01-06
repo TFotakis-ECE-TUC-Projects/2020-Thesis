@@ -1,0 +1,14 @@
+/*
+!.gitignore
+!/src
+!/solution*
+/solution*/*
+!/solution*/directives.tcl
+!/solution*/script.tcl
+![Rr][Ee][Aa][Dd][Mm][Ee]*
+csim*
+impl*
+sim*
+syn*
+Debug*
+*.dat
