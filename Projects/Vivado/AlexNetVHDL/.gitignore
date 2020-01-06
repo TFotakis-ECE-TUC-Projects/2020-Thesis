@@ -1,0 +1,40 @@
+/*
+!.gitignore
+
+# # Project Files
+!*.xpr
+
+# # Project sources
+!*.srcs
+
+# # Ignore all but HDL and Waveform Configuration files under folders other than 'ip'
+*.srcs/*/*/*/*
+!*.srcs/*/*/*.v
+!*.srcs/*/*/*.vhd
+!*.srcs/*/*/*.wcfg
+
+*.srcs/*/bd/*/*
+!*.srcs/*/bd/*/*.bd
+
+!*.srcs/*/bd/*/hdl
+*.srcs/*/bd/*/hdl/*
+!*.srcs/*/bd/*/hdl/*.v
+
+!*.srcs/*/bd/*/ip
+*.srcs/*/bd/*/ip/*/*
+!*.srcs/*/bd/*/ip/*/*.xci
+
+# # Ignore all but .xci files (responsible for ip instantiation) under ip folder
+*.srcs/*/ip/*.*
+!*.srcs/*/ip/*.xci
+!*.srcs/*/ip/*.xcix
+!*.srcs/*/ip/*
+*.srcs/*/ip/*/*
+!*.srcs/*/ip/*/*.xci
+!*.srcs/*/ip/*/*.xcix
+
+!*.sdk
+*.sdk/*.*
+*.sdk/*/*
+!*.sdk/*/src
+!*.sdk/*/*.mss
