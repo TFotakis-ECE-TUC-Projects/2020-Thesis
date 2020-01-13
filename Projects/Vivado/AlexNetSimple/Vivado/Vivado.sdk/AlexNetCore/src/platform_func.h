@@ -3,11 +3,12 @@
 
 matrix_t *PARAMS_ADDR[LAYERS_NUMBER * 2];
 
-void init_Conv_core(XConv_core Conv_Core, XConv_core_Config *Conv_Core_cfg) {
+void init_Conv_core(XConv_core *Conv_Core, XConv_core_Config *Conv_Core_cfg_bak) {
 	printf("- Initializing Core: ");
+	XConv_core_Config *Conv_Core_cfg;
 	Conv_Core_cfg = XConv_core_LookupConfig(XPAR_CONV_CORE_0_DEVICE_ID);
 	if (Conv_Core_cfg) {
-		int status = XConv_core_CfgInitialize(&Conv_Core, Conv_Core_cfg);
+		int status = XConv_core_CfgInitialize(Conv_Core, Conv_Core_cfg);
 		if (status != XST_SUCCESS) {
 			printf("Error\n");
 			exit(-1);
@@ -44,6 +45,7 @@ void init_Linear_core(XLinear_core Linear_Core, XLinear_core_Config *Linear_Core
 
 void setup_accelerator() {
 	for(u32 i = 0; i < CONV_CORES_NUM; i++){
+		Conv_core_list[i] = (XConv_core *) malloc(sizeof(XConv_core));
 		init_Conv_core(Conv_core_list[i], Conv_core_cfg_list[i]);
 	}
 	for(u32 i = 0; i < MAXPOOL_CORES_NUM; i++){
@@ -163,7 +165,7 @@ void complete_layer_conf(matrix_t *xAddr) {
 	}
 }
 
-XConv_core get_Conv_core() {
+XConv_core *get_Conv_core() {
 	return Conv_core_list[0];
 }
 
@@ -176,7 +178,8 @@ XLinear_core get_Linear_core() {
 }
 
 void process_Conv(LayerConf lc) {
-	XConv_core Conv_Core = get_Conv_core();
+//	XConv_core Conv_Core = get_Conv_core();
+	XConv_core Conv_Core;
 	printf("- Setup: ");
 	XConv_core_Set_x(&Conv_Core, (u32) (u64) &lc.xAddr);
 	XConv_core_Set_weights(&Conv_Core, (u32) (u64) &lc.weightsAddr);

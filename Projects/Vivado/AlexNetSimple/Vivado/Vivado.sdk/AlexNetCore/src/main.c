@@ -17,8 +17,9 @@ void setup(){
 }
 
 int main() {
-	setup();
-	runTests();
+//	setup();
+//	runTests();
+	test_Conv_core();
 	printf("\n*** All Done ***\n");
 	return 0;
 }

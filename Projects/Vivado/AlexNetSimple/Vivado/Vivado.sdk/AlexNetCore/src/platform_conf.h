@@ -45,7 +45,7 @@ typedef struct {
 	u32 doReLU;
 } LayerConf;
 
-XConv_core Conv_core_list[CONV_CORES_NUM];
+XConv_core *Conv_core_list[CONV_CORES_NUM];
 XConv_core_Config *Conv_core_cfg_list[CONV_CORES_NUM];
 
 XMaxpool_core Maxpool_core_list[MAXPOOL_CORES_NUM];

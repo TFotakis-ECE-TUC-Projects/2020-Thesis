@@ -2,7 +2,24 @@
 #define SRC_TEST_H_
 
 void test_Conv_core(){
-	XConv_core Conv_Core = get_Conv_core();
+//	XConv_core *Conv_Core = get_Conv_core();
+	setbuf(stdout, NULL); // No printf flushing needed
+	printf("\033[2J"); // Clear terminal
+	printf("\033[H");  // Move cursor to the home position
+	Xil_DCacheDisable();
+
+	XConv_core Conv_Core;
+	XConv_core_Config *Conv_Core_cfg;
+	printf("- Initializing Core: ");
+	Conv_Core_cfg = XConv_core_LookupConfig(XPAR_CONV_CORE_0_DEVICE_ID);
+	if (Conv_Core_cfg) {
+		int status = XConv_core_CfgInitialize(&Conv_Core, Conv_Core_cfg);
+		if (status != XST_SUCCESS) {
+			printf("Error\n");
+			exit(-1);
+		}
+	}
+	printf("Success\n");
 
 	printf("\n*** Testing Conv Core ***\n");
 
@@ -21,32 +38,37 @@ void test_Conv_core(){
 	u32 BIAS_SIZE = DOUT;
 	u32 RES_SIZE = (DOUT * HOUT * WOUT);
 
-	u32 X_ADDR = BASE_ADDR;
-	u32 WEIGHTS_ADDR = X_ADDR + X_SIZE;
-	u32 BIAS_ADDR = WEIGHTS_ADDR + WEIGHTS_SIZE;
-	u32 RES_ADDR = BIAS_ADDR + BIAS_SIZE;
+	matrix_t *X_ADDR = (matrix_t *) malloc(X_SIZE * sizeof(matrix_t));
+	matrix_t *WEIGHTS_ADDR = (matrix_t *) malloc(WEIGHTS_SIZE * sizeof(matrix_t));
+	matrix_t *BIAS_ADDR = (matrix_t *) malloc(BIAS_SIZE * sizeof(matrix_t));
+	matrix_t *RES_ADDR = (matrix_t *) malloc(RES_SIZE * sizeof(matrix_t));
 
 	printf("- Initializing Memory: ");
-	matrix_t *x = (matrix_t*) (uint64_t) X_ADDR;
+	matrix_t *x = X_ADDR;
 	for(u32 i = 0; i < X_SIZE; i++){
 		x[i] = 1;
 	}
 
-	matrix_t *weights = (matrix_t*) (uint64_t) WEIGHTS_ADDR;
+	matrix_t *weights = WEIGHTS_ADDR;
 	for(u32 i = 0; i < WEIGHTS_SIZE; i++){
 		weights[i] = 2;
 	}
 
-	matrix_t *bias = (matrix_t*) (uint64_t) BIAS_ADDR;
+	matrix_t *bias = BIAS_ADDR;
 	for(u32 i = 0; i < BIAS_SIZE; i++){
 		bias[i] = 1;
+	}
+
+	matrix_t *res = RES_ADDR;
+	for(u32 i = 0; i < RES_SIZE; i++){
+		res[i] = 0;
 	}
 	printf("Success\n");
 
 	printf("- Setup: ");
-	XConv_core_Set_x(&Conv_Core, X_ADDR);
-	XConv_core_Set_weights(&Conv_Core, WEIGHTS_ADDR);
-	XConv_core_Set_bias(&Conv_Core, BIAS_ADDR);
+	XConv_core_Set_x(&Conv_Core, (u32) (u64) &X_ADDR);
+	XConv_core_Set_weights(&Conv_Core, (u32) (u64) &WEIGHTS_ADDR);
+	XConv_core_Set_bias(&Conv_Core, (u32) (u64) &BIAS_ADDR);
 	XConv_core_Set_din(&Conv_Core, DIN);
 	XConv_core_Set_hin(&Conv_Core, HIN);
 	XConv_core_Set_win(&Conv_Core, WIN);
@@ -56,7 +78,7 @@ void test_Conv_core(){
 	XConv_core_Set_kernel_size(&Conv_Core, KERNEL_SIZE);
 	XConv_core_Set_stride(&Conv_Core, STRIDE);
 	XConv_core_Set_padding(&Conv_Core, PADDING);
-	XConv_core_Set_res(&Conv_Core, RES_ADDR);
+	XConv_core_Set_res(&Conv_Core, (u32) (u64) &RES_ADDR);
 	printf("Success\n");
 
 	printf("- Starting: ");
@@ -64,16 +86,20 @@ void test_Conv_core(){
 	printf("Success\n");
 
 	printf("- Return value: ");
-	while (!XConv_core_IsDone(&Conv_Core));
+//	while (!XConv_core_IsDone(Conv_Core));
+	u32 dat = XConv_core_IsDone(&Conv_Core);
+	printf("dat: %u\n", dat);
 	u32 status = XConv_core_Get_return(&Conv_Core);
 	printf("%d\n", status);
 
 	printf("- Validating: ");
+
 	u32 flag = 1;
-	matrix_t *res = (matrix_t *) (uint64_t) RES_ADDR;
-	matrix_t pixel_value = 1 * 2 * KERNEL_SIZE * KERNEL_SIZE * DIN + 1;
+//	matrix_t *res = RES_ADDR;
+//	matrix_t pixel_value = 1 * 2 * KERNEL_SIZE * KERNEL_SIZE * DIN + 1;
 	for(u32 i = 0; i < RES_SIZE; i++) {
-		if (res[i] != pixel_value) {
+//		if (res[i] != pixel_value) {
+		if (res[i] == 0) {
 			flag = 0;
 			break;
 		}
@@ -82,7 +108,8 @@ void test_Conv_core(){
 }
 
 void test_Conv_core_with_conf(){
-	XConv_core Conv_Core = get_Conv_core();
+//	XConv_core Conv_Core = get_Conv_core();
+	XConv_core Conv_Core;
 
 	printf("\n*** Testing Conv Core with conf ***\n");
 	LayerConf lc = {
