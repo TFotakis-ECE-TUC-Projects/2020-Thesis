@@ -17,16 +17,16 @@ unsigned int calc3DIndex(unsigned int dim0, unsigned int dim1,
 int MaxPool_Core(matrix_t *x, unsigned int d, unsigned int hin, unsigned int win,
 		unsigned int hout, unsigned int wout, unsigned int kernel_size,
 		unsigned int stride, matrix_t *res) {
-#pragma HLS INTERFACE m_axi depth=1024 port=x offset=slave bundle=MEM_R
-#pragma HLS INTERFACE s_axilite port=d
-#pragma HLS INTERFACE s_axilite port=hin
-#pragma HLS INTERFACE s_axilite port=win
-#pragma HLS INTERFACE s_axilite port=hout
-#pragma HLS INTERFACE s_axilite port=wout
-#pragma HLS INTERFACE s_axilite port=kernel_size
-#pragma HLS INTERFACE s_axilite port=stride
-#pragma HLS INTERFACE m_axi depth=1024 port=res offset=slave bundle=MEM_W
-#pragma HLS INTERFACE s_axilite port=return
+#pragma HLS INTERFACE m_axi depth=1024 port=x offset=slave bundle=MASTER_BUS
+#pragma HLS INTERFACE s_axilite port=d bundle=CRTL_BUS
+#pragma HLS INTERFACE s_axilite port=hin bundle=CRTL_BUS
+#pragma HLS INTERFACE s_axilite port=win bundle=CRTL_BUS
+#pragma HLS INTERFACE s_axilite port=hout bundle=CRTL_BUS
+#pragma HLS INTERFACE s_axilite port=wout bundle=CRTL_BUS
+#pragma HLS INTERFACE s_axilite port=kernel_size bundle=CRTL_BUS
+#pragma HLS INTERFACE s_axilite port=stride bundle=CRTL_BUS
+#pragma HLS INTERFACE m_axi depth=1024 port=res offset=slave bundle=MASTER_BUS
+#pragma HLS INTERFACE s_axilite port=return bundle=CRTL_BUS
 
 	/** For every channel */
 	for (int i = 0; i < d; i++) {
