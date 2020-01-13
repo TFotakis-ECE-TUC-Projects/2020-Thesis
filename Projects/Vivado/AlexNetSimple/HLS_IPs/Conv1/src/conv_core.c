@@ -108,8 +108,8 @@ int Conv_Core(volatile matrix_t *x, volatile matrix_t *weights,
 //						for (unsigned int j = jStart; j < jEnd; j++) {
 						for (unsigned int j = 0; j < kernel_size; j++) {
 #pragma HLS UNROLL
-							unsigned int imgH = i + imgStartH;
-							unsigned int imgW = j + imgStartW;
+							int imgH = i + imgStartH;
+							int imgW = j + imgStartW;
 
 							if (imgH < 0 || imgH >= hin || imgW < 0 || imgW >= win)
 								continue;
