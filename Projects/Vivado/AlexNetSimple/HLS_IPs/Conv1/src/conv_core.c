@@ -65,51 +65,38 @@ int Conv_Core(volatile matrix_t *x, volatile matrix_t *weights,
 	stride = 4;
 	padding = 2;
 
+	Loop_output_channel:
 	/** For every output channel */
 	for (unsigned int out_channel = 0; out_channel < dout; out_channel++) {
-//#pragma HLS PIPELINE
 
+		Loop_output_row:
 		/** For every output row */
 		for (unsigned int oh = 0; oh < hout; oh++) {
-//#pragma HLS PIPELINE
 			int imgStartH = oh * stride - padding;
 
-//			unsigned int iStart = imgStartH < 0 ? padding : 0;
-//			unsigned int iEnd =
-//					imgStartH + kernel_size >= hin ?
-//							kernel_size - (imgStartH + kernel_size - hin) :
-//							kernel_size;
-
+			Loop_output_pixel:
 			/** For every output row's pixel */
 			for (unsigned int ow = 0; ow < wout; ow++) {
-//#pragma HLS PIPELINE
 				/** Calculate starting coordinates on the padded matrix */
 				int imgStartW = ow * stride - padding;
-
-//				unsigned int jStart = imgStartW < 0 ? padding : 0;
-//				unsigned int jEnd =
-//						imgStartW + kernel_size >= win ?
-//								kernel_size - (imgStartW + kernel_size - win) :
-//								kernel_size;
-
 				/** Initialize output pixel */
 				matrix_t pixel = bias[out_channel];
+
+				Loop_kernel:
 				/** For every input channel */
 				for (unsigned int in_channel = 0; in_channel < din;
 						in_channel++) {
-#pragma HLS UNROLL
 
+					Loop_kernel_row:
 					/** For kernel_size rows on padded matrix */
-//					for (unsigned int i = iStart; i < iEnd; i++) {
 					for (unsigned int i = 0; i < kernel_size; i++) {
-#pragma HLS UNROLL
+
 						/** For kernel_size pixels on each padded matrix's row
 						 */
-//						for (unsigned int j = jStart; j < jEnd; j++) {
+						Loop_kernel_pixel:
 						for (unsigned int j = 0; j < kernel_size; j++) {
-#pragma HLS UNROLL
-							unsigned int imgH = i + imgStartH;
-							unsigned int imgW = j + imgStartW;
+							int imgH = i + imgStartH;
+							int imgW = j + imgStartW;
 
 							if (imgH < 0 || imgH >= hin || imgW < 0 || imgW >= win)
 								continue;
@@ -152,4 +139,3 @@ int Conv_Core(volatile matrix_t *x, volatile matrix_t *weights,
 
 	return 0;
 }
-
