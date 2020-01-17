@@ -69,32 +69,53 @@ int Conv_Core(volatile matrix_t *x, volatile matrix_t *weights,
 	/** For every output channel */
 	for (unsigned int out_channel = 0; out_channel < dout; out_channel++) {
 
-		Loop_output_row:
-		/** For every output row */
-		for (unsigned int oh = 0; oh < hout; oh++) {
-			int imgStartH = oh * stride - padding;
+		matrix_t pixels[55][55];
+		matrix_t biasCache = bias[out_channel];
+		Loop_pixels_row_init:
+		for (unsigned int i = 0; i < 55; i++) {
+		Loop_pixels_pixel_init:
+			for (unsigned int j = 0; j < 55; j++) {
+				pixels[i][j] = biasCache;
+			}
+		}
 
-			Loop_output_pixel:
-			/** For every output row's pixel */
-			for (unsigned int ow = 0; ow < wout; ow++) {
-				/** Calculate starting coordinates on the padded matrix */
-				int imgStartW = ow * stride - padding;
-				/** Initialize output pixel */
-				matrix_t pixel = bias[out_channel];
+		Loop_kernel:
+		/** For every input channel */
+		for (unsigned int in_channel = 0; in_channel < din; in_channel++) {
 
-				Loop_kernel:
-				/** For every input channel */
-				for (unsigned int in_channel = 0; in_channel < din;
-						in_channel++) {
+			matrix_t weightsCache[11][11];
+		Loop_weightsCache_row_init:
+			for (unsigned int i = 0; i < 11; i++) {
+			Loop_weightsCache_pixel_init:
+				for (unsigned int j = 0; j < 11; j++) {
+					/* Calculate the 1-dimensional representation's
+					 * index of the kernel's matrix
+					 */
+					unsigned int weightsIndex = calc4DIndex(dout, din,
+							kernel_size, kernel_size, out_channel, in_channel,
+							i, j);
+					weightsCache[i][j] = weights[weightsIndex];
+				}
+			}
+
+			Loop_output_row:
+			/** For every output row */
+			for (unsigned int oh = 0; oh < hout; oh++) {
+				int imgStartH = oh * stride - padding;
+
+				Loop_output_pixel:
+				/** For every output row's pixel */
+				for (unsigned int ow = 0; ow < wout; ow++) {
+					/** Calculate starting coordinates on the padded matrix */
+					int imgStartW = ow * stride - padding;
 
 					Loop_kernel_row:
 					/** For kernel_size rows on padded matrix */
 					for (unsigned int i = 0; i < kernel_size; i++) {
 
-						/** For kernel_size pixels on each padded matrix's row
-						 */
-						Loop_kernel_pixel:
-						for (unsigned int j = 0; j < kernel_size; j++) {
+						/** For kernel_size pixels on each padded matrix's row */
+						Loop_kernel_pixel: for (unsigned int j = 0;
+								j < kernel_size; j++) {
 							int imgH = i + imgStartH;
 							int imgW = j + imgStartW;
 
@@ -107,32 +128,30 @@ int Conv_Core(volatile matrix_t *x, volatile matrix_t *weights,
 							unsigned int arrIndex = calc3DIndex(din, hin, win,
 									in_channel, imgH, imgW);
 
-							/**
-							 * Calculate the 1-dimensional representation's
-							 * index of the kernel's matrix
-							 */
-							unsigned int weightsIndex = calc4DIndex(dout, din,
-									kernel_size, kernel_size, out_channel,
-									in_channel, i, j);
-
 							/** Calculate dot product of the two matrices */
-							pixel += x[arrIndex] * weights[weightsIndex];
+							pixels[oh][ow] += x[arrIndex] * weightsCache[i][j];
 						}
 					}
 				}
+			}
+		}
 
+		Loop_output_row_write:
+		for (unsigned int oh = 0; oh < 55; oh++) {
+		Loop_output_pixel_write:
+			for (unsigned int ow = 0; ow < 55; ow++) {
 				/**
 				 * Calculate the 1-dimensional representation's index of the
 				 * output matrix
 				 */
-				unsigned int resIndex = calc3DIndex(dout, hout, wout,
-						out_channel, oh, ow);
+				unsigned int resIndex =
+					calc3DIndex(dout, hout, wout, out_channel, oh, ow);
 
 				/**
 				 * Assign biased dot product result on the corresponding
 				 * output pixel
 				 */
-				res[resIndex] = pixel > 0 ? pixel : 0;
+				res[resIndex] = pixels[oh][ow] > 0 ? pixels[oh][ow] : 0;
 			}
 		}
 	}
