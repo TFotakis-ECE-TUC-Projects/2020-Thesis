@@ -125,6 +125,7 @@ void Maxpool_core_test() {
 
 	while (!Maxpool_core_result_avail)
 		;
+	Maxpool_core_result_avail = 0;
 	printf("- Interrupt received from Maxpool_core.\n");
 	int status = XMaxpool_core_Get_return(&Maxpool_core);
 	printf("- Return value: %d\n", status);
@@ -143,6 +144,10 @@ void Maxpool_core_test() {
 	} else {
 		printf("%sError %lf%s\n", KRED, error, KNRM);
 	}
+
+//	Todo: Find why it stucks here
+//	free(X_ADDR);
+	free(RES_ADDR);
 }
 
 void Linear_core_start(void *InstancePtr) {
@@ -259,6 +264,7 @@ void Linear_core_test() {
 
 	while (!Linear_core_result_avail)
 		;
+	Linear_core_result_avail = 0;
 	printf("- Interrupt received from Linear_core.\n");
 	int status = XLinear_core_Get_return(&Linear_core);
 	printf("- Return value: %d\n", status);
@@ -277,6 +283,12 @@ void Linear_core_test() {
 	} else {
 		printf("%sError %lf%s\n", KRED, error, KNRM);
 	}
+
+
+	free(X_ADDR);
+	free(WEIGHTS_ADDR);
+	free(BIAS_ADDR);
+	free(RES_ADDR);
 }
 
 void Conv_core_start(void *InstancePtr) {
@@ -405,6 +417,7 @@ void Conv_core_test() {
 
 	while (!Conv_core_result_avail)
 		;
+	Conv_core_result_avail = 0;
 	printf("- Interrupt received from Conv_core.\n");
 	int status = XConv_core_Get_return(&Conv_core);
 	printf("- Return value: %d\n", status);
@@ -431,6 +444,11 @@ void Conv_core_test() {
 	} else {
 		printf("%sError %lf%s\n", KRED, error, KNRM);
 	}
+
+	free(X_ADDR);
+	free(WEIGHTS_ADDR);
+	free(BIAS_ADDR);
+	free(RES_ADDR);
 }
 
 int setup_interrupt() {
@@ -493,8 +511,11 @@ void run_tests() {
 int main() {
 	setup();
 
-	run_tests();
-
+	u32 runCount = 0;
+	while(1){
+		printf("\n\n%s*** Test run %u ***%s\n", KYEL, ++runCount, KNRM);
+		run_tests();
+	}
 	printf("- Exiting!\n");
 	return 0;
 }
