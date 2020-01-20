@@ -145,9 +145,8 @@ void Maxpool_core_test() {
 		printf("%sError %lf%s\n", KRED, error, KNRM);
 	}
 
-//	Todo: Find why it stucks here
-//	free(X_ADDR);
 	free(RES_ADDR);
+	free(X_ADDR);
 }
 
 void Linear_core_start(void *InstancePtr) {
