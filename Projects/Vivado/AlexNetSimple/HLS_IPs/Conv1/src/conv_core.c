@@ -55,26 +55,29 @@ int Conv_Core(volatile matrix_t *x, volatile matrix_t *weights,
 //		res[i] = 2;
 //	}
 //	return 0;
-	din = 3;
-	hin = 224;
-	win = 224;
-	dout = 64;
-	hout = 55;
-	wout = 55;
-	kernel_size = 11;
-	stride = 4;
-	padding = 2;
+
+//	din = 3;
+//	hin = 224;
+//	win = 224;
+//	dout = 64;
+//	hout = 55;
+//	wout = 55;
+//	kernel_size = 11;
+//	stride = 4;
+//	padding = 2;
 
 	Loop_output_channel:
 	/** For every output channel */
 	for (unsigned int out_channel = 0; out_channel < dout; out_channel++) {
 
+		// Todo: Fix hardcoded dims
 		matrix_t pixels[55][55];
+
 		matrix_t biasCache = bias[out_channel];
 		Loop_pixels_row_init:
-		for (unsigned int i = 0; i < 55; i++) {
+		for (unsigned int i = 0; i < hout; i++) {
 		Loop_pixels_pixel_init:
-			for (unsigned int j = 0; j < 55; j++) {
+			for (unsigned int j = 0; j < wout; j++) {
 				pixels[i][j] = biasCache;
 			}
 		}
@@ -83,11 +86,13 @@ int Conv_Core(volatile matrix_t *x, volatile matrix_t *weights,
 		/** For every input channel */
 		for (unsigned int in_channel = 0; in_channel < din; in_channel++) {
 
+			// Todo: Fix hardcoded dims
 			matrix_t weightsCache[11][11];
+
 		Loop_weightsCache_row_init:
-			for (unsigned int i = 0; i < 11; i++) {
+			for (unsigned int i = 0; i < kernel_size; i++) {
 			Loop_weightsCache_pixel_init:
-				for (unsigned int j = 0; j < 11; j++) {
+				for (unsigned int j = 0; j < kernel_size; j++) {
 					/* Calculate the 1-dimensional representation's
 					 * index of the kernel's matrix
 					 */
@@ -137,9 +142,9 @@ int Conv_Core(volatile matrix_t *x, volatile matrix_t *weights,
 		}
 
 		Loop_output_row_write:
-		for (unsigned int oh = 0; oh < 55; oh++) {
+		for (unsigned int oh = 0; oh < hout; oh++) {
 		Loop_output_pixel_write:
-			for (unsigned int ow = 0; ow < 55; ow++) {
+			for (unsigned int ow = 0; ow < wout; ow++) {
 				/**
 				 * Calculate the 1-dimensional representation's index of the
 				 * output matrix
