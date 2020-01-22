@@ -95,9 +95,9 @@ void Conv_conf_complete(u32 layer_index, u32 params_index, matrix_t *xAddr) {
 
 void Conv_core_setup(XConv_core *Conv_core, LayerConf lc) {
 	printf("- Setup Conv_core: ");
-	XConv_core_Set_x(Conv_core, (u32)(u64) &lc.xAddr);
-	XConv_core_Set_weights(Conv_core, (u32)(u64) &lc.weightsAddr);
-	XConv_core_Set_bias(Conv_core, (u32)(u64) &lc.biasAddr);
+	XConv_core_Set_x(Conv_core, (u32)(u64) lc.xAddr);
+	XConv_core_Set_weights(Conv_core, (u32)(u64) lc.weightsAddr);
+	XConv_core_Set_bias(Conv_core, (u32)(u64) lc.biasAddr);
 	XConv_core_Set_din(Conv_core, lc.din);
 	XConv_core_Set_hin(Conv_core, lc.hin);
 	XConv_core_Set_win(Conv_core, lc.win);
@@ -107,7 +107,7 @@ void Conv_core_setup(XConv_core *Conv_core, LayerConf lc) {
 	XConv_core_Set_kernel_size(Conv_core, lc.kernelSize);
 	XConv_core_Set_stride(Conv_core, lc.stride);
 	XConv_core_Set_padding(Conv_core, lc.padding);
-	XConv_core_Set_res(Conv_core, (u32)(u64) &lc.resAddr);
+	XConv_core_Set_res(Conv_core, (u32)(u64) lc.resAddr);
 	printf("%sSuccess%s\n", KGRN, KNRM);
 }
 
@@ -138,7 +138,7 @@ void Conv_core_process(LayerConf lc) {
 	XConv_core *Conv_core = get_Conv_core();
 	Conv_core_setup(Conv_core, lc);
 	Conv_core_start(Conv_core);
-//	Conv_core_wait_int(Conv_core);
+	Conv_core_wait_int(Conv_core);
 }
 
 // ----------------------------------------------
@@ -225,7 +225,7 @@ void Maxpool_conf_complete(u32 layer_index, matrix_t *xAddr) {
 
 void Maxpool_core_setup(XMaxpool_core *Maxpool_core, LayerConf lc) {
 	printf("- Setup Maxpool_core: ");
-	XMaxpool_core_Set_x(Maxpool_core, (u32)(u64) &lc.xAddr);
+	XMaxpool_core_Set_x(Maxpool_core, (u32)(u64) lc.xAddr);
 	XMaxpool_core_Set_d(Maxpool_core, lc.din);
 	XMaxpool_core_Set_hin(Maxpool_core, lc.hin);
 	XMaxpool_core_Set_win(Maxpool_core, lc.win);
@@ -233,7 +233,7 @@ void Maxpool_core_setup(XMaxpool_core *Maxpool_core, LayerConf lc) {
 	XMaxpool_core_Set_wout(Maxpool_core, lc.wout);
 	XMaxpool_core_Set_kernel_size(Maxpool_core, lc.kernelSize);
 	XMaxpool_core_Set_stride(Maxpool_core, lc.stride);
-	XMaxpool_core_Set_res(Maxpool_core, (u32)(u64) &lc.resAddr);
+	XMaxpool_core_Set_res(Maxpool_core, (u32)(u64) lc.resAddr);
 	printf("%sSuccess%s\n", KGRN, KNRM);
 }
 
@@ -353,13 +353,13 @@ void Linear_conf_complete(u32 layer_index, u32 params_index, matrix_t *xAddr) {
 
 void Linear_core_setup(XLinear_core *Linear_core, LayerConf lc) {
 	printf("- Setup Linear_core: ");
-	XLinear_core_Set_x(Linear_core, (u32)(u64) &lc.xAddr);
-	XLinear_core_Set_weights(Linear_core, (u32)(u64) &lc.weightsAddr);
-	XLinear_core_Set_bias(Linear_core, (u32)(u64) &lc.biasAddr);
+	XLinear_core_Set_x(Linear_core, (u32)(u64) lc.xAddr);
+	XLinear_core_Set_weights(Linear_core, (u32)(u64) lc.weightsAddr);
+	XLinear_core_Set_bias(Linear_core, (u32)(u64) lc.biasAddr);
 	XLinear_core_Set_in_features(Linear_core, lc.inFeatures);
 	XLinear_core_Set_out_features(Linear_core, lc.outFeatures);
 	XLinear_core_Set_doReLU(Linear_core, lc.doReLU);
-	XLinear_core_Set_res(Linear_core, (u32)(u64) &lc.resAddr);
+	XLinear_core_Set_res(Linear_core, (u32)(u64) lc.resAddr);
 	printf("%sSuccess%s\n", KGRN, KNRM);
 }
 

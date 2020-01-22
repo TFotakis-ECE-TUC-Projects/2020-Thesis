@@ -228,12 +228,12 @@ int run_tests() {
 	int status;
 	status = Conv_core_single_test();
 	if (status != XST_SUCCESS) return status;
-//	printf("\n");
-//	status = Maxpool_core_single_test();
-//	if (status != XST_SUCCESS) return status;
-//	printf("\n");
-//	status = Linear_core_single_test();
-//	if (status != XST_SUCCESS) return status;
+	printf("\n");
+	status = Maxpool_core_single_test();
+	if (status != XST_SUCCESS) return status;
+	printf("\n");
+	status = Linear_core_single_test();
+	if (status != XST_SUCCESS) return status;
 	// printf("\n");
 	// status = Network_single_test();
 	// if (status != XST_SUCCESS) return status;
