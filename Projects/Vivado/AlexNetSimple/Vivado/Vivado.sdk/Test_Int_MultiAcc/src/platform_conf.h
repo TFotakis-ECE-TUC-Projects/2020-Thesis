@@ -16,7 +16,7 @@ typedef double matrix_t;
 
 typedef enum {
 	Conv,
-	MaxPool,
+	Maxpool,
 	LinearReLU,
 	Linear
 } LayerType;
