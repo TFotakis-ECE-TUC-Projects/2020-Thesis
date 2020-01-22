@@ -88,7 +88,7 @@ void complete_Maxpool_conf(u32 layer_index, matrix_t *xAddr) {
 	if (layer_index > 0) {
 		LayerConf *plc = &LAYERS_CONF[layer_index - 1];
 		if(plc->layerType == LinearReLU || plc->layerType == Linear) {
-			printf("Error. Linear layer cannot be followed by MaxPool layer.\n");
+			printf("Error. Linear layer cannot be followed by Maxpool layer.\n");
 			exit(-1);
 		}
 		lc->din = plc->dout;
@@ -113,7 +113,7 @@ void complete_Linear_conf(u32 layer_index, u32 params_index, matrix_t *xAddr) {
 		LayerConf *plc = &LAYERS_CONF[layer_index - 1];
 		switch(plc->layerType) {
 		case Conv:
-		case MaxPool:
+		case Maxpool:
 			lc->inFeatures = plc->dout * plc->hout	* plc->wout;
 			break;
 		case LinearReLU:
@@ -150,7 +150,7 @@ void complete_layer_conf(matrix_t *xAddr) {
 			complete_Conv_conf(i, params_index, xAddr);
 			params_index += 2;
 			break;
-		case MaxPool:
+		case Maxpool:
 			complete_Maxpool_conf(i, xAddr);
 			break;
 		case LinearReLU:
@@ -177,7 +177,7 @@ XLinear_core get_Linear_core() {
 	return Linear_core_list[0];
 }
 
-void process_Conv(LayerConf lc) {
+void Conv_core_process(LayerConf lc) {
 //	XConv_core Conv_Core = get_Conv_core();
 	XConv_core Conv_Core;
 	printf("- Setup: ");
@@ -206,7 +206,7 @@ void process_Conv(LayerConf lc) {
 	printf("%d\n", status);
 }
 
-void process_Maxpool(LayerConf lc) {
+void Maxpool_core_process(LayerConf lc) {
 	XMaxpool_core Maxpool_Core = get_Maxpool_core();
 	printf("- Setup: ");
 	XMaxpool_core_Set_x(&Maxpool_Core, (u32) (u64) &lc.xAddr);
@@ -230,7 +230,7 @@ void process_Maxpool(LayerConf lc) {
 	printf("%d\n", status);
 }
 
-void process_Linear(LayerConf lc) {
+void Linear_core_process(LayerConf lc) {
 	XLinear_core Linear_Core = get_Linear_core();
 	printf("- Setup: ");
 	XLinear_core_Set_x(&Linear_Core, (u32) (u64) &lc.xAddr);
@@ -255,14 +255,14 @@ void process_Linear(LayerConf lc) {
 void process_layer(LayerConf lc) {
 	switch(lc.layerType) {
 	case Conv:
-		process_Conv(lc);
+		Conv_core_process(lc);
 		break;
-	case MaxPool:
-		process_Maxpool(lc);
+	case Maxpool:
+		Maxpool_core_process(lc);
 		break;
 	case LinearReLU:
 	case Linear:
-		process_Linear(lc);
+		Linear_core_process(lc);
 		break;
 	}
 	free(lc.xAddr);

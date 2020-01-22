@@ -15,7 +15,7 @@ LayerConf LAYERS_CONF[] = {
 		.dout = 64,
 	},
 	{
-		.layerType = MaxPool,
+		.layerType = Maxpool,
 		.kernelSize = 3,
 		.stride = 2,
 	},
@@ -27,7 +27,7 @@ LayerConf LAYERS_CONF[] = {
 		.dout = 192,
 	},
 	{
-		.layerType = MaxPool,
+		.layerType = Maxpool,
 		.kernelSize = 3,
 		.stride = 2,
 	},
@@ -53,7 +53,7 @@ LayerConf LAYERS_CONF[] = {
 		.dout = 256,
 	},
 	{
-		.layerType = MaxPool,
+		.layerType = Maxpool,
 		.kernelSize = 3,
 		.stride = 2,
 	},
