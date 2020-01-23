@@ -40,7 +40,7 @@ int Conv_core_single_test() {
 	for (u32 i = 0; i < lc.resSize; i++) { lc.resAddr[i] = 0; }
 	printf("%sSuccess%s\n", KGRN, KNRM);
 
-	Conv_core_process(lc);
+	process_layer(lc);
 
 	printf("- Validating: ");
 	matrix_t pixel_value;
@@ -72,10 +72,9 @@ int Conv_core_single_test() {
 		status = XST_FAILURE;
 	}
 
-	// free(lc.xAddr);
-	// free(lc.weightsAddr);
-	// free(lc.biasAddr);
-	// free(lc.resAddr);
+	free(lc.weightsAddr);
+	free(lc.biasAddr);
+	free(lc.resAddr);
 
 	return status;
 }
@@ -104,7 +103,7 @@ int Maxpool_core_single_test() {
 	for (u32 i = 0; i < lc.resSize; i++) { lc.resAddr[i] = 0; }
 	printf("%sSuccess%s\n", KGRN, KNRM);
 
-	Maxpool_core_process(lc);
+	process_layer(lc);
 
 	printf("- Validating: ");
 	matrix_t *res = (matrix_t *) (uint64_t) lc.resAddr;
@@ -122,8 +121,7 @@ int Maxpool_core_single_test() {
 		status = XST_FAILURE;
 	}
 
-	// free(lc.resAddr);
-	// free(lc.xAddr);
+	free(lc.resAddr);
 
 	return status;
 }
@@ -157,7 +155,7 @@ int Linear_core_single_test() {
 	for (u32 i = 0; i < lc.resSize; i++) { lc.resAddr[i] = 0; }
 	printf("%sSuccess%s\n", KGRN, KNRM);
 
-	Linear_core_process(lc);
+	process_layer(lc);
 
 	printf("- Validating: ");
 	matrix_t *res = (matrix_t *) (uint64_t) lc.resAddr;
@@ -175,10 +173,9 @@ int Linear_core_single_test() {
 		status = XST_FAILURE;
 	}
 
-	// free(lc.xAddr);
-	// free(lc.weightsAddr);
-	// free(lc.biasAddr);
-	// free(lc.resAddr);
+	free(lc.weightsAddr);
+	free(lc.biasAddr);
+	free(lc.resAddr);
 
 	return status;
 }
@@ -221,6 +218,16 @@ int Network_single_test() {
 	forward(xAddr);
 	printf("- %sForwarded Successfully%s\n", KGRN, KNRM);
 
+	printf("- Freeing PARAMS_ADDR: ");
+	for (u32 i = 0; i < params_index; i++) {
+		free(PARAMS_ADDR[i]);
+	}
+	printf("%sSuccess%s\n", KGRN, KNRM);
+
+	printf(" - Freeing last resAddr: ");
+	free(LAYERS_CONF[LAYERS_NUMBER - 1].resAddr);
+	printf("%sSuccess%s\n", KGRN, KNRM);
+
 	return XST_SUCCESS;
 }
 
@@ -237,6 +244,7 @@ int run_tests() {
 	printf("\n");
 	status = Network_single_test();
 	if (status != XST_SUCCESS) return status;
+
 	return XST_SUCCESS;
 }
 

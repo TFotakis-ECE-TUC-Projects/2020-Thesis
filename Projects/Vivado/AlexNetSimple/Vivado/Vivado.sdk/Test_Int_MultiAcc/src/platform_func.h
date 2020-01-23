@@ -489,7 +489,7 @@ void process_layer(LayerConf lc) {
 		case LinearReLU:
 		case Linear: Linear_core_process(lc); break;
 	}
-	// free(lc.xAddr);
+	free(lc.xAddr);
 }
 
 void forward(matrix_t *xAddr) {
