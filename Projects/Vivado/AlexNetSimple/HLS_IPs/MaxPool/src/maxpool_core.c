@@ -31,9 +31,9 @@ int MaxPool_Core(matrix_t *x, unsigned int d, unsigned int hin, unsigned int win
 	/** For every channel */
 	for (int i = 0; i < d; i++) {
 		/** For every output row */
-		for (int j = 0; j < hin; j++) {
+		for (int j = 0; j < hout; j++) {
 			/** For every output row's pixel */
-			for (int k = 0; k < win; k++) {
+			for (int k = 0; k < wout; k++) {
 				/** Calculate pools starting coordinates on the input matrix */
 				unsigned int a = j * stride;
 				unsigned int b = k * stride;
@@ -49,6 +49,7 @@ int MaxPool_Core(matrix_t *x, unsigned int d, unsigned int hin, unsigned int win
 						 * the input matrix
 						 */
 						unsigned int index = calc3DIndex(d, hin, win, i, l, m);
+
 						/**
 						 * Check if current value is greater than max and
 						 * update it
