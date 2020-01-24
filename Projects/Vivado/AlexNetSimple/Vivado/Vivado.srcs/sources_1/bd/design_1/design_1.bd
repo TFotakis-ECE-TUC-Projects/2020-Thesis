@@ -21,9 +21,9 @@
         "m02_couplers": {}
       },
       "Linear_Core_0": "",
-      "MaxPool_Core_0": "",
       "xlconcat_0": "",
-      "Conv_Core_0": ""
+      "Conv_Core_0": "",
+      "MaxPool_Core_0": ""
     },
     "components": {
       "zynq_ultra_ps_e_0": {
@@ -1519,22 +1519,10 @@
           }
         },
         "interface_nets": {
-          "m01_couplers_to_ps8_0_axi_periph": {
+          "m00_couplers_to_ps8_0_axi_periph": {
             "interface_ports": [
-              "M01_AXI",
-              "m01_couplers/M_AXI"
-            ]
-          },
-          "m02_couplers_to_ps8_0_axi_periph": {
-            "interface_ports": [
-              "M02_AXI",
-              "m02_couplers/M_AXI"
-            ]
-          },
-          "xbar_to_m01_couplers": {
-            "interface_ports": [
-              "xbar/M01_AXI",
-              "m01_couplers/S_AXI"
+              "M00_AXI",
+              "m00_couplers/M_AXI"
             ]
           },
           "xbar_to_m00_couplers": {
@@ -1549,22 +1537,34 @@
               "s00_couplers/S_AXI"
             ]
           },
-          "s00_couplers_to_xbar": {
+          "m01_couplers_to_ps8_0_axi_periph": {
             "interface_ports": [
-              "s00_couplers/M_AXI",
-              "xbar/S00_AXI"
+              "M01_AXI",
+              "m01_couplers/M_AXI"
             ]
           },
-          "m00_couplers_to_ps8_0_axi_periph": {
+          "xbar_to_m01_couplers": {
             "interface_ports": [
-              "M00_AXI",
-              "m00_couplers/M_AXI"
+              "xbar/M01_AXI",
+              "m01_couplers/S_AXI"
             ]
           },
           "xbar_to_m02_couplers": {
             "interface_ports": [
               "xbar/M02_AXI",
               "m02_couplers/S_AXI"
+            ]
+          },
+          "m02_couplers_to_ps8_0_axi_periph": {
+            "interface_ports": [
+              "M02_AXI",
+              "m02_couplers/M_AXI"
+            ]
+          },
+          "s00_couplers_to_xbar": {
+            "interface_ports": [
+              "s00_couplers/M_AXI",
+              "xbar/S00_AXI"
             ]
           }
         },
@@ -1643,10 +1643,6 @@
         "vlnv": "xilinx.com:hls:Linear_Core:1.0",
         "xci_name": "design_1_Linear_Core_0_0"
       },
-      "MaxPool_Core_0": {
-        "vlnv": "xilinx.com:hls:MaxPool_Core:1.0",
-        "xci_name": "design_1_MaxPool_Core_0_0"
-      },
       "xlconcat_0": {
         "vlnv": "xilinx.com:ip:xlconcat:2.1",
         "xci_name": "design_1_xlconcat_0_0",
@@ -1664,6 +1660,10 @@
             "value": "32"
           }
         }
+      },
+      "MaxPool_Core_0": {
+        "vlnv": "xilinx.com:hls:MaxPool_Core:1.0",
+        "xci_name": "design_1_MaxPool_Core_0_0"
       }
     },
     "interface_nets": {
@@ -1679,16 +1679,22 @@
           "zynq_ultra_ps_e_0/S_AXI_HP2_FPD"
         ]
       },
+      "ps8_0_axi_periph_M01_AXI": {
+        "interface_ports": [
+          "ps8_0_axi_periph/M01_AXI",
+          "MaxPool_Core_0/s_axi_CRTL_BUS"
+        ]
+      },
       "MaxPool_Core_0_m_axi_MASTER_BUS": {
         "interface_ports": [
           "MaxPool_Core_0/m_axi_MASTER_BUS",
           "zynq_ultra_ps_e_0/S_AXI_HP1_FPD"
         ]
       },
-      "ps8_0_axi_periph_M01_AXI": {
+      "ps8_0_axi_periph_M00_AXI": {
         "interface_ports": [
-          "ps8_0_axi_periph/M01_AXI",
-          "MaxPool_Core_0/s_axi_CRTL_BUS"
+          "ps8_0_axi_periph/M00_AXI",
+          "Conv_Core_0/s_axi_CRTL_BUS"
         ]
       },
       "zynq_ultra_ps_e_0_M_AXI_HPM0_FPD": {
@@ -1701,12 +1707,6 @@
         "interface_ports": [
           "Conv_Core_0/m_axi_MASTER_BUS",
           "zynq_ultra_ps_e_0/S_AXI_HP0_FPD"
-        ]
-      },
-      "ps8_0_axi_periph_M00_AXI": {
-        "interface_ports": [
-          "ps8_0_axi_periph/M00_AXI",
-          "Conv_Core_0/s_axi_CRTL_BUS"
         ]
       }
     },
@@ -1724,9 +1724,9 @@
           "ps8_0_axi_periph/M01_ACLK",
           "ps8_0_axi_periph/M02_ACLK",
           "Linear_Core_0/ap_clk",
-          "MaxPool_Core_0/ap_clk",
           "zynq_ultra_ps_e_0/saxihp2_fpd_aclk",
-          "Conv_Core_0/ap_clk"
+          "Conv_Core_0/ap_clk",
+          "MaxPool_Core_0/ap_clk"
         ]
       },
       "zynq_ultra_ps_e_0_pl_resetn0": {
@@ -1743,8 +1743,8 @@
           "ps8_0_axi_periph/M01_ARESETN",
           "ps8_0_axi_periph/M02_ARESETN",
           "Linear_Core_0/ap_rst_n",
-          "MaxPool_Core_0/ap_rst_n",
-          "Conv_Core_0/ap_rst_n"
+          "Conv_Core_0/ap_rst_n",
+          "MaxPool_Core_0/ap_rst_n"
         ]
       },
       "xlconcat_0_dout": {
@@ -1825,27 +1825,6 @@
           }
         }
       },
-      "/MaxPool_Core_0": {
-        "address_spaces": {
-          "Data_m_axi_MASTER_BUS": {
-            "range": "4G",
-            "width": "32",
-            "segments": {
-              "SEG_zynq_ultra_ps_e_0_HP1_DDR_LOW": {
-                "address_block": "/zynq_ultra_ps_e_0/SAXIGP3/HP1_DDR_LOW",
-                "offset": "0x00000000",
-                "range": "2G"
-              },
-              "SEG_zynq_ultra_ps_e_0_HP1_LPS_OCM": {
-                "address_block": "/zynq_ultra_ps_e_0/SAXIGP3/HP1_LPS_OCM",
-                "offset": "0xFF000000",
-                "range": "16M",
-                "is_excluded": "TRUE"
-              }
-            }
-          }
-        }
-      },
       "/Conv_Core_0": {
         "address_spaces": {
           "Data_m_axi_MASTER_BUS": {
@@ -1859,6 +1838,27 @@
               },
               "SEG_zynq_ultra_ps_e_0_HP0_LPS_OCM": {
                 "address_block": "/zynq_ultra_ps_e_0/SAXIGP2/HP0_LPS_OCM",
+                "offset": "0xFF000000",
+                "range": "16M",
+                "is_excluded": "TRUE"
+              }
+            }
+          }
+        }
+      },
+      "/MaxPool_Core_0": {
+        "address_spaces": {
+          "Data_m_axi_MASTER_BUS": {
+            "range": "4G",
+            "width": "32",
+            "segments": {
+              "SEG_zynq_ultra_ps_e_0_HP1_DDR_LOW": {
+                "address_block": "/zynq_ultra_ps_e_0/SAXIGP3/HP1_DDR_LOW",
+                "offset": "0x00000000",
+                "range": "2G"
+              },
+              "SEG_zynq_ultra_ps_e_0_HP1_LPS_OCM": {
+                "address_block": "/zynq_ultra_ps_e_0/SAXIGP3/HP1_LPS_OCM",
                 "offset": "0xFF000000",
                 "range": "16M",
                 "is_excluded": "TRUE"
