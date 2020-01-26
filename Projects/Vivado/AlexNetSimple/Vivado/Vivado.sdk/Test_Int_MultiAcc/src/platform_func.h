@@ -27,24 +27,18 @@ int Conv_core_setup_interrupt(Core *core) {
 	// Connect the Conv_core ISR to the exception table
 	int result = XScuGic_Connect(
 		&ScuGic,
-		CONV_CORE_INTERRUPT_IDS[core->InstanceId],
+		Conv_core_interrupt_ids[core->InstanceId],
 		(Xil_InterruptHandler) Conv_core_isr,
 		core);
 	if (result != XST_SUCCESS) return result;
-	XScuGic_Enable(&ScuGic, CONV_CORE_INTERRUPT_IDS[core->InstanceId]);
+	XScuGic_Enable(&ScuGic, Conv_core_interrupt_ids[core->InstanceId]);
 	return XST_SUCCESS;
 }
 
 void Conv_core_init(Core *core) {
 	printf("- Initializing Conv_core %u: ", core->InstanceId);
 	core->InstancePtr = (void *) malloc(sizeof(XConv_core));
-	XConv_core_Config *Conv_core_cfg =
-		XConv_core_LookupConfig(CONV_CORE_DEVICE_IDS[core->InstanceId]);
-	if (!Conv_core_cfg) {
-		printf("%sError%s\n", KRED, KNRM);
-		exit(XST_FAILURE);
-	}
-	int status = XConv_core_CfgInitialize(core->InstancePtr, Conv_core_cfg);
+	int status = XConv_core_Initialize(core->InstancePtr, Conv_core_device_ids[core->InstanceId]);
 	if (status != XST_SUCCESS) {
 		printf("%sError%s\n", KRED, KNRM);
 		exit(XST_FAILURE);
@@ -157,25 +151,19 @@ int Maxpool_core_setup_interrupt(Core *core) {
 	// Connect the Maxpool_core ISR to the exception table
 	int result = XScuGic_Connect(
 		&ScuGic,
-		CONV_CORE_INTERRUPT_IDS[core->InstanceId],
+		Maxpool_core_interrupt_ids[core->InstanceId],
 		(Xil_InterruptHandler) Maxpool_core_isr,
-		&core);
-	if (result != XST_SUCCESS) { return result; }
-	// print("Enable the Adder ISR\n\r");
-	XScuGic_Enable(&ScuGic, CONV_CORE_INTERRUPT_IDS[core->InstanceId]);
+		core);
+	if (result != XST_SUCCESS) return result;
+	XScuGic_Enable(&ScuGic, Maxpool_core_interrupt_ids[core->InstanceId]);
 	return XST_SUCCESS;
 }
 
 void Maxpool_core_init(Core *core) {
 	printf("- Initializing Maxpool_core %u: ", core->InstanceId);
 	core->InstancePtr = (void *) malloc(sizeof(XMaxpool_core));
-	XMaxpool_core_Config *Maxpool_core_cfg =
-		XMaxpool_core_LookupConfig(CONV_CORE_DEVICE_IDS[core->InstanceId]);
-	if (!Maxpool_core_cfg) {
-		printf("%sError%s\n", KRED, KNRM);
-		exit(XST_FAILURE);
-	}
-	int status = XMaxpool_core_CfgInitialize(core->InstancePtr, Maxpool_core_cfg);
+	int status = XMaxpool_core_Initialize(
+		core->InstancePtr, Maxpool_core_device_ids[core->InstanceId]);
 	if (status != XST_SUCCESS) {
 		printf("%sError%s\n", KRED, KNRM);
 		exit(XST_FAILURE);
@@ -283,25 +271,19 @@ int Linear_core_setup_interrupt(Core *core) {
 	// Connect the Linear_core ISR to the exception table
 	int result = XScuGic_Connect(
 		&ScuGic,
-		CONV_CORE_INTERRUPT_IDS[core->InstanceId],
+		Linear_core_interrupt_ids[core->InstanceId],
 		(Xil_InterruptHandler) Linear_core_isr,
-		&core);
-	if (result != XST_SUCCESS) { return result; }
-	// print("Enable the Adder ISR\n\r");
-	XScuGic_Enable(&ScuGic, CONV_CORE_INTERRUPT_IDS[core->InstanceId]);
+		core);
+	if (result != XST_SUCCESS) return result;
+	XScuGic_Enable(&ScuGic, Linear_core_interrupt_ids[core->InstanceId]);
 	return XST_SUCCESS;
 }
 
 void Linear_core_init(Core *core) {
 	printf("- Initializing Linear_core %u: ", core->InstanceId);
 	core->InstancePtr = (void *) malloc(sizeof(XLinear_core));
-	XLinear_core_Config *Linear_core_cfg =
-		XLinear_core_LookupConfig(CONV_CORE_DEVICE_IDS[core->InstanceId]);
-	if (!Linear_core_cfg) {
-		printf("%sError%s\n", KRED, KNRM);
-		exit(XST_FAILURE);
-	}
-	int status = XLinear_core_CfgInitialize(core->InstancePtr, Linear_core_cfg);
+	int status = XLinear_core_Initialize(
+		core->InstancePtr, Linear_core_device_ids[core->InstanceId]);
 	if (status != XST_SUCCESS) {
 		printf("%sError%s\n", KRED, KNRM);
 		exit(XST_FAILURE);
@@ -443,16 +425,16 @@ void setup_accelerator() {
 		Conv_core_list[i]->InstanceId = i;
 		Conv_core_init(Conv_core_list[i]);
 	}
-	for (u32 i = 0; i < MAXPOOL_CORES_NUM; i++) {
-		Maxpool_core_list[i] = (Core *) malloc(sizeof(Core));
-		Maxpool_core_list[i]->InstanceId = i;
-		Maxpool_core_init(Maxpool_core_list[i]);
-	}
-	for (u32 i = 0; i < LINEAR_CORES_NUM; i++) {
-		Linear_core_list[i] = (Core *) malloc(sizeof(Core));
-		Linear_core_list[i]->InstanceId = i;
-		Linear_core_init(Linear_core_list[i]);
-	}
+	 for (u32 i = 0; i < MAXPOOL_CORES_NUM; i++) {
+	 	Maxpool_core_list[i] = (Core *) malloc(sizeof(Core));
+	 	Maxpool_core_list[i]->InstanceId = i;
+	 	Maxpool_core_init(Maxpool_core_list[i]);
+	 }
+	 for (u32 i = 0; i < LINEAR_CORES_NUM; i++) {
+	 	Linear_core_list[i] = (Core *) malloc(sizeof(Core));
+	 	Linear_core_list[i]->InstanceId = i;
+	 	Linear_core_init(Linear_core_list[i]);
+	 }
 }
 
 void setup_platform(char *greeting_message) {

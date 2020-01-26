@@ -57,21 +57,21 @@ Core *Maxpool_core_list[MAXPOOL_CORES_NUM];
 Core *Linear_core_list[LINEAR_CORES_NUM];
 
 #if CONV_CORES_NUM == 1
-const unsigned int CONV_CORE_DEVICE_IDS[CONV_CORES_NUM] = {
+const unsigned int Conv_core_device_ids[CONV_CORES_NUM] = {
 	XPAR_XCONV_CORE_0_DEVICE_ID,
 };
-const unsigned int CONV_CORE_INTERRUPT_IDS[CONV_CORES_NUM] = {
+const unsigned int Conv_core_interrupt_ids[CONV_CORES_NUM] = {
 	XPAR_FABRIC_CONV_CORE_0_INTERRUPT_INTR,
 };
 volatile static int Conv_core_result_avail[CONV_CORES_NUM] = {
 	0,
 };
 #elif CONV_CORES_NUM == 2
-const unsigned int CONV_CORE_DEVICE_IDS[CONV_CORES_NUM] = {
+const unsigned int Conv_core_device_ids[CONV_CORES_NUM] = {
 	XPAR_XCONV_CORE_0_DEVICE_ID,
 	XPAR_XCONV_CORE_1_DEVICE_ID,
 };
-const unsigned int CONV_CORE_INTERRUPT_IDS[CONV_CORES_NUM] = {
+const unsigned int Conv_core_interrupt_ids[CONV_CORES_NUM] = {
 	XPAR_FABRIC_CONV_CORE_0_INTERRUPT_INTR,
 	XPAR_FABRIC_CONV_CORE_1_INTERRUPT_INTR,
 };
@@ -80,12 +80,12 @@ volatile static int Conv_core_result_avail[CONV_CORES_NUM] = {
 	0,
 };
 #elif CONV_CORES_NUM == 3
-const unsigned int CONV_CORE_DEVICE_IDS[CONV_CORES_NUM] = {
+const unsigned int Conv_core_device_ids[CONV_CORES_NUM] = {
 	XPAR_XCONV_CORE_0_DEVICE_ID,
 	XPAR_XCONV_CORE_1_DEVICE_ID,
 	XPAR_XCONV_CORE_2_DEVICE_ID,
 };
-const unsigned int CONV_CORE_INTERRUPT_IDS[CONV_CORES_NUM] = {
+const unsigned int Conv_core_interrupt_ids[CONV_CORES_NUM] = {
 	XPAR_FABRIC_CONV_CORE_0_INTERRUPT_INTR,
 	XPAR_FABRIC_CONV_CORE_1_INTERRUPT_INTR,
 	XPAR_FABRIC_CONV_CORE_2_INTERRUPT_INTR,
@@ -96,13 +96,13 @@ volatile static int Conv_core_result_avail[CONV_CORES_NUM] = {
 	0,
 };
 #elif CONV_CORES_NUM == 4
-const unsigned int CONV_CORE_DEVICE_IDS[CONV_CORES_NUM] = {
+const unsigned int Conv_core_device_ids[CONV_CORES_NUM] = {
 	XPAR_XCONV_CORE_0_DEVICE_ID,
 	XPAR_XCONV_CORE_1_DEVICE_ID,
 	XPAR_XCONV_CORE_2_DEVICE_ID,
 	XPAR_XCONV_CORE_3_DEVICE_ID,
 };
-const unsigned int CONV_CORE_INTERRUPT_IDS[CONV_CORES_NUM] = {
+const unsigned int Conv_core_interrupt_ids[CONV_CORES_NUM] = {
 	XPAR_FABRIC_CONV_CORE_0_INTERRUPT_INTR,
 	XPAR_FABRIC_CONV_CORE_1_INTERRUPT_INTR,
 	XPAR_FABRIC_CONV_CORE_2_INTERRUPT_INTR,
@@ -117,21 +117,21 @@ volatile static int Conv_core_result_avail[CONV_CORES_NUM] = {
 #endif
 
 #if MAXPOOL_CORES_NUM == 1
-const unsigned int MAXPOOL_CORE_DEVICE_IDS[MAXPOOL_CORES_NUM] = {
+const unsigned int Maxpool_core_device_ids[MAXPOOL_CORES_NUM] = {
 	XPAR_XMAXPOOL_CORE_0_DEVICE_ID,
 };
-const unsigned int MAXPOOL_CORE_INTERRUPT_IDS[MAXPOOL_CORES_NUM] = {
+const unsigned int Maxpool_core_interrupt_ids[MAXPOOL_CORES_NUM] = {
 	XPAR_FABRIC_MAXPOOL_CORE_0_INTERRUPT_INTR,
 };
 volatile static int Maxpool_core_result_avail[CONV_CORES_NUM] = {
 	0,
 };
 #elif MAXPOOL_CORES_NUM == 2
-const unsigned int MAXPOOL_CORE_DEVICE_IDS[MAXPOOL_CORES_NUM] = {
+const unsigned int Maxpool_core_device_ids[MAXPOOL_CORES_NUM] = {
 	XPAR_XMAXPOOL_CORE_0_DEVICE_ID,
 	XPAR_XMAXPOOL_CORE_1_DEVICE_ID,
 };
-const unsigned int MAXPOOL_CORE_INTERRUPT_IDS[MAXPOOL_CORES_NUM] = {
+const unsigned int Maxpool_core_interrupt_ids[MAXPOOL_CORES_NUM] = {
 	XPAR_FABRIC_MAXPOOL_CORE_0_INTERRUPT_INTR,
 	XPAR_FABRIC_MAXPOOL_CORE_1_INTERRUPT_INTR,
 };
@@ -140,12 +140,12 @@ volatile static int Maxpool_core_result_avail[CONV_CORES_NUM] = {
 	0,
 };
 #elif MAXPOOL_CORES_NUM == 3
-const unsigned int MAXPOOL_CORE_DEVICE_IDS[MAXPOOL_CORES_NUM] = {
+const unsigned int Maxpool_core_device_ids[MAXPOOL_CORES_NUM] = {
 	XPAR_XMAXPOOL_CORE_0_DEVICE_ID,
 	XPAR_XMAXPOOL_CORE_1_DEVICE_ID,
 	XPAR_XMAXPOOL_CORE_2_DEVICE_ID,
 };
-const unsigned int MAXPOOL_CORE_INTERRUPT_IDS[MAXPOOL_CORES_NUM] = {
+const unsigned int Maxpool_core_interrupt_ids[MAXPOOL_CORES_NUM] = {
 	XPAR_FABRIC_MAXPOOL_CORE_0_INTERRUPT_INTR,
 	XPAR_FABRIC_MAXPOOL_CORE_1_INTERRUPT_INTR,
 	XPAR_FABRIC_MAXPOOL_CORE_2_INTERRUPT_INTR,
@@ -156,13 +156,13 @@ volatile static int Maxpool_core_result_avail[CONV_CORES_NUM] = {
 	0,
 };
 #elif MAXPOOL_CORES_NUM == 4
-const unsigned int MAXPOOL_CORE_DEVICE_IDS[MAXPOOL_CORES_NUM] = {
+const unsigned int Maxpool_core_device_ids[MAXPOOL_CORES_NUM] = {
 	XPAR_XMAXPOOL_CORE_0_DEVICE_ID,
 	XPAR_XMAXPOOL_CORE_1_DEVICE_ID,
 	XPAR_XMAXPOOL_CORE_2_DEVICE_ID,
 	XPAR_XMAXPOOL_CORE_3_DEVICE_ID,
 };
-const unsigned int MAXPOOL_CORE_INTERRUPT_IDS[MAXPOOL_CORES_NUM] = {
+const unsigned int Maxpool_core_interrupt_ids[MAXPOOL_CORES_NUM] = {
 	XPAR_FABRIC_MAXPOOL_CORE_0_INTERRUPT_INTR,
 	XPAR_FABRIC_MAXPOOL_CORE_1_INTERRUPT_INTR,
 	XPAR_FABRIC_MAXPOOL_CORE_2_INTERRUPT_INTR,
@@ -177,21 +177,21 @@ volatile static int Maxpool_core_result_avail[CONV_CORES_NUM] = {
 #endif
 
 #if LINEAR_CORES_NUM == 1
-const unsigned int LINEAR_CORE_DEVICE_IDS[LINEAR_CORES_NUM] = {
+const unsigned int Linear_core_device_ids[LINEAR_CORES_NUM] = {
 	XPAR_XLINEAR_CORE_0_DEVICE_ID,
 };
-const unsigned int LINEAR_CORE_INTERRUPT_IDS[LINEAR_CORES_NUM] = {
+const unsigned int Linear_core_interrupt_ids[LINEAR_CORES_NUM] = {
 	XPAR_FABRIC_LINEAR_CORE_0_INTERRUPT_INTR,
 };
 volatile static int Linear_core_result_avail[CONV_CORES_NUM] = {
 	0,
 };
 #elif LINEAR_CORES_NUM == 2
-const unsigned int LINEAR_CORE_DEVICE_IDS[LINEAR_CORES_NUM] = {
+const unsigned int Linear_core_device_ids[LINEAR_CORES_NUM] = {
 	XPAR_XLINEAR_CORE_0_DEVICE_ID,
 	XPAR_XLINEAR_CORE_1_DEVICE_ID,
 };
-const unsigned int LINEAR_CORE_INTERRUPT_IDS[LINEAR_CORES_NUM] = {
+const unsigned int Linear_core_interrupt_ids[LINEAR_CORES_NUM] = {
 	XPAR_FABRIC_LINEAR_CORE_0_INTERRUPT_INTR,
 	XPAR_FABRIC_LINEAR_CORE_1_INTERRUPT_INTR,
 };
@@ -200,12 +200,12 @@ volatile static int Linear_core_result_avail[CONV_CORES_NUM] = {
 	0,
 };
 #elif LINEAR_CORES_NUM == 3
-const unsigned int LINEAR_CORE_DEVICE_IDS[LINEAR_CORES_NUM] = {
+const unsigned int Linear_core_device_ids[LINEAR_CORES_NUM] = {
 	XPAR_XLINEAR_CORE_0_DEVICE_ID,
 	XPAR_XLINEAR_CORE_1_DEVICE_ID,
 	XPAR_XLINEAR_CORE_2_DEVICE_ID,
 };
-const unsigned int LINEAR_CORE_INTERRUPT_IDS[LINEAR_CORES_NUM] = {
+const unsigned int Linear_core_interrupt_ids[LINEAR_CORES_NUM] = {
 	XPAR_FABRIC_LINEAR_CORE_0_INTERRUPT_INTR,
 	XPAR_FABRIC_LINEAR_CORE_1_INTERRUPT_INTR,
 	XPAR_FABRIC_LINEAR_CORE_2_INTERRUPT_INTR,
@@ -216,13 +216,13 @@ volatile static int Linear_core_result_avail[CONV_CORES_NUM] = {
 	0,
 };
 #elif LINEAR_CORES_NUM == 4
-const unsigned int LINEAR_CORE_DEVICE_IDS[LINEAR_CORES_NUM] = {
+const unsigned int Linear_core_device_ids[LINEAR_CORES_NUM] = {
 	XPAR_XLINEAR_CORE_0_DEVICE_ID,
 	XPAR_XLINEAR_CORE_1_DEVICE_ID,
 	XPAR_XLINEAR_CORE_2_DEVICE_ID,
 	XPAR_XLINEAR_CORE_3_DEVICE_ID,
 };
-const unsigned int LINEAR_CORE_INTERRUPT_IDS[LINEAR_CORES_NUM] = {
+const unsigned int Linear_core_interrupt_ids[LINEAR_CORES_NUM] = {
 	XPAR_FABRIC_LINEAR_CORE_0_INTERRUPT_INTR,
 	XPAR_FABRIC_LINEAR_CORE_1_INTERRUPT_INTR,
 	XPAR_FABRIC_LINEAR_CORE_2_INTERRUPT_INTR,
