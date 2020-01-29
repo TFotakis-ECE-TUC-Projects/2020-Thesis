@@ -1,5 +1,7 @@
+#define MAX_X_SIZE 193600
+
 /** Matrix data type for easy switching when needed to other types */
-typedef double matrix_t;
+typedef float matrix_t;
 
 /**
  * Calculates the index on a 1D buffer representation of a 3D matrix
@@ -65,6 +67,12 @@ int Conv_Core(volatile matrix_t *x, volatile matrix_t *weights,
 //	kernel_size = 11;
 //	stride = 4;
 //	padding = 2;
+
+	matrix_t xCache[MAX_X_SIZE];
+	for (unsigned int i = 0; i < din * hin * win; i++) {
+#pragma HLS PIPELINE II=1
+		xCache[i] = x[i];
+	}
 
 	Loop_output_channel:
 	/** For every output channel */
@@ -134,7 +142,8 @@ int Conv_Core(volatile matrix_t *x, volatile matrix_t *weights,
 									in_channel, imgH, imgW);
 
 							/** Calculate dot product of the two matrices */
-							pixels[oh][ow] += x[arrIndex] * weightsCache[i][j];
+//							pixels[oh][ow] += x[arrIndex] * weightsCache[i][j];
+							pixels[oh][ow] += xCache[arrIndex] * weightsCache[i][j];
 						}
 					}
 				}
