@@ -1,5 +1,5 @@
 /** Matrix data type for easy switching when needed to other types */
-typedef double matrix_t;
+typedef float matrix_t;
 
 /**
  * Calculates the index on a 1D buffer representation of a 3D matrix
@@ -28,12 +28,33 @@ int MaxPool_Core(matrix_t *x, unsigned int d, unsigned int hin, unsigned int win
 #pragma HLS INTERFACE m_axi depth=1024 port=res offset=slave bundle=MASTER_BUS
 #pragma HLS INTERFACE s_axilite port=return bundle=CRTL_BUS
 
+//	d = 64;
+//	hin = 55;
+//	win = 55;
+//	hout = 27;
+//	wout = 27;
+//	kernel_size = 3;
+//	stride = 2;
+
+	matrix_t xCache[55][55];
+
 	/** For every channel */
-	for (int i = 0; i < d; i++) {
+	for (unsigned int i = 0; i < d; i++) {
+
+		for (unsigned int ki = 0; ki < hin; ki++) {
+			for (unsigned int kj = 0; kj < win; kj++) {
+	#pragma HLS PIPELINE
+				unsigned int index = calc3DIndex(d, hin, win, i, ki, kj);
+				xCache[ki][kj] = x[index];
+			}
+		}
+
 		/** For every output row */
-		for (int j = 0; j < hout; j++) {
+		Loop_output_row:
+		for (unsigned int j = 0; j < hout; j++) {
 			/** For every output row's pixel */
-			for (int k = 0; k < wout; k++) {
+			Loop_output_pixel:
+			for (unsigned int k = 0; k < wout; k++) {
 				/** Calculate pools starting coordinates on the input matrix */
 				unsigned int a = j * stride;
 				unsigned int b = k * stride;
@@ -41,20 +62,24 @@ int MaxPool_Core(matrix_t *x, unsigned int d, unsigned int hin, unsigned int win
 				/** Initialize max value */
 				matrix_t max = -100000000;
 				/** For every pool's row */
-				for (int l = a; l < a + kernel_size; l++) {
+				Loop_pool_row:
+				for (int l = 0; l < kernel_size; l++) {
 					/** For every pool row's pixel */
-					for (int m = b; m < b + kernel_size; m++) {
+					Loop_pool_pixel:
+					for (int m = 0; m < kernel_size; m++) {
 						/**
 						 * Calculate the 1-dimensional representation's index of
 						 * the input matrix
 						 */
-						unsigned int index = calc3DIndex(d, hin, win, i, l, m);
+//						unsigned int index = calc3DIndex(d, hin, win, i, l, m);
 
 						/**
 						 * Check if current value is greater than max and
 						 * update it
 						 */
-						max = max < x[index] ? x[index] : max;
+//						max = max < x[index] ? x[index] : max;
+						matrix_t curX = xCache[l + a][m + b];
+						if (max < curX) max = curX;
 					}
 				}
 
