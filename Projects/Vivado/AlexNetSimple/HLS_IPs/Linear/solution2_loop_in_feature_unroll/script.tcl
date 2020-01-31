@@ -6,11 +6,11 @@
 open_project Linear
 set_top Linear_Core
 add_files Linear/src/linear_core.c
-open_solution "solution1"
-set_part {xczu9eg-ffvb1156-2-e} -tool vivado
+open_solution "solution2_loop_in_feature_unroll"
+set_part {xczu9eg-ffvb1156-2-e}
 create_clock -period 10 -name default
 config_export -format ip_catalog -rtl verilog
-source "./Linear/solution1/directives.tcl"
+source "./Linear/solution2_loop_in_feature_unroll/directives.tcl"
 #csim_design
 csynth_design
 #cosim_design
