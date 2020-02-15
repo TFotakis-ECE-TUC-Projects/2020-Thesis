@@ -1,8 +1,8 @@
 //Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 //--------------------------------------------------------------------------------
 //Tool Version: Vivado v.2019.1 (lin64) Build 2552052 Fri May 24 14:47:09 MDT 2019
-//Date        : Fri Jan 31 03:54:38 2020
-//Host        : arch running 64-bit unknown
+//Date        : Wed Feb 12 12:33:32 2020
+//Host        : zeus.mhl.tuc.gr running 64-bit CentOS Linux release 7.4.1708 (Core)
 //Command     : generate_target design_1_wrapper.bd
 //Design      : design_1_wrapper
 //Purpose     : IP block netlist
