@@ -2,7 +2,7 @@
 ![Technical-University-of-Crete-TUC-logo](Documentation/Assets/Technical-University-of-Crete-logo.png)  
 [Technical University of Crete][tucPage]
 
-Reconfigurable-based Design and Implementation of AlexNet Deep Learning Network  
+**Reconfigurable-based Design and Implementation of AlexNet Deep Learning Network**  
 
 Author:  
 [Tzanis Fotakis][tzanisPage]
@@ -79,6 +79,7 @@ Abbreviation	| Meaning
 --- 			| ---
 AI				| **A**rtificial **I**ntelligence  
 ANN				| **A**rtificial **N**eural **N**etwork  
+ASIC			| **A**pplication **S**pecific **I**ntegrated **C**ircuit  
 B-RAM			| **B**lock **R**andom **A**ccess **M**emory
 CNN				| **C**onvolutional **N**eural **N**etwork
 CPU				| **C**entral **P**rocessor **U**nit  
@@ -99,10 +100,19 @@ RAM				| **R**andom Access Memory
 ReLU			| **R**ectified **L**inear **U**nit
 SDK				| **S**oftware **D**evelopment **K**it
 SLC				| **S**econd **L**evel **C**odebook
+TDP				| **T**hermal **D**esign **P**ower  
 TPU				| **T**ensor **P**rocessor **U**nit  
 <!-- spell-checker: enable -->
 # Chapter 1: Introduction
+Since the invention of the first computer, humankind is rapidly solving problems that are intellectually difficult for human beings but relatively easy for computers, as such problems can be described in detail with a formal list of mathematical rules. However, problems that are easy for humans, that are solved intuitively, like distinguishing the difference between a car and a person, or a spoken word and a bird's chirp, is a real challenge for computers and engineers [8]. Those problems cannot be described, at the time of writing, with sharply defined mathematical rules. Artificial Intelligence (AI) and Machine Learning (ML) study those types of problems, with many successes in the cost of highly computationally complex algorithms.  
+It is estimated that by the year 2025, the total amount of data created worldwide will rise to 163 ZettaBytes, while every minute of the year 2019, Americans used more than 4.4 PetaBytes of data [6]. It is evident that data management systems and knowledge extraction from them, also called Data Analysis, are urgent. Although such problems can be tackled using Artificial Intelligence and Machine Learning, it is extremely computationally intensive, if not even non-feasible, in a reasonable amount of time.  
+Fortunately, most of the algorithms used to tackle such problems come with great parallelism. Therefore, they can be expanded in the space domain, in other words, they can utilize more hardware resources in order to cut down on needs from the time domain. Of course, there are many different types of hardware resources, each one of them with their advantages and disadvantages, from parallelism capabilities and energy efficiency to cost of production and reconfigurability.
 ## 1.1 Motivation
+Nowadays, the computational complexity of the aforementioned algorithms makes hardware acceleration a necessity, since running them on Central Processing Units (CPUs) is, while possible, the least efficient and fast solution. Although writing software for CPUs may be fast and easy, its running speed due to low parallelism and high power consumption, as a general propose piece of hardware, are far from ideal. For reference, at the time of writing, a top grade server CPU, AMD EPYC 7002 Series, can provide up to 64 cores and 128 threads, at up to 2.25GHz base clock and 3.4GHz boost clock, with a rated Thermal Design Power (TDP) of 225Watts, with a list price of 4425USD [].  
+Graphics Processing Units (GPUs), on the other hand, provide much higher parallelism, while still being relatively easy for their software to be written. However, they can be costly to scale up, and their power consumption can be really high.  
+Moreover, there are Application Specific Integrated Circuits (ASICs), which for a particular application can provide the best parallelism capabilities and the lowest power consumption. Unfortunately, they are very expensive to develop and produce, and they can only serve a single purpose, a single application.  
+Field Programmable Gate Arrays (FPGAs), on the contrary, are bridging the gap between the GPUs' flexibility and the ASICs' performance and power consumption.  
+In this work, the FPGAs' benefits are being utilized in order to create a hardware accelerator that can speed up the inference of Convolutional Neural Networks (CNNs), a branch of Deep Neural Networks (DNNs), which is a subfield of Machine Learning.  
 ## 1.2 Scientific Contributions
 ## 1.3 Thesis Outline
 In this section this thesis organization is outlined.
@@ -116,8 +126,7 @@ In this section this thesis organization is outlined.
 The theoretical background of Machine Learning and Convolutional Neural Networks is being described below.
 
 ## 2.1 Machine Learning
-Machine Learning (ML), the name of which was first proposed in 1959 by Arthur Samuel [1], is a subset of Artificial Intelligence (AI) and a Computer Science (CS) field that studies algorithms and statistical models capable of performing specific tasks, such as prediction or decision making, without being explicitly programmed. Instead, sample data are used, also known as "training data", for the machine to "learn" to distinguish useful patterns on the input data capable of creating the needed output, e.g., decision or prediction. There are numerous approaches [2] on the learning algorithms types, as well as on the model types used to get trained.
-
+Machine Learning, the name of which was first proposed in 1959 by Arthur Samuel [1], is a subset of Artificial Intelligence and a Computer Science (CS) field that studies algorithms and statistical models capable of performing specific tasks, such as prediction or decision making, without being explicitly programmed. Instead, sample data are used, also known as "training data", for the machine to "learn" to distinguish useful patterns on the input data capable of creating the needed output, e.g., decision or prediction. There are numerous approaches [2] on the learning algorithms types, as well as on the model types used to get trained.
 Such algorithm types, at the time of writing, include, but are not limited to:
 - Supervised Learning: Algorithms that learn by using "labeled" sample data, data that contain both the inputs and their desired outputs to be used for classification and regression.
 - Unsupervised Learning: In contrast with the Supervised Learning, "unlabeled" sample data are used to discover structures that could group or cluster them.
@@ -291,6 +300,7 @@ Pipelined K*OC Parallelism: 3.48 ms
 <!-- Todo: Fix Reference Numbers -->
 [1] Samuel, Arthur (1959). "Some Studies in Machine Learning Using the Game of Checkers". IBM Journal of Research and Development. 3 (3): 210–229. CiteSeerX 10.1.1.368.2254. doi:10.1147/rd.33.0210. *url:* https://ieeexplore.ieee.org/document/5392560.  
 [x] Alex Krizhevsky, Ilya Sutskever, Geoffrey E. Hinton: *ImageNet classification with deep convolutional neural networks*, (2017) Communications of the ACM. 60 (6): 84–90. doi:10.1145/3065386. ISSN 0001-0782. *url:* https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf.  
+[8] Ian Goodfellow, Yoshua Bengio, Aaron Courville. (2016) Deep Learning (page 1), MIT Press. *url:* http://www.deeplearningbook.org/  
 # External Links
 <!-- Todo: Fix Reference Numbers -->
 [2] Machine learning - Wikipedia, (23 September 2019) *url:* https://en.wikipedia.org/wiki/Machine_learning#Approaches.  
@@ -305,6 +315,8 @@ Pipelined K*OC Parallelism: 3.48 ms
 [x] PyTorch. *url:* https://pytorch.org/.  
 [x] Vivado Design Suite - HLx Editions. *url:* https://www.xilinx.com/products/design-tools/vivado.html.  
 [x] ZCU102 User Guide. *url:* https://www.xilinx.com/support/documentation/boards_and_kits/zcu102/ug1182-zcu102-eval-bd.pdf.  
+[6] Forbes - How Much Data Is Collected Every Minute Of The Day (August 7 2019). *url:* https://www.forbes.com/sites/nicolemartin1/2019/08/07/how-much-data-is-collected-every-minute-of-the-day/#747555a33d66.
+[7] AMD EPYC™ 7002 Series Processors. *url:* https://www.amd.com/en/processors/epyc-7002-series.
 
 <!-- Reference links -->
 [dollasPage]: https://www.ece.tuc.gr/index.php?id=4531&tx_tuclabspersonnel_list%5Bperson%5D=289&tx_tuclabspersonnel_list%5Baction%5D=person&tx_tuclabspersonnel_list%5Bcontroller%5D=List
