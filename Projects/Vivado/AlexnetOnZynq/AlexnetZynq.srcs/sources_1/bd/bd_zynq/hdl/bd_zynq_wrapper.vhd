@@ -1,7 +1,7 @@
 --Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------
---Tool Version: Vivado v.2018.3.1 (lin64) Build 2489853 Tue Mar 26 04:18:30 MDT 2019
---Date        : Tue Oct 29 18:25:57 2019
+--Tool Version: Vivado v.2019.1 (lin64) Build 2552052 Fri May 24 14:47:09 MDT 2019
+--Date        : Sat Feb 15 12:45:04 2020
 --Host        : arch running 64-bit unknown
 --Command     : generate_target bd_zynq_wrapper.bd
 --Design      : bd_zynq_wrapper

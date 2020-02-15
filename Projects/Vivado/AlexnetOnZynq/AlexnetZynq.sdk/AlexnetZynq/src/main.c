@@ -12,8 +12,8 @@
 
 #define FILE_SYSTEM_USE_STRFUNC 1
 
-#define IMAGES_DIR "tzanis/images"
-#define PARAMS_FILE "tzanis/alexnet.bin"
+#define IMAGES_DIR "tzanis/images/test/cat"
+#define PARAMS_FILE "tzanis/alexnetParams"
 #define LABELS_FILE "tzanis/labels.txt"
 
 
