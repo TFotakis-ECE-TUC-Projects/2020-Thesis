@@ -3,6 +3,7 @@
 
 # # Project Files
 !*.xpr
+!*.tcl
 
 # # Project sources
 !*.srcs
