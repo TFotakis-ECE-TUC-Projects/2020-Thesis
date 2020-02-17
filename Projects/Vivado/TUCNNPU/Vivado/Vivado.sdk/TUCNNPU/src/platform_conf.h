@@ -2,59 +2,65 @@
 #define SRC_PLATFORM_CONF_H_
 
 #include <xparameters.h>
-#include <xconv_core.h>
-#include <xmaxpool_core.h>
-#include <xlinear_core.h>
-
-#define CONV_CORES_NUM XPAR_XCONV_CORE_NUM_INSTANCES
-#define MAXPOOL_CORES_NUM XPAR_XMAXPOOL_CORE_NUM_INSTANCES
-#define LINEAR_CORES_NUM XPAR_XLINEAR_CORE_NUM_INSTANCES
-
-#define BASE_ADDR 0x50000000
 
 typedef float matrix_t;
 
 typedef enum {
-	Conv,
-	Maxpool,
-	LinearReLU,
-	Linear
+	CONV_LAYER_TYPE,
+	MAXPOOL_LAYER_TYPE,
+	LINEAR_LAYER_TYPE,
+	LINEAR_RELU_LAYER_TYPE
 } LayerType;
 
 typedef struct {
 	LayerType layerType;
-	u32 kernelSize;
-	u32 stride;
-	u32 padding;
-	u32 din;
-	u32 hin;
-	u32 win;
-	u32 dout;
-	u32 hout;
-	u32 wout;
-	u32 inFeatures;
-	u32 outFeatures;
-	u32 xSize;
-	u32 weightsSize;
-	u32 biasSize;
-	u32 resSize;
+	unsigned int kernelSize;
+	unsigned int stride;
+	unsigned int padding;
+	unsigned int din;
+	unsigned int hin;
+	unsigned int win;
+	unsigned int dout;
+	unsigned int hout;
+	unsigned int wout;
+	unsigned int inFeatures;
+	unsigned int outFeatures;
+	unsigned int xSize;
+	unsigned int weightsSize;
+	unsigned int biasSize;
+	unsigned int resSize;
 	matrix_t *xAddr;
 	matrix_t *weightsAddr;
 	matrix_t *biasAddr;
 	matrix_t *resAddr;
-	u32 doReLU;
+	unsigned int doReLU;
 } LayerConf;
+
+unsigned int LAYERS_NUMBER;
+LayerConf *LAYERS_CONF;
 
 typedef struct {
 	unsigned int InstanceId;
 	void *InstancePtr;
 } Core;
 
+#ifdef XPAR_XCONV_CORE_NUM_INSTANCES
+#include <xconv_core.h>
+#define CONV_CORES_NUM XPAR_XCONV_CORE_NUM_INSTANCES
 Core *Conv_core_list[CONV_CORES_NUM];
+#endif
 
+#ifdef XPAR_XMAXPOOL_CORE_NUM_INSTANCES
+#include <xmaxpool_core.h>
+#define MAXPOOL_CORES_NUM XPAR_XMAXPOOL_CORE_NUM_INSTANCES
 Core *Maxpool_core_list[MAXPOOL_CORES_NUM];
+#endif
 
+#ifdef XPAR_XLINEAR_CORE_NUM_INSTANCES
+#include <xlinear_core.h>
+#define LINEAR_CORES_NUM XPAR_XLINEAR_CORE_NUM_INSTANCES
 Core *Linear_core_list[LINEAR_CORES_NUM];
+#endif
 
 #if CONV_CORES_NUM == 1
 const unsigned int Conv_core_device_ids[CONV_CORES_NUM] = {
