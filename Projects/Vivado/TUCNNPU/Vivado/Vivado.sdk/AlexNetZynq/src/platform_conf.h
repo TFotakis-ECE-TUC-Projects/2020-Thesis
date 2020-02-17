@@ -36,8 +36,10 @@ typedef struct {
 	unsigned int doReLU;
 } LayerConf;
 
-unsigned int LAYERS_NUMBER;
-LayerConf *LAYERS_CONF;
+typedef struct {
+	unsigned int layersNum;
+	LayerConf *layersConf;
+} NetConf;
 
 typedef struct {
 	unsigned int InstanceId;

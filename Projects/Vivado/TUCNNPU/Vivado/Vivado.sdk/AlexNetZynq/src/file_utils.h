@@ -347,74 +347,86 @@ FloatMatrix *loadImage(char *path) {
 	return x;
 }
 
-void read_config(char *path) {
+NetConf *read_config(char *path) {
 	printf("- Loading \"%s\": ", path);
 
 	FIL f = open_file(path);
 
 	char buff[200];
-	char *s = f_gets(buff, sizeof(buff), &f);
-	sscanf(s, "LAYERS_NUMBER=%u\n", &LAYERS_NUMBER);
 
-	LAYERS_CONF = (LayerConf *) malloc(LAYERS_NUMBER * sizeof(LayerConf));
-	if (LAYERS_CONF == NULL) {
+	NetConf *netConf = (NetConf *) malloc(sizeof(NetConf));
+	if (netConf == NULL) {
 		printf(
-			"%sError. Not enough memory for read config LAYERS_CONF.%s\n",
+			"%sError. Not enough memory for read config netConf.%s\n",
+			KRED,
+			KNRM);
+		exit(XST_FAILURE);
+	}
+
+	char *s = f_gets(buff, sizeof(buff), &f);
+	sscanf(s, "LAYERS_NUMBER=%u\n", &netConf->layersNum);
+
+	netConf->layersConf = (LayerConf *) malloc(netConf->layersNum * sizeof(LayerConf));
+	if (netConf->layersConf == NULL) {
+		printf(
+			"%sError. Not enough memory for read config netConf->layersConf.%s\n",
 			KRED,
 			KNRM);
 		exit(XST_FAILURE);
 	}
 
 	s = f_gets(buff, sizeof(buff), &f);
-	sscanf(s, "din=%u\n", &LAYERS_CONF[0].din);
+	sscanf(s, "din=%u\n", &netConf->layersConf[0].din);
 
 	s = f_gets(buff, sizeof(buff), &f);
-	sscanf(s, "hin=%u\n", &LAYERS_CONF[0].hin);
+	sscanf(s, "hin=%u\n", &netConf->layersConf[0].hin);
 
 	s = f_gets(buff, sizeof(buff), &f);
-	sscanf(s, "win=%u\n", &LAYERS_CONF[0].win);
+	sscanf(s, "win=%u\n", &netConf->layersConf[0].win);
 
-	for (unsigned int i = 0; i < LAYERS_NUMBER; i++) {
+	for (unsigned int i = 0; i < netConf->layersNum; i++) {
 		s = f_gets(buff, sizeof(buff), &f);
 		char layerType[200];
 		sscanf(s, "layerType=%s\n", layerType);
 
 		if (!strcmp(layerType, "Conv")) {
-			LAYERS_CONF[i].layerType = CONV_LAYER_TYPE;
+			netConf->layersConf[i].layerType = CONV_LAYER_TYPE;
 
 			s = f_gets(buff, sizeof(buff), &f);
-			sscanf(s, "kernelSize=%u\n", &LAYERS_CONF[i].kernelSize);
+			sscanf(s, "kernelSize=%u\n", &netConf->layersConf[i].kernelSize);
+			printf("KernelSize: %d\n", netConf->layersConf[i].kernelSize);
 
 			s = f_gets(buff, sizeof(buff), &f);
-			sscanf(s, "stride=%u\n", &LAYERS_CONF[i].stride);
+			sscanf(s, "stride=%u\n", &netConf->layersConf[i].stride);
 
 			s = f_gets(buff, sizeof(buff), &f);
-			sscanf(s, "padding=%u\n", &LAYERS_CONF[i].padding);
+			sscanf(s, "padding=%u\n", &netConf->layersConf[i].padding);
 
 			s = f_gets(buff, sizeof(buff), &f);
-			sscanf(s, "dout=%u\n", &LAYERS_CONF[i].dout);
+			sscanf(s, "dout=%u\n", &netConf->layersConf[i].dout);
 
 		} else if (!strcmp(layerType, "Maxpool")) {
-			LAYERS_CONF[i].layerType = MAXPOOL_LAYER_TYPE;
+			netConf->layersConf[i].layerType = MAXPOOL_LAYER_TYPE;
 
 			s = f_gets(buff, sizeof(buff), &f);
-			sscanf(s, "kernelSize=%u\n", &LAYERS_CONF[i].kernelSize);
+			sscanf(s, "kernelSize=%u\n", &netConf->layersConf[i].kernelSize);
 
 			s = f_gets(buff, sizeof(buff), &f);
-			sscanf(s, "stride=%u\n", &LAYERS_CONF[i].stride);
+			sscanf(s, "stride=%u\n", &netConf->layersConf[i].stride);
 		} else if (!strcmp(layerType, "Linear")) {
-			LAYERS_CONF[i].layerType = LINEAR_LAYER_TYPE;
+			netConf->layersConf[i].layerType = LINEAR_LAYER_TYPE;
 
 			s = f_gets(buff, sizeof(buff), &f);
-			sscanf(s, "outFeatures=%u\n", &LAYERS_CONF[i].outFeatures);
+			sscanf(s, "outFeatures=%u\n", &netConf->layersConf[i].outFeatures);
 		} else if (!strcmp(layerType, "LinearReLU")) {
-			LAYERS_CONF[i].layerType = LINEAR_RELU_LAYER_TYPE;
+			netConf->layersConf[i].layerType = LINEAR_RELU_LAYER_TYPE;
 
 			s = f_gets(buff, sizeof(buff), &f);
-			sscanf(s, "outFeatures=%u\n", &LAYERS_CONF[i].outFeatures);
+			sscanf(s, "outFeatures=%u\n", &netConf->layersConf[i].outFeatures);
 		}
 	}
 	close_file(f);
+	return netConf;
 }
 
 static FATFS fatfs;
