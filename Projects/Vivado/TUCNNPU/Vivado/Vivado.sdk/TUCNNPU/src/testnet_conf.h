@@ -3,9 +3,9 @@
 
 #define LAYERS_NUMBER 11
 
-LayerConf LAYERS_CONF[] = {
+LayerConf LAYERS_CONF_DEF[] = {
 	{
-		.layerType = Conv,
+		.layerType = CONV_LAYER_TYPE,
 		.kernelSize = 11,
 		.stride = 4,
 		.padding = 2,
@@ -15,58 +15,58 @@ LayerConf LAYERS_CONF[] = {
 		.dout = 64,
 	},
 	{
-		.layerType = Maxpool,
+		.layerType = MAXPOOL_LAYER_TYPE,
 		.kernelSize = 3,
 		.stride = 2,
 	},
 	{
-		.layerType = Conv,
+		.layerType = CONV_LAYER_TYPE,
 		.kernelSize = 5,
 		.stride = 1,
 		.padding = 2,
 		.dout = 192,
 	},
 	{
-		.layerType = Maxpool,
+		.layerType = MAXPOOL_LAYER_TYPE,
 		.kernelSize = 3,
 		.stride = 2,
 	},
 	{
-		.layerType = Conv,
+		.layerType = CONV_LAYER_TYPE,
 		.kernelSize = 3,
 		.stride = 1,
 		.padding = 1,
 		.dout = 384,
 	},
 	{
-		.layerType = Conv,
+		.layerType = CONV_LAYER_TYPE,
 		.kernelSize = 3,
 		.stride = 1,
 		.padding = 1,
 		.dout = 256,
 	},
 	{
-		.layerType = Conv,
+		.layerType = CONV_LAYER_TYPE,
 		.kernelSize = 3,
 		.stride = 1,
 		.padding = 1,
 		.dout = 256,
 	},
 	{
-		.layerType = Maxpool,
+		.layerType = MAXPOOL_LAYER_TYPE,
 		.kernelSize = 3,
 		.stride = 2,
 	},
 	{
-		.layerType = LinearReLU,
+		.layerType = LINEAR_RELU_LAYER_TYPE,
 		.outFeatures = 4096,
 	},
 	{
-		.layerType = LinearReLU,
+		.layerType = LINEAR_RELU_LAYER_TYPE,
 		.outFeatures = 4096,
 	},
 	{
-		.layerType = Linear,
+		.layerType = LINEAR_LAYER_TYPE,
 		.outFeatures = 1000,
 	},
 };

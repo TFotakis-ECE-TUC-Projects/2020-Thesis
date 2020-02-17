@@ -9,7 +9,7 @@ int Conv_core_single_test() {
 	printf("*** Testing Conv_core ***\n");
 
 	LayerConf lc = {
-		.layerType = Conv,
+		.layerType = CONV_LAYER_TYPE,
 		.kernelSize = 11,
 		.stride = 4,
 		.padding = 2,
@@ -80,7 +80,7 @@ int Maxpool_core_single_test() {
 	printf("*** Testing Maxpool_core ***\n");
 
 	LayerConf lc = {
-		.layerType = Maxpool,
+		.layerType = MAXPOOL_LAYER_TYPE,
 		.kernelSize = 3,
 		.stride = 2,
 		.din = 64,
@@ -129,7 +129,7 @@ int Linear_core_single_test() {
 	printf("*** Testing Linear_core ***\n");
 
 	LayerConf lc = {
-		.layerType = LinearReLU,
+		.layerType = LINEAR_RELU_LAYER_TYPE,
 		.inFeatures = 9216,
 		.outFeatures = 4096,
 	};
@@ -194,7 +194,7 @@ int Network_single_test() {
 
 	u32 params_index = 0;
 	for (u32 i = 0; i < LAYERS_NUMBER; i++) {
-		if (LAYERS_CONF[i].layerType == Maxpool) continue;
+		if (LAYERS_CONF[i].layerType == MAXPOOL_LAYER_TYPE) continue;
 		PARAMS_ADDR[params_index] =
 			(matrix_t *) malloc(LAYERS_CONF[i].weightsSize * sizeof(matrix_t));
 		for (u32 j = 0; j < LAYERS_CONF[i].weightsSize; j++) {

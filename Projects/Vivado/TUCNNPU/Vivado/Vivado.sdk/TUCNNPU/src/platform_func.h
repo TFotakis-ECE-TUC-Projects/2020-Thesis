@@ -64,7 +64,7 @@ void Conv_conf_complete(u32 layer_index, u32 params_index, matrix_t *xAddr) {
 	LayerConf *lc = &LAYERS_CONF[layer_index];
 	if (layer_index > 0) {
 		LayerConf *plc = &LAYERS_CONF[layer_index - 1];
-		if (plc->layerType == LinearReLU || plc->layerType == Linear) {
+		if (plc->layerType == LINEAR_RELU_LAYER_TYPE || plc->layerType == LINEAR_LAYER_TYPE) {
 			printf("Error. Linear layer cannot be followed by Conv "
 				   "layer.\n");
 			exit(-1);
@@ -188,7 +188,7 @@ void Maxpool_conf_complete(u32 layer_index, matrix_t *xAddr) {
 	LayerConf *lc = &LAYERS_CONF[layer_index];
 	if (layer_index > 0) {
 		LayerConf *plc = &LAYERS_CONF[layer_index - 1];
-		if (plc->layerType == LinearReLU || plc->layerType == Linear) {
+		if (plc->layerType == LINEAR_RELU_LAYER_TYPE || plc->layerType == LINEAR_LAYER_TYPE) {
 			printf("Error. Linear layer cannot be followed by Maxpool "
 				   "layer.\n");
 			exit(-1);
@@ -301,7 +301,7 @@ void Linear_conf_params_complete(LayerConf *lc) {
 	lc->weightsSize = lc->inFeatures * lc->outFeatures;
 	lc->biasSize = lc->outFeatures;
 	lc->resSize = lc->outFeatures;
-	lc->doReLU = lc->layerType == LinearReLU ? 1 : 0;
+	lc->doReLU = lc->layerType == LINEAR_RELU_LAYER_TYPE ? 1 : 0;
 }
 
 void Linear_conf_complete(u32 layer_index, u32 params_index, matrix_t *xAddr) {
@@ -309,12 +309,12 @@ void Linear_conf_complete(u32 layer_index, u32 params_index, matrix_t *xAddr) {
 	if (layer_index > 0) {
 		LayerConf *plc = &LAYERS_CONF[layer_index - 1];
 		switch (plc->layerType) {
-			case Conv:
-			case Maxpool:
+			case CONV_LAYER_TYPE:
+			case MAXPOOL_LAYER_TYPE:
 				lc->inFeatures = plc->dout * plc->hout * plc->wout;
 				break;
-			case LinearReLU:
-			case Linear: lc->inFeatures = plc->outFeatures; break;
+			case LINEAR_RELU_LAYER_TYPE:
+			case LINEAR_LAYER_TYPE: lc->inFeatures = plc->outFeatures; break;
 		}
 		lc->xAddr = plc->resAddr;
 	} else {
@@ -451,13 +451,13 @@ void layer_conf_complete(matrix_t *xAddr) {
 	u32 params_index = 0;
 	for (u32 i = 0; i < LAYERS_NUMBER; i++) {
 		switch (LAYERS_CONF[i].layerType) {
-			case Conv:
+			case CONV_LAYER_TYPE:
 				Conv_conf_complete(i, params_index, xAddr);
 				params_index += 2;
 				break;
-			case Maxpool: Maxpool_conf_complete(i, xAddr); break;
-			case LinearReLU:
-			case Linear:
+			case MAXPOOL_LAYER_TYPE: Maxpool_conf_complete(i, xAddr); break;
+			case LINEAR_RELU_LAYER_TYPE:
+			case LINEAR_LAYER_TYPE:
 				Linear_conf_complete(i, params_index, xAddr);
 				params_index += 2;
 				break;
@@ -467,10 +467,10 @@ void layer_conf_complete(matrix_t *xAddr) {
 
 void process_layer(LayerConf lc) {
 	switch (lc.layerType) {
-		case Conv: Conv_core_process(lc); break;
-		case Maxpool: Maxpool_core_process(lc); break;
-		case LinearReLU:
-		case Linear: Linear_core_process(lc); break;
+		case CONV_LAYER_TYPE: Conv_core_process(lc); break;
+		case MAXPOOL_LAYER_TYPE: Maxpool_core_process(lc); break;
+		case LINEAR_RELU_LAYER_TYPE:
+		case LINEAR_LAYER_TYPE: Linear_core_process(lc); break;
 	}
 	free(lc.xAddr);
 }
