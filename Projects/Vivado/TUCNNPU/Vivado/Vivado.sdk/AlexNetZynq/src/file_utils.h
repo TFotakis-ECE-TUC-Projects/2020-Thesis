@@ -5,6 +5,7 @@
 #include <ff.h>
 #include <xstatus.h>
 #include "floatmatrix_utils.h"
+#include "platform_conf.h"
 #include "terminal_colors.h"
 
 /** Structure to store the network's parameters */
@@ -346,35 +347,6 @@ FloatMatrix *loadImage(char *path) {
 	return x;
 }
 
-typedef enum { ConvType, MaxpoolType, LinearReLUType, LinearType } LayerType;
-
-typedef struct {
-	LayerType layerType;
-	u32 kernelSize;
-	u32 stride;
-	u32 padding;
-	u32 din;
-	u32 hin;
-	u32 win;
-	u32 dout;
-	u32 hout;
-	u32 wout;
-	u32 inFeatures;
-	u32 outFeatures;
-	u32 xSize;
-	u32 weightsSize;
-	u32 biasSize;
-	u32 resSize;
-	matrix_t *xAddr;
-	matrix_t *weightsAddr;
-	matrix_t *biasAddr;
-	matrix_t *resAddr;
-	u32 doReLU;
-} LayerConf;
-
-unsigned int LAYERS_NUMBER;
-LayerConf *LAYERS_CONF;
-
 void read_config(char *path) {
 	printf("- Loading \"%s\": ", path);
 
@@ -408,7 +380,7 @@ void read_config(char *path) {
 		sscanf(s, "layerType=%s\n", layerType);
 
 		if (!strcmp(layerType, "Conv")) {
-			LAYERS_CONF[i].layerType = ConvType;
+			LAYERS_CONF[i].layerType = CONV_LAYER_TYPE;
 
 			s = f_gets(buff, sizeof(buff), &f);
 			sscanf(s, "kernelSize=%u\n", &LAYERS_CONF[i].kernelSize);
@@ -423,7 +395,7 @@ void read_config(char *path) {
 			sscanf(s, "dout=%u\n", &LAYERS_CONF[i].dout);
 
 		} else if (!strcmp(layerType, "Maxpool")) {
-			LAYERS_CONF[i].layerType = MaxpoolType;
+			LAYERS_CONF[i].layerType = MAXPOOL_LAYER_TYPE;
 
 			s = f_gets(buff, sizeof(buff), &f);
 			sscanf(s, "kernelSize=%u\n", &LAYERS_CONF[i].kernelSize);
@@ -431,12 +403,12 @@ void read_config(char *path) {
 			s = f_gets(buff, sizeof(buff), &f);
 			sscanf(s, "stride=%u\n", &LAYERS_CONF[i].stride);
 		} else if (!strcmp(layerType, "Linear")) {
-			LAYERS_CONF[i].layerType = LinearType;
+			LAYERS_CONF[i].layerType = LINEAR_LAYER_TYPE;
 
 			s = f_gets(buff, sizeof(buff), &f);
 			sscanf(s, "outFeatures=%u\n", &LAYERS_CONF[i].outFeatures);
 		} else if (!strcmp(layerType, "LinearReLU")) {
-			LAYERS_CONF[i].layerType = LinearReLUType;
+			LAYERS_CONF[i].layerType = LINEAR_RELU_LAYER_TYPE;
 
 			s = f_gets(buff, sizeof(buff), &f);
 			sscanf(s, "outFeatures=%u\n", &LAYERS_CONF[i].outFeatures);
