@@ -51,7 +51,7 @@ typedef struct {
  * @returns Filelist *
  */
 Filelist *getFileList(char *path) {
-	printf("- Getting file list in directory \"%s\": ", path);
+	printf("- Loading file list \"%s\": ", path);
 	DIR dp;
 	FRESULT fRes = f_opendir(&dp, path);
 	if (fRes != FR_OK) {
@@ -154,7 +154,7 @@ int close_file(FIL f) {
  * @returns a Params structure pointer containing the loaded network parameters.
  */
 Params *loadParameters(char *filename) {
-	printf("- Loading parameters \"%s\": 00%%", filename);
+	printf("- Loading \"%s\": 00%%", filename);
 
 	/** Open the parameters file */
 	FIL f = open_file(filename);
@@ -247,7 +247,7 @@ Params *loadParameters(char *filename) {
  * @returns an array of strings containing the loaded labels.
  */
 char **loadLabels(char *labelsPath) {
-	printf("- Loading labels \"%s\": ", labelsPath);
+	printf("- Loading \"%s\": ", labelsPath);
 
 	/** Open the labels file */
 	FIL f = open_file(labelsPath);
@@ -295,7 +295,8 @@ FloatMatrix *loadImage(char *path) {
 	// check the image format
 	s = f_gets(buff, sizeof(buff), &f);
 	if (!s || buff[0] != 'P' || buff[1] != '6') {
-		printf("%s- Error. Invalid image format (must be 'P6') on \"%s\".%s\n", KRED, path, KNRM);
+		printf(
+			"%s- Error. Invalid image format on \"%s\".%s\n", KRED, path, KNRM);
 		exit(XST_FAILURE);
 	}
 
@@ -318,7 +319,10 @@ FloatMatrix *loadImage(char *path) {
 	s = f_gets(buff, sizeof(buff), &f);
 	if (sscanf(s, "%d", &depth) != 1) {
 		printf(
-			"%s- Error. Invalid RGB component  on \"%s\".%s\n", KRED, path, KNRM);
+			"%s- Error. Invalid RGB component on \"%s\".%s\n",
+			KRED,
+			path,
+			KNRM);
 		exit(XST_FAILURE);
 	}
 
@@ -340,6 +344,105 @@ FloatMatrix *loadImage(char *path) {
 	close_file(f);
 
 	return x;
+}
+
+typedef enum { ConvType, MaxpoolType, LinearReLUType, LinearType } LayerType;
+
+typedef struct {
+	LayerType layerType;
+	u32 kernelSize;
+	u32 stride;
+	u32 padding;
+	u32 din;
+	u32 hin;
+	u32 win;
+	u32 dout;
+	u32 hout;
+	u32 wout;
+	u32 inFeatures;
+	u32 outFeatures;
+	u32 xSize;
+	u32 weightsSize;
+	u32 biasSize;
+	u32 resSize;
+	matrix_t *xAddr;
+	matrix_t *weightsAddr;
+	matrix_t *biasAddr;
+	matrix_t *resAddr;
+	u32 doReLU;
+} LayerConf;
+
+unsigned int LAYERS_NUMBER;
+LayerConf *LAYERS_CONF;
+
+void read_config(char *path) {
+	printf("- Loading \"%s\": ", path);
+
+	FIL f = open_file(path);
+
+	char buff[200];
+	char *s = f_gets(buff, sizeof(buff), &f);
+	sscanf(s, "LAYERS_NUMBER=%u\n", &LAYERS_NUMBER);
+
+	LAYERS_CONF = (LayerConf *) malloc(LAYERS_NUMBER * sizeof(LayerConf));
+	if (LAYERS_CONF == NULL) {
+		printf(
+			"%sError. Not enough memory for read config LAYERS_CONF.%s\n",
+			KRED,
+			KNRM);
+		exit(XST_FAILURE);
+	}
+
+	s = f_gets(buff, sizeof(buff), &f);
+	sscanf(s, "din=%u\n", &LAYERS_CONF[0].din);
+
+	s = f_gets(buff, sizeof(buff), &f);
+	sscanf(s, "hin=%u\n", &LAYERS_CONF[0].hin);
+
+	s = f_gets(buff, sizeof(buff), &f);
+	sscanf(s, "win=%u\n", &LAYERS_CONF[0].win);
+
+	for (unsigned int i = 0; i < LAYERS_NUMBER; i++) {
+		s = f_gets(buff, sizeof(buff), &f);
+		char layerType[200];
+		sscanf(s, "layerType=%s\n", layerType);
+
+		if (!strcmp(layerType, "Conv")) {
+			LAYERS_CONF[i].layerType = ConvType;
+
+			s = f_gets(buff, sizeof(buff), &f);
+			sscanf(s, "kernelSize=%u\n", &LAYERS_CONF[i].kernelSize);
+
+			s = f_gets(buff, sizeof(buff), &f);
+			sscanf(s, "stride=%u\n", &LAYERS_CONF[i].stride);
+
+			s = f_gets(buff, sizeof(buff), &f);
+			sscanf(s, "padding=%u\n", &LAYERS_CONF[i].padding);
+
+			s = f_gets(buff, sizeof(buff), &f);
+			sscanf(s, "dout=%u\n", &LAYERS_CONF[i].dout);
+
+		} else if (!strcmp(layerType, "Maxpool")) {
+			LAYERS_CONF[i].layerType = MaxpoolType;
+
+			s = f_gets(buff, sizeof(buff), &f);
+			sscanf(s, "kernelSize=%u\n", &LAYERS_CONF[i].kernelSize);
+
+			s = f_gets(buff, sizeof(buff), &f);
+			sscanf(s, "stride=%u\n", &LAYERS_CONF[i].stride);
+		} else if (!strcmp(layerType, "Linear")) {
+			LAYERS_CONF[i].layerType = LinearType;
+
+			s = f_gets(buff, sizeof(buff), &f);
+			sscanf(s, "outFeatures=%u\n", &LAYERS_CONF[i].outFeatures);
+		} else if (!strcmp(layerType, "LinearReLU")) {
+			LAYERS_CONF[i].layerType = LinearReLUType;
+
+			s = f_gets(buff, sizeof(buff), &f);
+			sscanf(s, "outFeatures=%u\n", &LAYERS_CONF[i].outFeatures);
+		}
+	}
+	close_file(f);
 }
 
 static FATFS fatfs;

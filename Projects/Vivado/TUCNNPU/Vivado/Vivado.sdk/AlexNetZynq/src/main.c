@@ -3,9 +3,14 @@
 #include "file_utils.h"
 #include "nn_utils.h"
 
-#define IMAGES_DIR "tzanis/images/test/cat"
-#define PARAMS_FILE "tzanis/alexnetParams"
-#define LABELS_FILE "tzanis/labels.txt"
+#define IMAGES_DIR "tzanis/images"
+#define CONFIGS_DIR "tzanis/configs"
+#define PARAMS_DIR "tzanis/params"
+#define LABELS_DIR "tzanis/labels"
+
+#define CONFIG_FILE "tzanis/configs/alexnet.conf"
+#define PARAMS_FILE "tzanis/params/alexnet.params"
+#define LABELS_FILE "tzanis/labels/alexnet.labels"
 
 /**
  * Runs the network's forward pass
@@ -64,6 +69,7 @@ int main() {
 	printf("- Starting...\n");
 
 	mount_sd();
+	read_config(CONFIG_FILE);
 	Filelist *imagesPaths = getFileList(IMAGES_DIR);
 	char **labels = loadLabels(LABELS_FILE);
 	Params *params = params = loadParameters(PARAMS_FILE);
