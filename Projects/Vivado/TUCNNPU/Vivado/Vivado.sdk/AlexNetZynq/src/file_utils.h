@@ -394,7 +394,6 @@ NetConf *read_config(char *path) {
 
 			s = f_gets(buff, sizeof(buff), &f);
 			sscanf(s, "kernelSize=%u\n", &netConf->layersConf[i].kernelSize);
-			printf("KernelSize: %d\n", netConf->layersConf[i].kernelSize);
 
 			s = f_gets(buff, sizeof(buff), &f);
 			sscanf(s, "stride=%u\n", &netConf->layersConf[i].stride);
