@@ -4,10 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <xstatus.h>
+#include "platform_conf.h"
 #include "terminal_colors.h"
-
-/** Matrix data type for easy switching when needed to other types */
-typedef double matrix_t;
 
 /** Contains all necessary data for an image to be stored in memory. */
 typedef struct Image_t {
