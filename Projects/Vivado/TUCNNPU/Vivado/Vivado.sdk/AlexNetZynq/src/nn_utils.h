@@ -1,3 +1,6 @@
+#ifndef SRC_NN_UTILS_H_
+#define SRC_NN_UTILS_H_
+
 #include "math.h"
 
 /**
@@ -12,7 +15,6 @@
  * @param[in] stride: The amount of pixels to skip for each convolution
  * @param[in] padding: The circular padding applied to the input before
  * convoluting
- * @param[in] layerName: This layer's name
  * @returns a FloatMatrix pointer containing the convolution's result
  */
 FloatMatrix *Conv2dReLU(
@@ -23,8 +25,7 @@ FloatMatrix *Conv2dReLU(
 	unsigned int out_channels,
 	unsigned int kernel_size,
 	unsigned int stride,
-	unsigned int padding,
-	char *layerName) {
+	unsigned int padding) {
 	/** Allocate and initialize a 3D zeros matrix to store the result */
 	FloatMatrix *res = zero3DFloatMatrix(
 		out_channels,
@@ -32,7 +33,8 @@ FloatMatrix *Conv2dReLU(
 		(x->dims[2] + 2 * padding - kernel_size) / stride + 1);
 
 	/** For every output channel */
-	for (unsigned int out_channel = 0; out_channel < out_channels; out_channel++) {
+	for (unsigned int out_channel = 0; out_channel < out_channels;
+		 out_channel++) {
 		/** For every output row */
 		for (unsigned int oh = 0; oh < res->dims[1]; oh++) {
 			int imgStartH = oh * stride - padding;
@@ -89,7 +91,8 @@ FloatMatrix *Conv2dReLU(
 				 * Calculate the 1-dimensional representation's index of the
 				 * output matrix
 				 */
-				unsigned int resIndex = calc3DIndex(res->dims, out_channel, oh, ow);
+				unsigned int resIndex =
+					calc3DIndex(res->dims, out_channel, oh, ow);
 
 				/**
 				 * Assign biased dot product result on the corresponding
@@ -112,11 +115,10 @@ FloatMatrix *Conv2dReLU(
  * @param[in] x: The input FloatMatrix to apply max pooling
  * @param[in] kernel_size: The kernel's dimensions
  * @param[in] stride: The amount of pixels to skip for every pool
- * @param[in] layerName: This layer's name
  * @returns a FloatMatrix pointer containing the max pooling's result
  */
 FloatMatrix *
-	MaxPool2d(FloatMatrix *x, unsigned int kernel_size, unsigned int stride, char *layerName) {
+	MaxPool2d(FloatMatrix *x, unsigned int kernel_size, unsigned int stride) {
 	/** Allocate and initialize a 3D zeros matrix to store the result */
 	FloatMatrix *res = zero3DFloatMatrix(
 		x->dims[0],
@@ -178,7 +180,6 @@ FloatMatrix *
  * @param[in] out_features: The number of output features (dimension of the
  * result)
  * @param[in] useReLU: Assign 1 for applying ReLU on output, else assign 0
- * @param[in] layerName: This layer's name
  * @returns a FloatMatrix pointer containing the linear transformation's result
  */
 FloatMatrix *Linear(
@@ -187,8 +188,7 @@ FloatMatrix *Linear(
 	FloatMatrix *bias,
 	unsigned int in_features,
 	unsigned int out_features,
-	unsigned int useReLU,
-	char *layerName) {
+	unsigned int useReLU) {
 	/** Allocate and create a 1D matrix to store the result */
 	FloatMatrix *res = create1DFloatMatrix(out_features);
 
@@ -209,3 +209,5 @@ FloatMatrix *Linear(
 	freeFloatMatrix(x);
 	return res;
 }
+
+#endif

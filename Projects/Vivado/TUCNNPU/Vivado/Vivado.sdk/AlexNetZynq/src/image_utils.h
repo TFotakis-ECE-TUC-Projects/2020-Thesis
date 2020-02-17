@@ -8,13 +8,20 @@
  *
  * Compile with: cc project_name.c -ljpeg -o project_name
  */
+
+#ifndef SRC_IMAGE_UTILS_H_
+#define SRC_IMAGE_UTILS_H_
+
+#include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include <dirent.h>
 #include <string.h>
-
+#include <xstatus.h>
+#include "terminal_colors.h"
 
 /** Contains all necessary data for an image to be stored in memory. */
-typedef struct Image_t {
+typedef struct {
 	/** Image's height */
 	int height;
 	/** Image's width */
@@ -38,18 +45,16 @@ typedef struct Image_t {
 	 *
 	 * Valid pixel values: unsigned integers in range (0, 255).
 	 */
-	u_int8_t ***channels;
+	unsigned char ***channels;
 } Image;
 
-
 /** Structure to contain file paths */
-typedef struct filelist_t {
+typedef struct {
 	/** Length of the list (number of paths stored) */
 	uint length;
 	/** List of strings to store filepaths */
 	char **list;
 } Filelist;
-
 
 /**
  * Frees image's channels matrix
@@ -68,7 +73,6 @@ void freeImageChannels(Image *image) {
 	free(image->channels);
 }
 
-
 /**
  * Frees image's channels, path and its given structure
  * @param[in] image
@@ -79,7 +83,6 @@ void freeImage(Image *image) {
 	free(image);
 }
 
-
 /**
  * Allocates needed memory for storing the image in a matrix representation
  * on the image->channels field.
@@ -87,19 +90,45 @@ void freeImage(Image *image) {
  */
 void initChannelsMatrix(Image *image) {
 	/** Allocate memory for first dimension - color channels */
-	image->channels = (u_int8_t ***) malloc(image->depth * sizeof(u_int8_t *));
+	image->channels =
+		(unsigned char ***) malloc(image->depth * sizeof(unsigned char *));
+	if (image->channels == NULL) {
+		printf(
+			"%sError. Not enough memory for initChannelsMatrix "
+			"image->channels.%s\n",
+			KRED,
+			KNRM);
+		exit(XST_FAILURE);
+	}
+
 	for (int i = 0; i < image->depth; ++i) {
 		/** Initialize every color channel to store all image's rows */
-		image->channels[i] = (u_int8_t **)
-				malloc(image->height * sizeof(u_int8_t *));
+		image->channels[i] =
+			(unsigned char **) malloc(image->height * sizeof(unsigned char *));
+		if (image->channels[i] == NULL) {
+			printf(
+				"%sError. Not enough memory for initChannelsMatrix "
+				"image->channels[i].%s\n",
+				KRED,
+				KNRM);
+			exit(XST_FAILURE);
+		}
+
 		for (int j = 0; j < image->height; j++) {
 			/** Initialize every row to store all row's pixels */
-			image->channels[i][j] = (u_int8_t *)
-					malloc(image->width * sizeof(u_int8_t));
+			image->channels[i][j] =
+				(unsigned char *) malloc(image->width * sizeof(unsigned char));
+			if (image->channels[i][j] == NULL) {
+				printf(
+					"%sError. Not enough memory for initChannelsMatrix "
+					"image->channels[i][j].%s\n",
+					KRED,
+					KNRM);
+				exit(XST_FAILURE);
+			}
 		}
 	}
 }
-
 
 /**
  * Converts the bmp_buffer to a channels matrix representation and stores it
@@ -116,8 +145,10 @@ void convertToMatrix(Image *image) {
 		for (int j = 0; j < image->width; j++) {
 			/** For every color channel */
 			for (int k = 0; k < image->depth; k++) {
-				image->channels[k][i][j] = image->bmp_buffer
-				[k + j * image->depth + i * image->width * image->depth];
+				image->channels[k][i][j] =
+					image->bmp_buffer
+						[k + j * image->depth +
+						 i * image->width * image->depth];
 			}
 		}
 	}
@@ -129,7 +160,6 @@ void convertToMatrix(Image *image) {
 	free(image->bmp_buffer);
 }
 
-
 /**
  * Converts the channels matrix representation to a bmp_buffer one and stores it
  * into bmp_buffer field using the given image.
@@ -140,8 +170,16 @@ void convertToBuffer(Image *image) {
 	image->bmp_size = image->depth * image->width * image->height;
 
 	/** Allocate needed memory */
-	image->bmp_buffer = (unsigned char *)
-			malloc(image->bmp_size * sizeof(unsigned char));
+	image->bmp_buffer =
+		(unsigned char *) malloc(image->bmp_size * sizeof(unsigned char));
+	if (image->bmp_buffer == NULL) {
+		printf(
+			"%sError. Not enough memory for convertToBuffer "
+			"image->bmp_buffer.%s\n",
+			KRED,
+			KNRM);
+		exit(XST_FAILURE);
+	}
 
 	uint index = 0;
 	/** For every row */
@@ -157,12 +195,12 @@ void convertToBuffer(Image *image) {
 	}
 }
 
-
 /**
  * Concatenates two strings, one after the other
  * @param s1: First string
  * @param s2: Second string
- * @returns "s1s2" (e.g. s1 = "example ", s2 = "given", return = "example given")
+ * @returns "s1s2" (e.g. s1 = "example ", s2 = "given", return = "example
+ * given")
  */
 char *concat(char *s1, char *s2) {
 	/** Get strings lengths */
@@ -170,7 +208,11 @@ char *concat(char *s1, char *s2) {
 	const size_t len2 = strlen(s2);
 
 	/** Allocate memory for the new string, adding 1 for the null-terminator */
-	char *result = malloc(len1 + len2 + 1);
+	char *result = (char *) malloc((len1 + len2 + 1) * sizeof(char));
+	if (result == NULL) {
+		printf("%sError. Not enough memory for concat result.%s\n", KRED, KNRM);
+		exit(XST_FAILURE);
+	}
 
 	/** Copy s1 to result beginning from its first byte */
 	memcpy(result, s1, len1);
@@ -182,7 +224,6 @@ char *concat(char *s1, char *s2) {
 	memcpy(result + len1, s2, len2 + 1);
 	return result;
 }
-
 
 /**
  * Checks if given directory entry is current folder or parent folder
@@ -196,7 +237,6 @@ boolean isCurrentOrParentFolder(struct dirent *de) {
 	 */
 	return !strcmp(de->d_name, ".") || !strcmp(de->d_name, "..");
 }
-
 
 /**
  * Counts the files existing in the given path's directories
@@ -258,11 +298,9 @@ uint getFileCount(char *path) {
 	return count;
 }
 
-
 int compare(char **a, char **b) {
 	return strcmp(*a, *b);
 }
-
 
 /**
  * Reads a path and creates a Filelist which containes all files contained in
@@ -273,12 +311,25 @@ int compare(char **a, char **b) {
 Filelist *getFileList(char *path) {
 	/** Allocate necessary memory */
 	Filelist *filelist = (Filelist *) malloc(sizeof(Filelist));
-
+	if (filelist == NULL) {
+		printf(
+			"%sError. Not enough memory for getFileList filelist.%s\n",
+			KRED,
+			KNRM);
+		exit(XST_FAILURE);
+	}
 	/** Get the number of files contained in path */
 	filelist->length = getFileCount(path);
 
 	/** Allocate necessary memory to store all file paths */
 	filelist->list = (char **) malloc(filelist->length * sizeof(char *));
+	if (filelist->list == NULL) {
+		printf(
+			"%sError. Not enough memory for getFileList filelist->list.%s\n",
+			KRED,
+			KNRM);
+		exit(XST_FAILURE);
+	}
 
 	/** Initialize filelist->list index */
 	uint index = 0;
@@ -337,11 +388,14 @@ Filelist *getFileList(char *path) {
 	/** Free main directory entry */
 	free(de);
 
-	qsort(filelist->list, filelist->length, sizeof(char *), (int (*)(const void *, const void *)) compare);
+	qsort(
+		filelist->list,
+		filelist->length,
+		sizeof(char *),
+		(int (*)(const void *, const void *)) compare);
 
 	return filelist;
 }
-
 
 /**
  * Creates a new image and initializes it
@@ -354,6 +408,13 @@ Filelist *getFileList(char *path) {
 Image *createInitializedImage(uint depth, uint height, uint width, char *path) {
 	/** Allocate memory for the new image */
 	Image *image = (Image *) malloc(sizeof(Image));
+	if (image == NULL) {
+		printf(
+			"%sError. Not enough memory for createInitializedImage image.%s\n",
+			KRED,
+			KNRM);
+		exit(XST_FAILURE);
+	}
 
 	/** Initialize new image's dimensions */
 	image->depth = depth;
@@ -362,6 +423,15 @@ Image *createInitializedImage(uint depth, uint height, uint width, char *path) {
 
 	/** Copy path to new image */
 	image->path = (char *) malloc(strlen(path) * sizeof(char));
+	if (image->path == NULL) {
+		printf(
+			"%sError. Not enough memory for createInitializedImage "
+			"image->path.%s\n",
+			KRED,
+			KNRM);
+		exit(XST_FAILURE);
+	}
+
 	strcpy(image->path, path);
 
 	/** Allocate memory for new image's channel matrix representation */
@@ -369,5 +439,4 @@ Image *createInitializedImage(uint depth, uint height, uint width, char *path) {
 	return image;
 }
 
-
-
+#endif
