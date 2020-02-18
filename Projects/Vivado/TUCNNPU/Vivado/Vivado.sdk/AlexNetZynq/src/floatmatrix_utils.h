@@ -8,7 +8,7 @@
 #include "terminal_colors.h"
 
 /** Contains all necessary data for an image to be stored in memory. */
-typedef struct Image_t {
+typedef struct {
 	/** Image's height */
 	unsigned int height;
 	/** Image's width */
@@ -39,7 +39,7 @@ typedef struct Image_t {
  * Struct to store a multi-dimensional matrix of type matrix_t in a buffer-like
  * representation.
  */
-typedef struct floatMatrix_t {
+typedef struct {
 	unsigned int dimsNum; /**< Size of dims array */
 	unsigned int *dims;   /**< Stores the size of each dimension */
 	/**
