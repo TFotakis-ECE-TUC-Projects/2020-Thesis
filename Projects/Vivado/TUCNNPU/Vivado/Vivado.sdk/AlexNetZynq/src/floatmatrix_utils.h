@@ -7,55 +7,7 @@
 #include "platform_conf.h"
 #include "terminal_colors.h"
 
-/** Contains all necessary data for an image to be stored in memory. */
-typedef struct {
-	/** Image's height */
-	unsigned int height;
-	/** Image's width */
-	unsigned int width;
-	/** Image's color profile (RGB -> 3, BW -> 1, CMYK -> 4, etc.) */
-	unsigned int depth;
-	/**
-	 * Holds RGB data after jpeg decompression, one color in each cell,
-	 * flattened row by row
-	 */
-	unsigned char *bmp_buffer;
-	/** Size of bmp buffer in cells */
-	unsigned long bmp_size;
-	/** Image's path */
-	char *path;
-	/**
-	 * A 3-dimensional representation of an image.
-	 * First dimension: Color channel
-	 * Second dimension: Image's rows in pixels
-	 * Third dimension: Image's columns in pixels
-	 *
-	 * Valid pixel values: unsigned integers in range (0, 255).
-	 */
-	unsigned char ***channels;
-} Image;
 
-/**
- * Struct to store a multi-dimensional matrix of type matrix_t in a buffer-like
- * representation.
- */
-typedef struct {
-	unsigned int dimsNum; /**< Size of dims array */
-	unsigned int *dims;   /**< Stores the size of each dimension */
-	/**
-	 * Stores the matrix_t data as a 1D buffer by flattening every dimension.
-	 *
-	 * Its size is defined by:
-	 * dims[0] * dims[1] * dims[2] * ... * dims[dimsNum -1] * sizeof(matrix_t)
-	 *
-	 * To access data from the i-th plain, j-th row, k-th column calculate an
-	 * index as follows:
-	 * index = k + j * dims[2] + i * dims[1] * dims[2]
-	 *
-	 * For ease of calculating indices use calc3DIndex or calc4DIndex.
-	 */
-	matrix_t *matrix;
-} FloatMatrix;
 
 /**
  * Calculates the total cells number of a multi-dimensional matrix
