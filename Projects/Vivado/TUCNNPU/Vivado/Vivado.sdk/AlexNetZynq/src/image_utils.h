@@ -18,43 +18,8 @@
 #include <dirent.h>
 #include <string.h>
 #include <xstatus.h>
+#include "platform_conf.h"
 #include "terminal_colors.h"
-
-/** Contains all necessary data for an image to be stored in memory. */
-typedef struct {
-	/** Image's height */
-	int height;
-	/** Image's width */
-	int width;
-	/** Image's color profile (RGB -> 3, BW -> 1, CMYK -> 4, etc.) */
-	int depth;
-	/**
-	 * Holds RGB data after jpeg decompression, one color in each cell,
-	 * flattened row by row
-	 */
-	unsigned char *bmp_buffer;
-	/** Size of bmp buffer in cells */
-	unsigned long bmp_size;
-	/** Image's path */
-	char *path;
-	/**
-	 * A 3-dimensional representation of an image.
-	 * First dimension: Color channel
-	 * Second dimension: Image's rows in pixels
-	 * Third dimension: Image's columns in pixels
-	 *
-	 * Valid pixel values: unsigned integers in range (0, 255).
-	 */
-	unsigned char ***channels;
-} Image;
-
-/** Structure to contain file paths */
-typedef struct {
-	/** Length of the list (number of paths stored) */
-	uint length;
-	/** List of strings to store filepaths */
-	char **list;
-} Filelist;
 
 /**
  * Frees image's channels matrix
