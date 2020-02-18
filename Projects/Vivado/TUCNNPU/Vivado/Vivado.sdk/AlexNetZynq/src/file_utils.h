@@ -414,17 +414,20 @@ NetConf *read_config(char *path) {
 			sscanf(s, "stride=%u\n", &netConf->layersConf[i].stride);
 		} else if (!strcmp(layerType, "Linear")) {
 			netConf->layersConf[i].layerType = LINEAR_LAYER_TYPE;
+			netConf->layersConf[i].doReLU = 0;
 
 			s = f_gets(buff, sizeof(buff), &f);
 			sscanf(s, "outFeatures=%u\n", &netConf->layersConf[i].outFeatures);
 		} else if (!strcmp(layerType, "LinearReLU")) {
 			netConf->layersConf[i].layerType = LINEAR_RELU_LAYER_TYPE;
+			netConf->layersConf[i].doReLU = 1;
 
 			s = f_gets(buff, sizeof(buff), &f);
 			sscanf(s, "outFeatures=%u\n", &netConf->layersConf[i].outFeatures);
 		}
 	}
 	close_file(f);
+	printf("%sSuccess%s\n", KGRN, KNRM);
 	return netConf;
 }
 
