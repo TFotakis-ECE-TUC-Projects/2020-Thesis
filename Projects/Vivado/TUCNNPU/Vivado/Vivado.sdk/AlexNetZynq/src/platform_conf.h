@@ -13,6 +13,76 @@ typedef enum {
 } LayerType;
 
 typedef struct {
+	unsigned int InstanceId;
+	void *InstancePtr;
+} Core;
+
+/** Contains all necessary data for an image to be stored in memory. */
+typedef struct {
+	/** Image's height */
+	unsigned int height;
+	/** Image's width */
+	unsigned int width;
+	/** Image's color profile (RGB -> 3, BW -> 1, CMYK -> 4, etc.) */
+	unsigned int depth;
+	/**
+	 * Holds RGB data after jpeg decompression, one color in each cell,
+	 * flattened row by row
+	 */
+	unsigned char *bmp_buffer;
+	/** Size of bmp buffer in cells */
+	unsigned long bmp_size;
+	/** Image's path */
+	char *path;
+	/**
+	 * A 3-dimensional representation of an image.
+	 * First dimension: Color channel
+	 * Second dimension: Image's rows in pixels
+	 * Third dimension: Image's columns in pixels
+	 *
+	 * Valid pixel values: unsigned integers in range (0, 255).
+	 */
+	unsigned char ***channels;
+} Image;
+
+/** Structure to contain file paths */
+typedef struct {
+	/** Length of the list (number of paths stored) */
+	unsigned int length;
+	/** List of strings to store filepaths */
+	char **list;
+} Filelist;
+
+/**
+ * Struct to store a multi-dimensional matrix of type matrix_t in a buffer-like
+ * representation.
+ */
+typedef struct {
+	unsigned int dimsNum; /**< Size of dims array */
+	unsigned int *dims;   /**< Stores the size of each dimension */
+	/**
+	 * Stores the matrix_t data as a 1D buffer by flattening every dimension.
+	 *
+	 * Its size is defined by:
+	 * dims[0] * dims[1] * dims[2] * ... * dims[dimsNum -1] * sizeof(matrix_t)
+	 *
+	 * To access data from the i-th plain, j-th row, k-th column calculate an
+	 * index as follows:
+	 * index = k + j * dims[2] + i * dims[1] * dims[2]
+	 *
+	 * For ease of calculating indices use calc3DIndex or calc4DIndex.
+	 */
+	matrix_t *matrix;
+} FloatMatrix;
+
+/** Structure to store the network's parameters */
+typedef struct {
+	unsigned int len;	 /** The number of parameter matrices */
+	FloatMatrix **matrix; /** The 1D array of FloatMartix cells to store the
+							 parameters */
+} Params;
+
+typedef struct {
 	LayerType layerType;
 	unsigned int kernelSize;
 	unsigned int stride;
@@ -39,12 +109,10 @@ typedef struct {
 typedef struct {
 	unsigned int layersNum;
 	LayerConf *layersConf;
+	Params *params;
+	char **labels;
+	Filelist *imagesPaths;
 } NetConf;
-
-typedef struct {
-	unsigned int InstanceId;
-	void *InstancePtr;
-} Core;
 
 #ifdef XPAR_XCONV_CORE_NUM_INSTANCES
 #include <xconv_core.h>
