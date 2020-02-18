@@ -1,6 +1,7 @@
 #ifndef SRC_NN_UTILS_H_
 #define SRC_NN_UTILS_H_
 
+#include "platform_conf.h"
 #include "math.h"
 
 /**
