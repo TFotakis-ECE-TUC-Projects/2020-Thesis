@@ -23,27 +23,27 @@
  * likely it is for the input image to be of a class in a logarithmic scale.
  */
 FloatMatrix *forwardZynq(NetConf *netConf, FloatMatrix *x) {
+	// Params *params = netConf->params;
 	// x = Conv2dReLU(x, params->matrix[0], params->matrix[1], 3, 64, 11, 4, 2);
 	// x = MaxPool2d(x, 3, 2);
-	// x = Conv2dReLU(x, params->matrix[2], params->matrix[3], 64, 192, 5, 1,
-	// 2); x = MaxPool2d(x, 3, 2); x = Conv2dReLU(x, params->matrix[4],
-	// params->matrix[5], 192, 384, 3, 1, 1); x = Conv2dReLU(x,
-	// params->matrix[6], params->matrix[7], 384, 256, 3, 1, 1); x =
-	// Conv2dReLU(x, params->matrix[8], params->matrix[9], 256, 256, 3, 1, 1);
+	// x = Conv2dReLU(x, params->matrix[2], params->matrix[3], 64, 192, 5, 1, 2);
+	// x = MaxPool2d(x, 3, 2);
+	// x = Conv2dReLU(x, params->matrix[4], params->matrix[5], 192, 384, 3, 1, 1);
+	// x = Conv2dReLU(x, params->matrix[6], params->matrix[7], 384, 256, 3, 1, 1);
+	// x = Conv2dReLU(x, params->matrix[8], params->matrix[9], 256, 256, 3, 1, 1);
 	// x = MaxPool2d(x, 3, 2);
 	// x = Linear(x, params->matrix[10], params->matrix[11], 9216, 4096, 1);
 	// x = Linear(x, params->matrix[12], params->matrix[13], 4096, 4096, 1);
 	// x = Linear(x, params->matrix[14], params->matrix[15], 4096, 1000, 0);
 
-	printf("00%%");
+	printf("000/03d", netConf->layersNum);
 	unsigned int params_index = 0;
 	for (unsigned int i = 0; i < netConf->layersNum; i++) {
-		printf("\b\b\b");
-		printf("%02d%%", (i * 100) / netConf->layersNum);
+		printf("\b\b\b\b\b\b\b");
+		printf("%03d/%03d", i, netConf->layersNum);
 
 		switch (netConf->layersConf[i].layerType) {
 			case CONV_LAYER_TYPE:
-				printf("Conv");
 				x = Conv2dReLU(
 					x,
 					netConf->params->matrix[params_index],
@@ -56,7 +56,6 @@ FloatMatrix *forwardZynq(NetConf *netConf, FloatMatrix *x) {
 				params_index += 2;
 				break;
 			case MAXPOOL_LAYER_TYPE:
-				printf("maxpool");
 				x = MaxPool2d(
 					x,
 					netConf->layersConf[i].kernelSize,
@@ -64,7 +63,6 @@ FloatMatrix *forwardZynq(NetConf *netConf, FloatMatrix *x) {
 				break;
 			case LINEAR_RELU_LAYER_TYPE:
 			case LINEAR_LAYER_TYPE:
-				printf("Linear");
 				x = Linear(
 					x,
 					netConf->params->matrix[params_index],
@@ -125,9 +123,7 @@ void loop() {
 
 		printf("*** Starting Inference ***\n\n");
 		for (unsigned int i = 0; i < netConf->imagesPaths->length; i++) {
-			inference(
-				netConf->imagesPaths->list[i],
-				netConf);
+			inference(netConf->imagesPaths->list[i], netConf);
 		}
 		printf("\n*** Inference finished ***\n");
 		break;
