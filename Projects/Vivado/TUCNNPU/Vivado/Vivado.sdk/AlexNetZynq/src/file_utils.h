@@ -4,16 +4,9 @@
 #include <string.h>
 #include <ff.h>
 #include <xstatus.h>
-#include "floatmatrix_utils.h"
 #include "platform_conf.h"
+#include "floatmatrix_utils.h"
 #include "terminal_colors.h"
-
-/** Structure to store the network's parameters */
-typedef struct {
-	unsigned int len;	 /** The number of parameter matrices */
-	FloatMatrix **matrix; /** The 1D array of FloatMartix cells to store the
-							 parameters */
-} Params;
 
 unsigned int readUInt(FIL *f) {
 	unsigned int num;
@@ -36,14 +29,6 @@ float readFloat(FIL *f) {
 	}
 	return num;
 }
-
-/** Structure to contain file paths */
-typedef struct {
-	/** Length of the list (number of paths stored) */
-	unsigned int length;
-	/** List of strings to store filepaths */
-	char **list;
-} Filelist;
 
 /**
  * Reads a path and creates a Filelist which contains all files contained in
