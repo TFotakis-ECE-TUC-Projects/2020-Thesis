@@ -11,6 +11,13 @@
 #define PARAMS_FILE "tzanis/params/alexnet.params"
 #define LABELS_FILE "tzanis/labels/alexnet.labels"
 
+void runTests() {
+	Conv_core_test(1);
+	Maxpool_core_test(1);
+	Linear_core_test(1);
+	Network_test();
+}
+
 /**
  * Takes an image and passes it through the network to classify it and print its
  * label. It also measures the time in milliseconds for the forward pass to
@@ -53,6 +60,8 @@ void setup() {
 	printf("*** Starting ***\n");
 	setup_cache();
 	mount_sd();
+
+	runTests();
 }
 
 void loop() {

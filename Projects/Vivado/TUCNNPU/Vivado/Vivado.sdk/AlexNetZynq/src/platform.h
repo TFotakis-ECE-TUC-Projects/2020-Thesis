@@ -13,6 +13,8 @@
 
 typedef float matrix_t;
 
+// ----------------------------------------------
+
 typedef enum {
 	CONV_LAYER_TYPE,
 	MAXPOOL_LAYER_TYPE,
@@ -94,8 +96,6 @@ typedef struct {
 	char **labels;
 	Filelist *imagesPaths;
 } NetConf;
-
-XScuGic ScuGic;
 
 // ----------------------------------------------
 
@@ -786,7 +786,7 @@ void Conv_core_isr(Core *core) {
 	Conv_core_result_avail[core->InstanceId] = 1;
 }
 
-int Conv_core_setup_interrupt(Core *core) {
+int Conv_core_setup_interrupt(Core *core, XScuGic ScuGic) {
 	// Connect the Conv_core ISR to the exception table
 	int result = XScuGic_Connect(
 		&ScuGic,
@@ -798,7 +798,7 @@ int Conv_core_setup_interrupt(Core *core) {
 	return XST_SUCCESS;
 }
 
-void Conv_core_init(Core *core) {
+void Conv_core_init(Core *core, XScuGic ScuGic) {
 	printf("- Initializing Conv_core %u: ", core->InstanceId);
 	core->InstancePtr = (void *) malloc(sizeof(XConv_core));
 	int status = XConv_core_Initialize(
@@ -807,7 +807,7 @@ void Conv_core_init(Core *core) {
 		printf("%sError%s\n", KRED, KNRM);
 		exit(XST_FAILURE);
 	}
-	status = Conv_core_setup_interrupt(core);
+	status = Conv_core_setup_interrupt(core, ScuGic);
 	if (status != XST_SUCCESS) {
 		printf("%sError%s\n", KRED, KNRM);
 		exit(XST_FAILURE);
@@ -906,6 +906,88 @@ void Conv_conf_complete(
 	Conv_conf_params_complete(lc);
 	lc->weightsAddr = netConf->params[params_index];
 	lc->biasAddr = netConf->params[params_index + 1];
+}
+
+int Conv_core_test(unsigned int testAllCores) {
+	printf("*** Conv_core_test ***\n");
+
+	matrix_t X_VALUE = 1;
+	matrix_t WEIGHT_VALUE = .2;
+	matrix_t BIAS_VALUE = .1;
+
+	if (CONV_CORES_NUM <= 0) {
+		printf("%s- No Conv_core available!%s\n", KRED, KNRM);
+		return XST_DEVICE_NOT_FOUND;
+	}
+
+	LayerConf lc = {
+		.layerType = CONV_LAYER_TYPE,
+		.kernelSize = 11,
+		.stride = 4,
+		.padding = 2,
+		.din = 3,
+		.hin = 224,
+		.win = 224,
+		.dout = 64,
+	};
+
+	Conv_conf_params_complete(&lc);
+
+	printf("- Initializing Memory: ");
+	matrix_t *x = (matrix_t *) malloc(lc.xSize * sizeof(matrix_t));
+	for (u32 i = 0; i < lc.xSize; i++) x[i] = X_VALUE;
+
+	lc.weightsAddr = (matrix_t *) malloc(lc.weightsSize * sizeof(matrix_t));
+	for (u32 i = 0; i < lc.weightsSize; i++) lc.weightsAddr[i] = WEIGHT_VALUE;
+
+	lc.biasAddr = (matrix_t *) malloc(lc.biasSize * sizeof(matrix_t));
+	for (u32 i = 0; i < lc.biasSize; i++) lc.biasAddr[i] = BIAS_VALUE;
+	printf("%sSuccess%s\n", KGRN, KNRM);
+
+	int status = XST_SUCCESS;
+	unsigned int core_num = testAllCores ? CONV_CORES_NUM : 1;
+	for (unsigned int core = 0; core < core_num; core++) {
+		printf("- Conv_core[%u]: ", core);
+
+		matrix_t *res = (*lc.hw_func)(lc, x);
+
+		matrix_t pixel_value;
+		matrix_t error = 0;
+
+		pixel_value =
+			X_VALUE * WEIGHT_VALUE * lc.kernelSize * lc.kernelSize * lc.din +
+			BIAS_VALUE;
+		error +=
+			abs(lc.resAddr[0 * lc.hout * lc.wout + 23 * lc.wout + 23] -
+				pixel_value);
+		error +=
+			abs(lc.resAddr[1 * lc.hout * lc.wout + 23 * lc.wout + 23] -
+				pixel_value);
+		pixel_value = X_VALUE * WEIGHT_VALUE * (lc.kernelSize - lc.padding) *
+				(lc.kernelSize - lc.padding) * lc.din +
+			BIAS_VALUE;
+		error += abs(lc.resAddr[0] - pixel_value);
+		pixel_value = X_VALUE * WEIGHT_VALUE *
+				(lc.kernelSize - lc.padding + 1) *
+				(lc.kernelSize - lc.padding + 1) * lc.din +
+			BIAS_VALUE;
+		error +=
+			abs(lc.resAddr[0 * lc.hout * lc.wout + 54 * lc.wout + 54] -
+				pixel_value);
+
+		if (error < 0.1) {
+			printf("%sSuccess%s\n", KGRN, KNRM);
+		} else {
+			printf("%sError %f%s\n", KRED, error, KNRM);
+			status = XST_FAILURE;
+		}
+		free(res);
+	}
+
+	free(lc.weightsAddr);
+	free(lc.biasAddr);
+
+	return status;
 }
 
 // ----------------------------------------------
@@ -1055,7 +1137,7 @@ void Maxpool_core_isr(Core *core) {
 	Maxpool_core_result_avail[core->InstanceId] = 1;
 }
 
-int Maxpool_core_setup_interrupt(Core *core) {
+int Maxpool_core_setup_interrupt(Core *core, XScuGic ScuGic) {
 	// Connect the Maxpool_core ISR to the exception table
 	int result = XScuGic_Connect(
 		&ScuGic,
@@ -1067,7 +1149,7 @@ int Maxpool_core_setup_interrupt(Core *core) {
 	return XST_SUCCESS;
 }
 
-void Maxpool_core_init(Core *core) {
+void Maxpool_core_init(Core *core, XScuGic ScuGic) {
 	printf("- Initializing Maxpool_core %u: ", core->InstanceId);
 	core->InstancePtr = (void *) malloc(sizeof(XMaxpool_core));
 	int status = XMaxpool_core_Initialize(
@@ -1076,7 +1158,7 @@ void Maxpool_core_init(Core *core) {
 		printf("%sError%s\n", KRED, KNRM);
 		exit(XST_FAILURE);
 	}
-	status = Maxpool_core_setup_interrupt(core);
+	status = Maxpool_core_setup_interrupt(core, ScuGic);
 	if (status != XST_SUCCESS) {
 		printf("%sError%s\n", KRED, KNRM);
 		exit(XST_FAILURE);
@@ -1168,6 +1250,57 @@ void Maxpool_conf_complete(NetConf *netConf, unsigned int layer_index) {
 	}
 
 	Maxpool_conf_params_complete(lc);
+}
+
+int Maxpool_core_test(unsigned int testAllCores) {
+	printf("*** Maxpool_core_test ***\n");
+	matrix_t X_VALUE = .1;
+
+	if (MAXPOOL_CORES_NUM <= 0) {
+		printf("%s- No Maxpool_core available!%s\n", KRED, KNRM);
+		return XST_DEVICE_NOT_FOUND;
+	}
+
+	LayerConf lc = {
+		.layerType = MAXPOOL_LAYER_TYPE,
+		.kernelSize = 3,
+		.stride = 2,
+		.din = 64,
+		.hin = 55,
+		.win = 55,
+	};
+
+	Maxpool_conf_params_complete(&lc);
+
+	printf("- Initializing Memory: ");
+	matrix_t *x = (matrix_t *) malloc(lc.xSize * sizeof(matrix_t));
+	for (u32 i = 0; i < lc.xSize; i++) x[i] = X_VALUE;
+	printf("%sSuccess%s\n", KGRN, KNRM);
+
+	int status = XST_SUCCESS;
+	unsigned int core_num = testAllCores ? MAXPOOL_CORES_NUM : 1;
+	for (unsigned int core = 0; core < core_num; core++) {
+		printf("- Maxpool_core[%u]: ", core);
+
+		matrix_t *res = (*lc.hw_func)(lc, x);
+
+		matrix_t pixel_value = X_VALUE;
+		matrix_t error = 0;
+
+		for (u32 i = 0; i < lc.resSize; i++) {
+			error += abs(res[i] - pixel_value);
+		}
+
+		if (error < 0.1) {
+			printf("%sSuccess%s\n", KGRN, KNRM);
+		} else {
+			printf("%sError %f%s\n", KRED, error, KNRM);
+			status = XST_FAILURE;
+		}
+
+		free(lc.resAddr);
+	}
+	return status;
 }
 
 // ----------------------------------------------
@@ -1285,7 +1418,7 @@ void Linear_core_isr(Core *core) {
 	Linear_core_result_avail[core->InstanceId] = 1;
 }
 
-int Linear_core_setup_interrupt(Core *core) {
+int Linear_core_setup_interrupt(Core *core, XScuGic ScuGic) {
 	// Connect the Linear_core ISR to the exception table
 	int result = XScuGic_Connect(
 		&ScuGic,
@@ -1297,7 +1430,7 @@ int Linear_core_setup_interrupt(Core *core) {
 	return XST_SUCCESS;
 }
 
-void Linear_core_init(Core *core) {
+void Linear_core_init(Core *core, XScuGic ScuGic) {
 	printf("- Initializing Linear_core %u: ", core->InstanceId);
 	core->InstancePtr = (void *) malloc(sizeof(XLinear_core));
 	int status = XLinear_core_Initialize(
@@ -1306,7 +1439,7 @@ void Linear_core_init(Core *core) {
 		printf("%sError%s\n", KRED, KNRM);
 		exit(XST_FAILURE);
 	}
-	status = Linear_core_setup_interrupt(core);
+	status = Linear_core_setup_interrupt(core, ScuGic);
 	if (status != XST_SUCCESS) {
 		printf("%sError%s\n", KRED, KNRM);
 		exit(XST_FAILURE);
@@ -1401,79 +1534,66 @@ void Linear_conf_complete(
 	lc->biasAddr = netConf->params[params_index + 1];
 }
 
-// ----------------------------------------------
+int Linear_core_test(unsigned int testAllCores) {
+	printf("*** Linear_core_test ***\n");
 
-void setup_stdout() {
-	setbuf(stdout, NULL); // No printf flushing needed
-	printf("\033[2J");	// Clear terminal
-	printf("\033[H");	 // Move cursor to the home position
-}
+	matrix_t X_VALUE = 1;
+	matrix_t WEIGHT_VALUE = .2;
+	matrix_t BIAS_VALUE = .1;
 
-void setup_cache() {
-	Xil_DCacheDisable();
-}
-
-void setup_interrupt() {
-	printf("- Setting up interrupts: ");
-
-	// This functions sets up the interrupt on the ARM
-	int result;
-	XScuGic_Config *pCfg = XScuGic_LookupConfig(XPAR_SCUGIC_SINGLE_DEVICE_ID);
-	if (pCfg == NULL) {
-		printf(
-			"%sError: Interrupt Configuration Lookup Failed%s\n", KRED, KNRM);
-
-		print("Interrupt Configuration Lookup Failed\n");
-		exit(XST_FAILURE);
+	if (LINEAR_CORES_NUM <= 0) {
+		printf("%s- No Linear_core available!%s\n", KRED, KNRM);
+		return XST_DEVICE_NOT_FOUND;
 	}
-	result = XScuGic_CfgInitialize(&ScuGic, pCfg, pCfg->CpuBaseAddress);
-	if (result != XST_SUCCESS) {
-		printf("%sError%s\n", KRED, KNRM);
-		exit(result);
-	}
-	// self-test
-	result = XScuGic_SelfTest(&ScuGic);
-	if (result != XST_SUCCESS) {
-		printf("%sError%s\n", KRED, KNRM);
-		exit(result);
-	}
-	// Initialize the exception handler
-	Xil_ExceptionInit();
-	// Register the exception handler
-	// print("Register the exception handler\n\r");
-	Xil_ExceptionRegisterHandler(
-		XIL_EXCEPTION_ID_INT,
-		(Xil_ExceptionHandler) XScuGic_InterruptHandler,
-		&ScuGic);
-	// Enable the exception handler
-	Xil_ExceptionEnable();
+
+	LayerConf lc = {
+		.layerType = LINEAR_RELU_LAYER_TYPE,
+		.inFeatures = 9216,
+		.outFeatures = 4096,
+	};
+
+	Linear_conf_params_complete(&lc);
+
+	printf("- Initializing Memory: ");
+	matrix_t *x = (matrix_t *) malloc(lc.xSize * sizeof(matrix_t));
+	for (u32 i = 0; i < lc.xSize; i++) x[i] = X_VALUE;
+
+	lc.weightsAddr = (matrix_t *) malloc(lc.weightsSize * sizeof(matrix_t));
+	for (u32 i = 0; i < lc.weightsSize; i++) lc.weightsAddr[i] = WEIGHT_VALUE;
+
+	lc.biasAddr = (matrix_t *) malloc(lc.biasSize * sizeof(matrix_t));
+	for (u32 i = 0; i < lc.biasSize; i++) lc.biasAddr[i] = BIAS_VALUE;
 	printf("%sSuccess%s\n", KGRN, KNRM);
-}
 
-void setup_accelerator() {
-	for (unsigned int i = 0; i < CONV_CORES_NUM; i++) {
-		Conv_core_list[i] = (Core *) malloc(sizeof(Core));
-		Conv_core_list[i]->InstanceId = i;
-		Conv_core_init(Conv_core_list[i]);
-	}
-	for (unsigned int i = 0; i < MAXPOOL_CORES_NUM; i++) {
-		Maxpool_core_list[i] = (Core *) malloc(sizeof(Core));
-		Maxpool_core_list[i]->InstanceId = i;
-		Maxpool_core_init(Maxpool_core_list[i]);
-	}
-	for (unsigned int i = 0; i < LINEAR_CORES_NUM; i++) {
-		Linear_core_list[i] = (Core *) malloc(sizeof(Core));
-		Linear_core_list[i]->InstanceId = i;
-		Linear_core_init(Linear_core_list[i]);
-	}
-}
+	int status = XST_SUCCESS;
+	unsigned int core_num = testAllCores ? LINEAR_CORES_NUM : 1;
+	for (unsigned int core = 0; core < core_num; core++) {
+		printf("- Maxpool_core[%u]: ", core);
 
-void setup_platform(char *greeting_message) {
-	setup_stdout();
-	printf("%s", greeting_message);
-	setup_cache();
-	setup_interrupt();
-	setup_accelerator();
+		matrix_t *res = (*lc.hw_func)(lc, x);
+
+		matrix_t pixel_value =
+			X_VALUE * WEIGHT_VALUE * lc.inFeatures + BIAS_VALUE;
+		matrix_t error = 0;
+
+		for (u32 i = 0; i < lc.resSize; i++) {
+			error += abs(lc.resAddr[i] - pixel_value);
+		}
+
+		if (error < 0.1) {
+			printf("%sSuccess%s\n", KGRN, KNRM);
+		} else {
+			printf("%sError %f%s\n", KRED, error, KNRM);
+			status = XST_FAILURE;
+		}
+
+		free(res);
+	}
+
+	free(lc.weightsAddr);
+	free(lc.biasAddr);
+
+	return status;
 }
 
 // ----------------------------------------------
@@ -1516,6 +1636,204 @@ matrix_t *forward(NetConf *netConf, matrix_t *x, unsigned int useHW) {
 	}
 	printf("\b\b\b");
 	return x;
+}
+
+int Network_test() {
+	printf("*** Network_test ***\n");
+
+	matrix_t X_VALUE = 1;
+	matrix_t WEIGHT_VALUE = .2;
+	matrix_t BIAS_VALUE = .1;
+
+	unsigned int LAYERS_NUMBER = 11;
+
+	NetConf netConf;
+	netConf.layersNum = 11;
+
+	LayerConf lc[] = {
+		{
+			.layerType = CONV_LAYER_TYPE,
+			.kernelSize = 11,
+			.stride = 4,
+			.padding = 2,
+			.din = 3,
+			.hin = 224,
+			.win = 224,
+			.dout = 64,
+		},
+		{
+			.layerType = MAXPOOL_LAYER_TYPE,
+			.kernelSize = 3,
+			.stride = 2,
+		},
+		{
+			.layerType = CONV_LAYER_TYPE,
+			.kernelSize = 5,
+			.stride = 1,
+			.padding = 2,
+			.dout = 192,
+		},
+		{
+			.layerType = MAXPOOL_LAYER_TYPE,
+			.kernelSize = 3,
+			.stride = 2,
+		},
+		{
+			.layerType = CONV_LAYER_TYPE,
+			.kernelSize = 3,
+			.stride = 1,
+			.padding = 1,
+			.dout = 384,
+		},
+		{
+			.layerType = CONV_LAYER_TYPE,
+			.kernelSize = 3,
+			.stride = 1,
+			.padding = 1,
+			.dout = 256,
+		},
+		{
+			.layerType = CONV_LAYER_TYPE,
+			.kernelSize = 3,
+			.stride = 1,
+			.padding = 1,
+			.dout = 256,
+		},
+		{
+			.layerType = MAXPOOL_LAYER_TYPE,
+			.kernelSize = 3,
+			.stride = 2,
+		},
+		{
+			.layerType = LINEAR_RELU_LAYER_TYPE,
+			.outFeatures = 4096,
+		},
+		{
+			.layerType = LINEAR_RELU_LAYER_TYPE,
+			.outFeatures = 4096,
+		},
+		{
+			.layerType = LINEAR_LAYER_TYPE,
+			.outFeatures = 1000,
+		},
+	};
+	netConf.layersConf = lc;
+	matrix_t *params[16];
+	netConf.params = params;
+
+	layer_conf_complete(&netConf);
+
+	printf("- Initializing Memory: ");
+	u32 xSize = lc[0].xSize;
+	matrix_t *xAddr = (matrix_t *) malloc(xSize * sizeof(matrix_t));
+	for (u32 i = 0; i < xSize; i++) xAddr[i] = X_VALUE;
+
+	u32 params_index = 0;
+	for (u32 i = 0; i < LAYERS_NUMBER; i++) {
+		if (lc[i].layerType == MAXPOOL_LAYER_TYPE) continue;
+
+		params[params_index] =
+			(matrix_t *) malloc(lc[i].weightsSize * sizeof(matrix_t));
+		for (u32 j = 0; j < lc[i].weightsSize; j++) {
+			params[params_index][j] = WEIGHT_VALUE;
+		}
+		params_index++;
+
+		params[params_index] =
+			(matrix_t *) malloc(lc[i].biasSize * sizeof(matrix_t));
+		for (u32 j = 0; j < lc[i].biasSize; j++) {
+			params[params_index][j] = BIAS_VALUE;
+		}
+		params_index++;
+	}
+	printf("%sSuccess%s\n", KGRN, KNRM);
+
+	printf("- Forwarding...\n");
+	matrix_t *res = forward(&netConf, xAddr, 1);
+	printf("- %sForwarded Successfully%s\n", KGRN, KNRM);
+
+	for (u32 i = 0; i < params_index; i++) free(params[i]);
+	free(res);
+
+	return XST_SUCCESS;
+}
+
+// ----------------------------------------------
+
+void setup_stdout() {
+	setbuf(stdout, NULL); // No printf flushing needed
+	printf("\033[2J");	// Clear terminal
+	printf("\033[H");	 // Move cursor to the home position
+}
+
+void setup_cache() {
+	Xil_DCacheDisable();
+}
+
+XScuGic setup_interrupt() {
+	printf("- Setting up interrupts: ");
+
+	// This functions sets up the interrupt on the ARM
+	int result;
+	XScuGic_Config *pCfg = XScuGic_LookupConfig(XPAR_SCUGIC_SINGLE_DEVICE_ID);
+	if (pCfg == NULL) {
+		printf(
+			"%sError: Interrupt Configuration Lookup Failed%s\n", KRED, KNRM);
+
+		print("Interrupt Configuration Lookup Failed\n");
+		exit(XST_FAILURE);
+	}
+	XScuGic ScuGic;
+
+	result = XScuGic_CfgInitialize(&ScuGic, pCfg, pCfg->CpuBaseAddress);
+	if (result != XST_SUCCESS) {
+		printf("%sError%s\n", KRED, KNRM);
+		exit(result);
+	}
+	// self-test
+	result = XScuGic_SelfTest(&ScuGic);
+	if (result != XST_SUCCESS) {
+		printf("%sError%s\n", KRED, KNRM);
+		exit(result);
+	}
+	// Initialize the exception handler
+	Xil_ExceptionInit();
+	// Register the exception handler
+	// print("Register the exception handler\n\r");
+	Xil_ExceptionRegisterHandler(
+		XIL_EXCEPTION_ID_INT,
+		(Xil_ExceptionHandler) XScuGic_InterruptHandler,
+		&ScuGic);
+	// Enable the exception handler
+	Xil_ExceptionEnable();
+	printf("%sSuccess%s\n", KGRN, KNRM);
+	return ScuGic;
+}
+
+void setup_accelerator(XScuGic ScuGic) {
+	for (unsigned int i = 0; i < CONV_CORES_NUM; i++) {
+		Conv_core_list[i] = (Core *) malloc(sizeof(Core));
+		Conv_core_list[i]->InstanceId = i;
+		Conv_core_init(Conv_core_list[i], ScuGic);
+	}
+	for (unsigned int i = 0; i < MAXPOOL_CORES_NUM; i++) {
+		Maxpool_core_list[i] = (Core *) malloc(sizeof(Core));
+		Maxpool_core_list[i]->InstanceId = i;
+		Maxpool_core_init(Maxpool_core_list[i], ScuGic);
+	}
+	for (unsigned int i = 0; i < LINEAR_CORES_NUM; i++) {
+		Linear_core_list[i] = (Core *) malloc(sizeof(Core));
+		Linear_core_list[i]->InstanceId = i;
+		Linear_core_init(Linear_core_list[i], ScuGic);
+	}
+}
+
+void setup_platform(char *greeting_message) {
+	setup_stdout();
+	printf("%s", greeting_message);
+	setup_cache();
+	XScuGic ScuGic = setup_interrupt();
+	setup_accelerator(ScuGic);
 }
 
 #endif /* SRC_PLATFORM_H_ */
