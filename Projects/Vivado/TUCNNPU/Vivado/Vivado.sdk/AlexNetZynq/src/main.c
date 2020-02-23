@@ -1,9 +1,6 @@
 #include <stdio.h>
-#include "platform_conf.h"
-#include "floatmatrix_utils.h"
-#include "file_utils.h"
-#include "nn_utils.h"
-#include "platform_func.h"
+#include <xstatus.h>
+#include "platform.h"
 
 #define IMAGES_DIR "tzanis/images"
 #define CONFIGS_DIR "tzanis/configs"
@@ -15,70 +12,6 @@
 #define LABELS_FILE "tzanis/labels/alexnet.labels"
 
 /**
- * Runs the network's forward pass
- * @param[in] params: the network's parameters sets
- * @param[in] x: the input image to get classified
- * @returns a FloatMatrix containing the network's classification estimates,
- * that is an array of matrix_t numbers, one for each class, which shows how
- * likely it is for the input image to be of a class in a logarithmic scale.
- */
-FloatMatrix *forwardZynq(NetConf *netConf, FloatMatrix *x) {
-	// Params *params = netConf->params;
-	// x = Conv2dReLU(x, params->matrix[0], params->matrix[1], 3, 64, 11, 4, 2);
-	// x = MaxPool2d(x, 3, 2);
-	// x = Conv2dReLU(x, params->matrix[2], params->matrix[3], 64, 192, 5, 1, 2);
-	// x = MaxPool2d(x, 3, 2);
-	// x = Conv2dReLU(x, params->matrix[4], params->matrix[5], 192, 384, 3, 1, 1);
-	// x = Conv2dReLU(x, params->matrix[6], params->matrix[7], 384, 256, 3, 1, 1);
-	// x = Conv2dReLU(x, params->matrix[8], params->matrix[9], 256, 256, 3, 1, 1);
-	// x = MaxPool2d(x, 3, 2);
-	// x = Linear(x, params->matrix[10], params->matrix[11], 9216, 4096, 1);
-	// x = Linear(x, params->matrix[12], params->matrix[13], 4096, 4096, 1);
-	// x = Linear(x, params->matrix[14], params->matrix[15], 4096, 1000, 0);
-
-	printf("000/03d", netConf->layersNum);
-	unsigned int params_index = 0;
-	for (unsigned int i = 0; i < netConf->layersNum; i++) {
-		printf("\b\b\b\b\b\b\b");
-		printf("%03d/%03d", i, netConf->layersNum);
-
-		switch (netConf->layersConf[i].layerType) {
-			case CONV_LAYER_TYPE:
-				x = Conv2dReLU(
-					x,
-					netConf->params->matrix[params_index],
-					netConf->params->matrix[params_index + 1],
-					netConf->layersConf[i].din,
-					netConf->layersConf[i].dout,
-					netConf->layersConf[i].kernelSize,
-					netConf->layersConf[i].stride,
-					netConf->layersConf[i].padding);
-				params_index += 2;
-				break;
-			case MAXPOOL_LAYER_TYPE:
-				x = MaxPool2d(
-					x,
-					netConf->layersConf[i].kernelSize,
-					netConf->layersConf[i].stride);
-				break;
-			case LINEAR_RELU_LAYER_TYPE:
-			case LINEAR_LAYER_TYPE:
-				x = Linear(
-					x,
-					netConf->params->matrix[params_index],
-					netConf->params->matrix[params_index + 1],
-					netConf->layersConf[i].inFeatures,
-					netConf->layersConf[i].outFeatures,
-					netConf->layersConf[i].doReLU);
-				params_index += 2;
-				break;
-		}
-	}
-	printf("\b\b\b");
-	return x;
-}
-
-/**
  * Takes an image and passes it through the network to classify it and print its
  * label. It also measures the time in milliseconds for the forward pass to
  * complete.
@@ -88,22 +21,30 @@ FloatMatrix *forwardZynq(NetConf *netConf, FloatMatrix *x) {
  * @returns the time needed in milliseconds for the forward pass to complete.
  */
 int inference(char *path, NetConf *netConf) {
-	FloatMatrix *x = loadImage(path);
+	matrix_t *x = loadImage(path);
 	printf("- %s: ", path);
 
 	/** Pass the image through the network */
-	x = forwardZynq(netConf, x);
+	matrix_t *x_hw = forward(netConf, x, 1);
+	matrix_t *x_sw = forward(netConf, x, 0);
 
 	/** Find the class with the greatest likelihood and print its label */
-	unsigned int topClass = argmax(x);
+	unsigned int xSize = netConf->layersConf[netConf->layersNum - 1].resSize;
+	unsigned int topClass_hw = argmax(x_hw, xSize);
+	unsigned int topClass_sw = argmax(x_sw, xSize);
 
-	printf("%s\n", netConf->labels[topClass]);
+	if (topClass_hw == topClass_sw)
+		printf("%s\n", netConf->labels[topClass_sw]);
+	else
+		printf("%sError. No match between sw and hw.%s\n", KRED, KNRM);
 
 	/**
 	 * Free the forward pass's resulting FloatMatrix as it is no longer needed
 	 * to avoid memory leaks
 	 */
-	freeFloatMatrix(x);
+	free(x);
+	free(x_hw);
+	free(x_sw);
 	return XST_SUCCESS;
 }
 
