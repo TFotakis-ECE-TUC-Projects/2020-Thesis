@@ -346,7 +346,7 @@ int close_file(FIL f) {
 }
 
 char *selectFilePath(char *filesDir, char *msg) {
-	Filelist *configsList = getFileList(filesDir);
+	Filelist *configsList = getFilelist(filesDir);
 	printf("%s", msg);
 	for (unsigned int i = 0; i < configsList->length; i++) {
 		printf("\t%d. %s\n", i + 1, configsList->list[i]);
@@ -361,7 +361,7 @@ char *selectFilePath(char *filesDir, char *msg) {
 		scanf("%d", &selection);
 	}
 
-	char *path;
+	char *path = (char *) malloc(200 * sizeof(char));
 	strcpy(path, configsList->list[selection - 1]);
 
 	freeFilelist(configsList);
@@ -642,23 +642,26 @@ NetConf *selectNetConf(
 	char *labelsDir,
 	char *paramsDir,
 	char *imagesDir) {
+
 	char *configFile =
 		selectFilePath(configsDir, "- Select network configuration:\n");
-	char *configDir, configName;
-	sscanf(configFile, "%s/%s.conf", configDir, configName);
+	char *configParentDir = (char *) malloc(200 * sizeof(char));
+	char *configName = (char *) malloc(200 * sizeof(char));
+	sscanf(configFile, "%s/%s.conf", configParentDir, configName);
 
-	char *labelsFile;
+	char *labelsFile = (char *) malloc(200 * sizeof(char));
 	sprintf(labelsFile, "%s/%s.labels", labelsDir, configName);
 
-	char *paramsFile;
+	char *paramsFile = (char *) malloc(200 * sizeof(char));
 	sprintf(paramsFile, "%s/%s.params", paramsDir, configName);
 
 	NetConf *netConf = read_config(configFile);
 	netConf->labels = loadLabels(labelsFile);
 	netConf->params = loadParameters(paramsFile);
-	netConf->imagesPaths = getFileList(imagesDir);
+	netConf->imagesPaths = getFilelist(imagesDir);
 
 	free(configFile);
+	free(configParentDir);
 	free(configName);
 	free(labelsFile);
 	free(paramsFile);
