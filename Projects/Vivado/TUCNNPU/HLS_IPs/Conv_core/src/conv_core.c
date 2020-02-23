@@ -5,7 +5,7 @@ typedef float matrix_t;
 
 /**
  * Calculates the index on a 1D buffer representation of a 3D matrix
- * @param[in] dims: the sizes of the matrix's dimensions
+ * @param[in] dim0 - dim2: the sizes of the matrix's dimensions
  * @param[in] i: The plain dimension
  * @param[in] j: The row dimension
  * @param[in] k: The column dimension
@@ -18,7 +18,7 @@ unsigned int calc3DIndex(unsigned int dim0, unsigned int dim1,
 
 /**
  * Calculates the index on a 1D buffer representation of a 4D matrix
- * @param[in] dims: the sizes of the matrix's dimensions
+ * @param[in] dim0 - dim3: the sizes of the matrix's dimensions
  * @param[in] i: The forth dimension
  * @param[in] j: The plain dimension
  * @param[in] k: The row dimension
