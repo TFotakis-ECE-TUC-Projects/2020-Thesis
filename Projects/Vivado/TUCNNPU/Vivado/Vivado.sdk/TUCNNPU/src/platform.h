@@ -1,14 +1,15 @@
 #ifndef SRC_PLATFORM_H_
 #define SRC_PLATFORM_H_
 
-#include <xil_cache.h>
-#include <xparameters.h>
-#include <xscugic.h>
-#include <math.h>
 #include <stdlib.h>
-#include <string.h>
-#include <ff.h>
+#include <xil_types.h>
 #include <xstatus.h>
+#include <string.h>
+#include <math.h>
+#include <xil_cache.h>
+#include <xscugic.h>
+#include <ff.h>
+#include <xparameters.h>
 #include "terminal_colors.h"
 
 typedef float matrix_t;
@@ -23,64 +24,36 @@ typedef enum {
 } LayerType;
 
 typedef struct {
-	unsigned int InstanceId;
+	u32 InstanceId;
 	void *InstancePtr;
 } Core;
-
-/** Contains all necessary data for an image to be stored in memory. */
-typedef struct {
-	/** Image's height */
-	unsigned int height;
-	/** Image's width */
-	unsigned int width;
-	/** Image's color profile (RGB -> 3, BW -> 1, CMYK -> 4, etc.) */
-	unsigned int depth;
-	/**
-	 * Holds RGB data after jpeg decompression, one color in each cell,
-	 * flattened row by row
-	 */
-	unsigned char *bmp_buffer;
-	/** Size of bmp buffer in cells */
-	unsigned long bmp_size;
-	/** Image's path */
-	char *path;
-	/**
-	 * A 3-dimensional representation of an image.
-	 * First dimension: Color channel
-	 * Second dimension: Image's rows in pixels
-	 * Third dimension: Image's columns in pixels
-	 *
-	 * Valid pixel values: unsigned integers in range (0, 255).
-	 */
-	unsigned char ***channels;
-} Image;
 
 /** Structure to contain file paths */
 typedef struct {
 	/** Length of the list (number of paths stored) */
-	unsigned int length;
+	u32 length;
 	/** List of strings to store filepaths */
 	char **list;
 } Filelist;
 
 typedef struct LayerConf_t {
 	LayerType layerType;
-	unsigned int kernelSize;
-	unsigned int stride;
-	unsigned int padding;
-	unsigned int din;
-	unsigned int hin;
-	unsigned int win;
-	unsigned int dout;
-	unsigned int hout;
-	unsigned int wout;
-	unsigned int inFeatures;
-	unsigned int outFeatures;
-	unsigned int doReLU;
-	unsigned int xSize;
-	unsigned int weightsSize;
-	unsigned int biasSize;
-	unsigned int resSize;
+	u32 kernelSize;
+	u32 stride;
+	u32 padding;
+	u32 din;
+	u32 hin;
+	u32 win;
+	u32 dout;
+	u32 hout;
+	u32 wout;
+	u32 inFeatures;
+	u32 outFeatures;
+	u32 doReLU;
+	u32 xSize;
+	u32 weightsSize;
+	u32 biasSize;
+	u32 resSize;
 	matrix_t *weightsAddr;
 	matrix_t *biasAddr;
 	matrix_t *(*hw_func)();
@@ -88,7 +61,7 @@ typedef struct LayerConf_t {
 } LayerConf;
 
 typedef struct {
-	unsigned int layersNum;
+	u32 layersNum;
 	LayerConf *layersConf;
 	matrix_t **params;
 	char **labels;
@@ -105,13 +78,13 @@ typedef struct {
  * @param[in] k: The column dimension
  * @returns the 1D representation's index of a 3D matrix
  */
-unsigned int calc3DIndex(
-	unsigned int dim0,
-	unsigned int dim1,
-	unsigned int dim2,
-	unsigned int i,
-	unsigned int j,
-	unsigned int k) {
+u32 calc3DIndex(
+	u32 dim0,
+	u32 dim1,
+	u32 dim2,
+	u32 i,
+	u32 j,
+	u32 k) {
 	return k + j * dim2 + i * dim1 * dim2;
 }
 
@@ -124,15 +97,15 @@ unsigned int calc3DIndex(
  * @param[in] l: The column dimension
  * @returns the 1D representation's index of a 4D matrix
  */
-unsigned int calc4DIndex(
-	unsigned int dim0,
-	unsigned int dim1,
-	unsigned int dim2,
-	unsigned int dim3,
-	unsigned int i,
-	unsigned int j,
-	unsigned int k,
-	unsigned int l) {
+u32 calc4DIndex(
+	u32 dim0,
+	u32 dim1,
+	u32 dim2,
+	u32 dim3,
+	u32 i,
+	u32 j,
+	u32 k,
+	u32 l) {
 	return l + k * dim3 + j * dim2 * dim3 + i * dim1 * dim2 * dim3;
 }
 
@@ -141,7 +114,7 @@ unsigned int calc4DIndex(
  * @param[in] dim: The matrix's size
  * @returns the pointer of the allocated matrix
  */
-matrix_t *createMatrix(unsigned int dim) {
+matrix_t *createMatrix(u32 dim) {
 	/** Allocate matrix's buffer */
 	matrix_t *res = (matrix_t *) malloc(dim * sizeof(matrix_t));
 	if (res == NULL) {
@@ -159,9 +132,9 @@ matrix_t *createMatrix(unsigned int dim) {
  * @param[in] dim3: the column dimension
  * @returns the pointer of the allocated and initialized FloatMatrix
  */
-matrix_t *zeroMatrix(unsigned int dim) {
+matrix_t *zeroMatrix(u32 dim) {
 	matrix_t *res = createMatrix(dim);
-	for (unsigned int i = 0; i < dim; i++) res[i] = 0;
+	for (u32 i = 0; i < dim; i++) res[i] = 0;
 	return res;
 }
 
@@ -171,13 +144,13 @@ matrix_t *zeroMatrix(unsigned int dim) {
  * @param[in] xSize: input matrix size
  * @returns the 1-dimensional index of the highest valued cell
  */
-unsigned int argmax(matrix_t *x, unsigned int xSize) {
+u32 argmax(matrix_t *x, u32 xSize) {
 	/** Initialize max to the matrix's first cell */
 	matrix_t max = x[0];
 
 	/** Initialize the highest valued max index to be the first of the matrix */
-	unsigned int index = 0;
-	for (unsigned int i = 1; i < xSize; i++) {
+	u32 index = 0;
+	for (u32 i = 1; i < xSize; i++) {
 		/** If max greater than the current value ignore and continue */
 		if (max >= x[i]) continue;
 
@@ -188,8 +161,8 @@ unsigned int argmax(matrix_t *x, unsigned int xSize) {
 	return index;
 }
 
-void freeLayerConf(LayerConf *lc, unsigned int layersNum) {
-	for (unsigned int layer = 0; layer < layersNum; layer++) {
+void freeLayerConf(LayerConf *lc, u32 layersNum) {
+	for (u32 layer = 0; layer < layersNum; layer++) {
 		free(lc[layer].weightsAddr);
 		free(lc[layer].biasAddr);
 	}
@@ -197,17 +170,17 @@ void freeLayerConf(LayerConf *lc, unsigned int layersNum) {
 }
 
 void freeFilelist(Filelist *fl) {
-	for (unsigned int f = 0; f < fl->length; f++) free(fl->list[f]);
+	for (u32 f = 0; f < fl->length; f++) free(fl->list[f]);
 	free(fl);
 }
 
 void freeNetConf(NetConf *netConf) {
-	unsigned int labelsNum =
+	u32 labelsNum =
 		netConf->layersConf[netConf->layersNum - 1].outFeatures;
 	freeLayerConf(netConf->layersConf, netConf->layersNum);
 	free(netConf->params);
 
-	for (unsigned int label = 0; label < labelsNum; label++) {
+	for (u32 label = 0; label < labelsNum; label++) {
 		free(netConf->labels[label]);
 	}
 	free(netConf->labels);
@@ -219,9 +192,9 @@ void freeNetConf(NetConf *netConf) {
 
 // ----------------------------------------------
 
-unsigned int readUInt(FIL *f) {
-	unsigned int num;
-	unsigned int bytes_read;
+u32 readUInt(FIL *f) {
+	u32 num;
+	u32 bytes_read;
 	FRESULT fRes = f_read(f, &num, 4, &bytes_read);
 	if (fRes != FR_OK) {
 		printf("%sError %d. Cannot read uint.%s\n", KRED, fRes, KNRM);
@@ -232,7 +205,7 @@ unsigned int readUInt(FIL *f) {
 
 float readFloat(FIL *f) {
 	float num;
-	unsigned int bytes_read;
+	u32 bytes_read;
 	FRESULT fRes = f_read(f, &num, 4, &bytes_read);
 	if (fRes != FR_OK) {
 		printf("%sError %d. Cannot read float.%s\n", KRED, fRes, KNRM);
@@ -262,7 +235,7 @@ Filelist *getFilelist(char *path) {
 		exit(XST_FAILURE);
 	}
 
-	unsigned int filesCount = 0;
+	u32 filesCount = 0;
 	while (1) {
 		FILINFO fno;
 		// Read a directory item
@@ -289,7 +262,7 @@ Filelist *getFilelist(char *path) {
 		exit(XST_FAILURE);
 	}
 
-	unsigned int index = 0;
+	u32 index = 0;
 	while (1) {
 		FILINFO fno;
 		// Read a directory item
@@ -348,11 +321,11 @@ int close_file(FIL f) {
 char *selectFilePath(char *filesDir, char *msg) {
 	Filelist *configsList = getFilelist(filesDir);
 	printf("%s", msg);
-	for (unsigned int i = 0; i < configsList->length; i++) {
+	for (u32 i = 0; i < configsList->length; i++) {
 		printf("\t%d. %s\n", i + 1, configsList->list[i]);
 	}
 
-	unsigned int selection;
+	u32 selection;
 	printf("Select a number [1-%d]: ", configsList->length);
 	scanf("%d", &selection);
 	while (selection <= 0 || selection > configsList->length) {
@@ -381,7 +354,7 @@ matrix_t **loadParameters(char *filename) {
 	FIL f = open_file(filename);
 
 	/** Get the number of parameters sets existing in this file */
-	unsigned int params_len = readUInt(&f);
+	u32 params_len = readUInt(&f);
 
 	/**
 	 * Allocate the needed memory to store all the FloatMatrix structures
@@ -398,13 +371,13 @@ matrix_t **loadParameters(char *filename) {
 	}
 
 	/** For every parameters set */
-	for (unsigned int p = 0; p < params_len; p++) {
+	for (u32 p = 0; p < params_len; p++) {
 		/** Get the number of dimensions this parameters set consists of */
-		unsigned int matrix_dimsNum = readUInt(&f);
+		u32 matrix_dimsNum = readUInt(&f);
 
-		unsigned int xLen = 1;
+		u32 xLen = 1;
 		/** For every dimension of this parameters set */
-		for (unsigned int i = 0; i < matrix_dimsNum; i++) {
+		for (u32 i = 0; i < matrix_dimsNum; i++) {
 			/** Read the dimension's size */
 			xLen *= readUInt(&f);
 		}
@@ -423,7 +396,7 @@ matrix_t **loadParameters(char *filename) {
 		}
 
 		/** For every parameter */
-		for (unsigned int i = 0; i < xLen; i++) {
+		for (u32 i = 0; i < xLen; i++) {
 			/** Read parameter */
 			params[p][i] = readFloat(&f);
 		}
@@ -454,7 +427,7 @@ char **loadLabels(char *labelsPath) {
 	char buff[200];
 
 	/** Read the number of labels contained in this file */
-	unsigned int labelsNum;
+	u32 labelsNum;
 	s = f_gets(buff, sizeof(buff), &f);
 	sscanf(s, "%u\n", &labelsNum);
 
@@ -466,7 +439,7 @@ char **loadLabels(char *labelsPath) {
 	}
 
 	/** For every label in the file */
-	for (unsigned int i = 0; i < labelsNum; i++) {
+	for (u32 i = 0; i < labelsNum; i++) {
 		/** Allocate memory for each label string */
 		labels[i] = (char *) malloc(150 * sizeof(char));
 		if (labels[i] == NULL) {
@@ -524,9 +497,9 @@ matrix_t *loadImage(char *path) {
 		exit(XST_FAILURE);
 	}
 
-	unsigned char color;
-	unsigned char maxColorValue;
-	unsigned int bytes_read;
+	u8 color;
+	u8 maxColorValue;
+	u32 bytes_read;
 	f_read(&f, &maxColorValue, 1, &bytes_read);
 
 	matrix_t *x = (matrix_t *) malloc(3 * height * width * sizeof(matrix_t));
@@ -537,11 +510,11 @@ matrix_t *loadImage(char *path) {
 		exit(XST_FAILURE);
 	}
 
-	for (unsigned int h = 0; h < height; h++) {
-		for (unsigned int w = 0; w < width; w++) {
-			for (unsigned int c = 0; c < 3; c++) {
+	for (u32 h = 0; h < height; h++) {
+		for (u32 w = 0; w < width; w++) {
+			for (u32 c = 0; c < 3; c++) {
 				f_read(&f, &color, 1, &bytes_read);
-				unsigned int index = calc3DIndex(3, height, width, c, h, w);
+				u32 index = calc3DIndex(3, height, width, c, h, w);
 				x[index] = color / 255.0;
 			}
 		}
@@ -590,7 +563,7 @@ NetConf *read_config(char *path) {
 	s = f_gets(buff, sizeof(buff), &f);
 	sscanf(s, "win=%u\n", &netConf->layersConf[0].win);
 
-	for (unsigned int i = 0; i < netConf->layersNum; i++) {
+	for (u32 i = 0; i < netConf->layersNum; i++) {
 		s = f_gets(buff, sizeof(buff), &f);
 		char layerType[200];
 		sscanf(s, "layerType=%s\n", layerType);
@@ -704,44 +677,44 @@ matrix_t *Conv_sw(matrix_t *x, LayerConf lc) {
 	matrix_t *res = zeroMatrix(lc.resSize);
 
 	/** For every output channel */
-	for (unsigned int out_channel = 0; out_channel < lc.dout; out_channel++) {
+	for (u32 out_channel = 0; out_channel < lc.dout; out_channel++) {
 		/** For every output row */
-		for (unsigned int oh = 0; oh < lc.hout; oh++) {
+		for (u32 oh = 0; oh < lc.hout; oh++) {
 			int imgStartH = oh * lc.stride - lc.padding;
 
-			unsigned int iStart = imgStartH < 0 ? lc.padding : 0;
-			unsigned int iEnd = imgStartH + lc.kernelSize >= lc.hin ?
+			u32 iStart = imgStartH < 0 ? lc.padding : 0;
+			u32 iEnd = imgStartH + lc.kernelSize >= lc.hin ?
 				lc.kernelSize - (imgStartH + lc.kernelSize - lc.hin) :
 				lc.kernelSize;
 
 			/** For every output row's pixel */
-			for (unsigned int ow = 0; ow < lc.wout; ow++) {
+			for (u32 ow = 0; ow < lc.wout; ow++) {
 				/** Calculate starting coordinates on the padded matrix */
 				int imgStartW = ow * lc.stride - lc.padding;
 
-				unsigned int jStart = imgStartW < 0 ? lc.padding : 0;
-				unsigned int jEnd = imgStartW + lc.kernelSize >= lc.win ?
+				u32 jStart = imgStartW < 0 ? lc.padding : 0;
+				u32 jEnd = imgStartW + lc.kernelSize >= lc.win ?
 					lc.kernelSize - (imgStartW + lc.kernelSize - lc.win) :
 					lc.kernelSize;
 
 				/** Initialize output pixel */
 				matrix_t pixel = lc.biasAddr[out_channel];
 				/** For every input channel */
-				for (unsigned int in_channel = 0; in_channel < lc.din;
+				for (u32 in_channel = 0; in_channel < lc.din;
 					 in_channel++) {
 					/** For lc.kernelSize rows on padded matrix */
-					for (unsigned int i = iStart; i < iEnd; i++) {
+					for (u32 i = iStart; i < iEnd; i++) {
 						/** For lc.kernelSize pixels on each padded matrix's row
 						 */
-						for (unsigned int j = jStart; j < jEnd; j++) {
-							unsigned int imgH = i + imgStartH;
-							unsigned int imgW = j + imgStartW;
+						for (u32 j = jStart; j < jEnd; j++) {
+							u32 imgH = i + imgStartH;
+							u32 imgW = j + imgStartW;
 
 							/**
 							 * Calculate the 1-dimensional representation's
 							 * index of the kernel's matrix
 							 */
-							unsigned int weightsIndex = calc4DIndex(
+							u32 weightsIndex = calc4DIndex(
 								lc.dout,
 								lc.din,
 								lc.kernelSize,
@@ -755,7 +728,7 @@ matrix_t *Conv_sw(matrix_t *x, LayerConf lc) {
 							 * Calculate the 1-dimensional representation's
 							 * index of the padded matrix
 							 */
-							unsigned int arrIndex = calc3DIndex(
+							u32 arrIndex = calc3DIndex(
 								lc.din, lc.hin, lc.win, in_channel, imgH, imgW);
 
 							/** Calculate dot product of the two matrices */
@@ -767,7 +740,7 @@ matrix_t *Conv_sw(matrix_t *x, LayerConf lc) {
 				 * Calculate the 1-dimensional representation's index of the
 				 * output matrix
 				 */
-				unsigned int resIndex =
+				u32 resIndex =
 					calc3DIndex(lc.dout, lc.hout, lc.wout, out_channel, oh, ow);
 
 				/**
@@ -791,21 +764,21 @@ Core *Conv_core_list[CONV_CORES_NUM];
 #endif
 
 #if CONV_CORES_NUM == 1
-const unsigned int Conv_core_device_ids[CONV_CORES_NUM] = {
+const u32 Conv_core_device_ids[CONV_CORES_NUM] = {
 	XPAR_XCONV_CORE_0_DEVICE_ID,
 };
-const unsigned int Conv_core_interrupt_ids[CONV_CORES_NUM] = {
+const u32 Conv_core_interrupt_ids[CONV_CORES_NUM] = {
 	XPAR_FABRIC_CONV_CORE_0_INTERRUPT_INTR,
 };
 volatile static int Conv_core_result_avail[CONV_CORES_NUM] = {
 	0,
 };
 #elif CONV_CORES_NUM == 2
-const unsigned int Conv_core_device_ids[CONV_CORES_NUM] = {
+const u32 Conv_core_device_ids[CONV_CORES_NUM] = {
 	XPAR_XCONV_CORE_0_DEVICE_ID,
 	XPAR_XCONV_CORE_1_DEVICE_ID,
 };
-const unsigned int Conv_core_interrupt_ids[CONV_CORES_NUM] = {
+const u32 Conv_core_interrupt_ids[CONV_CORES_NUM] = {
 	XPAR_FABRIC_CONV_CORE_0_INTERRUPT_INTR,
 	XPAR_FABRIC_CONV_CORE_1_INTERRUPT_INTR,
 };
@@ -814,12 +787,12 @@ volatile static int Conv_core_result_avail[CONV_CORES_NUM] = {
 	0,
 };
 #elif CONV_CORES_NUM == 3
-const unsigned int Conv_core_device_ids[CONV_CORES_NUM] = {
+const u32 Conv_core_device_ids[CONV_CORES_NUM] = {
 	XPAR_XCONV_CORE_0_DEVICE_ID,
 	XPAR_XCONV_CORE_1_DEVICE_ID,
 	XPAR_XCONV_CORE_2_DEVICE_ID,
 };
-const unsigned int Conv_core_interrupt_ids[CONV_CORES_NUM] = {
+const u32 Conv_core_interrupt_ids[CONV_CORES_NUM] = {
 	XPAR_FABRIC_CONV_CORE_0_INTERRUPT_INTR,
 	XPAR_FABRIC_CONV_CORE_1_INTERRUPT_INTR,
 	XPAR_FABRIC_CONV_CORE_2_INTERRUPT_INTR,
@@ -830,13 +803,13 @@ volatile static int Conv_core_result_avail[CONV_CORES_NUM] = {
 	0,
 };
 #elif CONV_CORES_NUM == 4
-const unsigned int Conv_core_device_ids[CONV_CORES_NUM] = {
+const u32 Conv_core_device_ids[CONV_CORES_NUM] = {
 	XPAR_XCONV_CORE_0_DEVICE_ID,
 	XPAR_XCONV_CORE_1_DEVICE_ID,
 	XPAR_XCONV_CORE_2_DEVICE_ID,
 	XPAR_XCONV_CORE_3_DEVICE_ID,
 };
-const unsigned int Conv_core_interrupt_ids[CONV_CORES_NUM] = {
+const u32 Conv_core_interrupt_ids[CONV_CORES_NUM] = {
 	XPAR_FABRIC_CONV_CORE_0_INTERRUPT_INTR,
 	XPAR_FABRIC_CONV_CORE_1_INTERRUPT_INTR,
 	XPAR_FABRIC_CONV_CORE_2_INTERRUPT_INTR,
@@ -900,9 +873,9 @@ void Conv_core_init(Core *core, XScuGic ScuGic) {
 
 matrix_t *Conv_core_setup(XConv_core *Conv_core, LayerConf lc, matrix_t *x) {
 	printf("- Setup Conv_core: ");
-	XConv_core_Set_x(Conv_core, (unsigned int) (u64) x);
-	XConv_core_Set_weights(Conv_core, (unsigned int) (u64) lc.weightsAddr);
-	XConv_core_Set_bias(Conv_core, (unsigned int) (u64) lc.biasAddr);
+	XConv_core_Set_x(Conv_core, (u32) (u64) x);
+	XConv_core_Set_weights(Conv_core, (u32) (u64) lc.weightsAddr);
+	XConv_core_Set_bias(Conv_core, (u32) (u64) lc.biasAddr);
 	XConv_core_Set_din(Conv_core, lc.din);
 	XConv_core_Set_hin(Conv_core, lc.hin);
 	XConv_core_Set_win(Conv_core, lc.win);
@@ -920,7 +893,7 @@ matrix_t *Conv_core_setup(XConv_core *Conv_core, LayerConf lc, matrix_t *x) {
 			KNRM);
 		exit(XST_FAILURE);
 	}
-	XConv_core_Set_res(Conv_core, (unsigned int) (u64) resAddr);
+	XConv_core_Set_res(Conv_core, (u32) (u64) resAddr);
 	printf("%sSuccess%s\n", KGRN, KNRM);
 	return resAddr;
 }
@@ -971,8 +944,8 @@ void Conv_conf_params_complete(LayerConf *lc) {
 
 void Conv_conf_complete(
 	NetConf *netConf,
-	unsigned int layer_index,
-	unsigned int params_index) {
+	u32 layer_index,
+	u32 params_index) {
 	LayerConf *lc = &netConf->layersConf[layer_index];
 	if (layer_index > 0) {
 		LayerConf *plc = &netConf->layersConf[layer_index - 1];
@@ -991,7 +964,7 @@ void Conv_conf_complete(
 	lc->biasAddr = netConf->params[params_index + 1];
 }
 
-int Conv_core_test(unsigned int testAllCores) {
+int Conv_core_test(u32 testAllCores) {
 	printf("*** Conv_core_test ***\n");
 
 	matrix_t X_VALUE = 1;
@@ -1018,19 +991,19 @@ int Conv_core_test(unsigned int testAllCores) {
 
 	printf("- Initializing Memory: ");
 	matrix_t *x = (matrix_t *) malloc(lc.xSize * sizeof(matrix_t));
-	for (unsigned int i = 0; i < lc.xSize; i++) x[i] = X_VALUE;
+	for (u32 i = 0; i < lc.xSize; i++) x[i] = X_VALUE;
 
 	lc.weightsAddr = (matrix_t *) malloc(lc.weightsSize * sizeof(matrix_t));
-	for (unsigned int i = 0; i < lc.weightsSize; i++)
+	for (u32 i = 0; i < lc.weightsSize; i++)
 		lc.weightsAddr[i] = WEIGHT_VALUE;
 
 	lc.biasAddr = (matrix_t *) malloc(lc.biasSize * sizeof(matrix_t));
-	for (unsigned int i = 0; i < lc.biasSize; i++) lc.biasAddr[i] = BIAS_VALUE;
+	for (u32 i = 0; i < lc.biasSize; i++) lc.biasAddr[i] = BIAS_VALUE;
 	printf("%sSuccess%s\n", KGRN, KNRM);
 
 	int status = XST_SUCCESS;
-	unsigned int core_num = testAllCores ? CONV_CORES_NUM : 1;
-	for (unsigned int core = 0; core < core_num; core++) {
+	u32 core_num = testAllCores ? CONV_CORES_NUM : 1;
+	for (u32 core = 0; core < core_num; core++) {
 		printf("- Conv_core[%u]: ", core);
 
 		matrix_t *res = (*lc.hw_func)(lc, x);
@@ -1086,26 +1059,26 @@ matrix_t *Maxpool_sw(matrix_t *x, LayerConf lc) {
 	matrix_t *res = zeroMatrix(lc.resSize);
 
 	/** For every channel */
-	for (unsigned int i = 0; i < lc.din; i++) {
+	for (u32 i = 0; i < lc.din; i++) {
 		/** For every output row */
-		for (unsigned int j = 0; j < lc.hout; j++) {
+		for (u32 j = 0; j < lc.hout; j++) {
 			/** For every output row's pixel */
-			for (unsigned int k = 0; k < lc.wout; k++) {
+			for (u32 k = 0; k < lc.wout; k++) {
 				/** Calculate pools starting coordinates on the input matrix */
-				unsigned int a = j * lc.stride;
-				unsigned int b = k * lc.stride;
+				u32 a = j * lc.stride;
+				u32 b = k * lc.stride;
 
 				/** Initialize max value */
 				matrix_t max = -100000000;
 				/** For every pool's row */
-				for (unsigned int l = a; l < a + lc.kernelSize; l++) {
+				for (u32 l = a; l < a + lc.kernelSize; l++) {
 					/** For every pool row's pixel */
-					for (unsigned int m = b; m < b + lc.kernelSize; m++) {
+					for (u32 m = b; m < b + lc.kernelSize; m++) {
 						/**
 						 * Calculate the 1-dimensional representation's index of
 						 * the input matrix
 						 */
-						unsigned int index =
+						u32 index =
 							calc3DIndex(lc.din, lc.hin, lc.win, i, l, m);
 						/**
 						 * Check if current value is greater than max and
@@ -1119,7 +1092,7 @@ matrix_t *Maxpool_sw(matrix_t *x, LayerConf lc) {
 				 * Calculate the 1-dimensional representation's index of the
 				 * output matrix
 				 */
-				unsigned int resIndex =
+				u32 resIndex =
 					calc3DIndex(lc.dout, lc.hout, lc.wout, i, j, k);
 
 				/** Assign found max value to the output matrix */
@@ -1140,21 +1113,21 @@ Core *Maxpool_core_list[MAXPOOL_CORES_NUM];
 #endif
 
 #if MAXPOOL_CORES_NUM == 1
-const unsigned int Maxpool_core_device_ids[MAXPOOL_CORES_NUM] = {
+const u32 Maxpool_core_device_ids[MAXPOOL_CORES_NUM] = {
 	XPAR_XMAXPOOL_CORE_0_DEVICE_ID,
 };
-const unsigned int Maxpool_core_interrupt_ids[MAXPOOL_CORES_NUM] = {
+const u32 Maxpool_core_interrupt_ids[MAXPOOL_CORES_NUM] = {
 	XPAR_FABRIC_MAXPOOL_CORE_0_INTERRUPT_INTR,
 };
 volatile static int Maxpool_core_result_avail[CONV_CORES_NUM] = {
 	0,
 };
 #elif MAXPOOL_CORES_NUM == 2
-const unsigned int Maxpool_core_device_ids[MAXPOOL_CORES_NUM] = {
+const u32 Maxpool_core_device_ids[MAXPOOL_CORES_NUM] = {
 	XPAR_XMAXPOOL_CORE_0_DEVICE_ID,
 	XPAR_XMAXPOOL_CORE_1_DEVICE_ID,
 };
-const unsigned int Maxpool_core_interrupt_ids[MAXPOOL_CORES_NUM] = {
+const u32 Maxpool_core_interrupt_ids[MAXPOOL_CORES_NUM] = {
 	XPAR_FABRIC_MAXPOOL_CORE_0_INTERRUPT_INTR,
 	XPAR_FABRIC_MAXPOOL_CORE_1_INTERRUPT_INTR,
 };
@@ -1163,12 +1136,12 @@ volatile static int Maxpool_core_result_avail[CONV_CORES_NUM] = {
 	0,
 };
 #elif MAXPOOL_CORES_NUM == 3
-const unsigned int Maxpool_core_device_ids[MAXPOOL_CORES_NUM] = {
+const u32 Maxpool_core_device_ids[MAXPOOL_CORES_NUM] = {
 	XPAR_XMAXPOOL_CORE_0_DEVICE_ID,
 	XPAR_XMAXPOOL_CORE_1_DEVICE_ID,
 	XPAR_XMAXPOOL_CORE_2_DEVICE_ID,
 };
-const unsigned int Maxpool_core_interrupt_ids[MAXPOOL_CORES_NUM] = {
+const u32 Maxpool_core_interrupt_ids[MAXPOOL_CORES_NUM] = {
 	XPAR_FABRIC_MAXPOOL_CORE_0_INTERRUPT_INTR,
 	XPAR_FABRIC_MAXPOOL_CORE_1_INTERRUPT_INTR,
 	XPAR_FABRIC_MAXPOOL_CORE_2_INTERRUPT_INTR,
@@ -1179,13 +1152,13 @@ volatile static int Maxpool_core_result_avail[CONV_CORES_NUM] = {
 	0,
 };
 #elif MAXPOOL_CORES_NUM == 4
-const unsigned int Maxpool_core_device_ids[MAXPOOL_CORES_NUM] = {
+const u32 Maxpool_core_device_ids[MAXPOOL_CORES_NUM] = {
 	XPAR_XMAXPOOL_CORE_0_DEVICE_ID,
 	XPAR_XMAXPOOL_CORE_1_DEVICE_ID,
 	XPAR_XMAXPOOL_CORE_2_DEVICE_ID,
 	XPAR_XMAXPOOL_CORE_3_DEVICE_ID,
 };
-const unsigned int Maxpool_core_interrupt_ids[MAXPOOL_CORES_NUM] = {
+const u32 Maxpool_core_interrupt_ids[MAXPOOL_CORES_NUM] = {
 	XPAR_FABRIC_MAXPOOL_CORE_0_INTERRUPT_INTR,
 	XPAR_FABRIC_MAXPOOL_CORE_1_INTERRUPT_INTR,
 	XPAR_FABRIC_MAXPOOL_CORE_2_INTERRUPT_INTR,
@@ -1250,7 +1223,7 @@ void Maxpool_core_init(Core *core, XScuGic ScuGic) {
 matrix_t *
 	Maxpool_core_setup(XMaxpool_core *Maxpool_core, LayerConf lc, matrix_t *x) {
 	printf("- Setup Maxpool_core: ");
-	XMaxpool_core_Set_x(Maxpool_core, (unsigned int) (u64) x);
+	XMaxpool_core_Set_x(Maxpool_core, (u32) (u64) x);
 	XMaxpool_core_Set_d(Maxpool_core, lc.din);
 	XMaxpool_core_Set_hin(Maxpool_core, lc.hin);
 	XMaxpool_core_Set_win(Maxpool_core, lc.win);
@@ -1266,7 +1239,7 @@ matrix_t *
 			KNRM);
 		exit(XST_FAILURE);
 	}
-	XMaxpool_core_Set_res(Maxpool_core, (unsigned int) (u64) resAddr);
+	XMaxpool_core_Set_res(Maxpool_core, (u32) (u64) resAddr);
 	printf("%sSuccess%s\n", KGRN, KNRM);
 	return resAddr;
 }
@@ -1314,7 +1287,7 @@ void Maxpool_conf_params_complete(LayerConf *lc) {
 	lc->sw_func = &Maxpool_sw;
 }
 
-void Maxpool_conf_complete(NetConf *netConf, unsigned int layer_index) {
+void Maxpool_conf_complete(NetConf *netConf, u32 layer_index) {
 	LayerConf *lc = &netConf->layersConf[layer_index];
 	if (layer_index > 0) {
 		LayerConf *plc = &netConf->layersConf[layer_index - 1];
@@ -1334,7 +1307,7 @@ void Maxpool_conf_complete(NetConf *netConf, unsigned int layer_index) {
 	lc->biasAddr = NULL;
 }
 
-int Maxpool_core_test(unsigned int testAllCores) {
+int Maxpool_core_test(u32 testAllCores) {
 	printf("*** Maxpool_core_test ***\n");
 	matrix_t X_VALUE = .1;
 
@@ -1356,12 +1329,12 @@ int Maxpool_core_test(unsigned int testAllCores) {
 
 	printf("- Initializing Memory: ");
 	matrix_t *x = (matrix_t *) malloc(lc.xSize * sizeof(matrix_t));
-	for (unsigned int i = 0; i < lc.xSize; i++) x[i] = X_VALUE;
+	for (u32 i = 0; i < lc.xSize; i++) x[i] = X_VALUE;
 	printf("%sSuccess%s\n", KGRN, KNRM);
 
 	int status = XST_SUCCESS;
-	unsigned int core_num = testAllCores ? MAXPOOL_CORES_NUM : 1;
-	for (unsigned int core = 0; core < core_num; core++) {
+	u32 core_num = testAllCores ? MAXPOOL_CORES_NUM : 1;
+	for (u32 core = 0; core < core_num; core++) {
 		printf("- Maxpool_core[%u]: ", core);
 
 		matrix_t *res = (*lc.hw_func)(lc, x);
@@ -1369,7 +1342,7 @@ int Maxpool_core_test(unsigned int testAllCores) {
 		matrix_t pixel_value = X_VALUE;
 		matrix_t error = 0;
 
-		for (unsigned int i = 0; i < lc.resSize; i++) {
+		for (u32 i = 0; i < lc.resSize; i++) {
 			error += abs(res[i] - pixel_value);
 		}
 
@@ -1398,12 +1371,12 @@ matrix_t *Linear_sw(matrix_t *x, LayerConf lc) {
 	matrix_t *res = createMatrix(lc.resSize);
 
 	/** For every output feature */
-	for (unsigned int i = 0; i < lc.outFeatures; i++) {
+	for (u32 i = 0; i < lc.outFeatures; i++) {
 		/** Initialize output feature with its bias */
 		matrix_t output = lc.biasAddr[i];
 
 		/** For every input feature */
-		for (unsigned int j = 0; j < lc.inFeatures; j++) {
+		for (u32 j = 0; j < lc.inFeatures; j++) {
 			/** Add to the output feature the input feature's weighted value */
 			output += x[j] * lc.weightsAddr[j + i * lc.inFeatures];
 		}
@@ -1422,21 +1395,21 @@ Core *Linear_core_list[LINEAR_CORES_NUM];
 #endif
 
 #if LINEAR_CORES_NUM == 1
-const unsigned int Linear_core_device_ids[LINEAR_CORES_NUM] = {
+const u32 Linear_core_device_ids[LINEAR_CORES_NUM] = {
 	XPAR_XLINEAR_CORE_0_DEVICE_ID,
 };
-const unsigned int Linear_core_interrupt_ids[LINEAR_CORES_NUM] = {
+const u32 Linear_core_interrupt_ids[LINEAR_CORES_NUM] = {
 	XPAR_FABRIC_LINEAR_CORE_0_INTERRUPT_INTR,
 };
 volatile static int Linear_core_result_avail[CONV_CORES_NUM] = {
 	0,
 };
 #elif LINEAR_CORES_NUM == 2
-const unsigned int Linear_core_device_ids[LINEAR_CORES_NUM] = {
+const u32 Linear_core_device_ids[LINEAR_CORES_NUM] = {
 	XPAR_XLINEAR_CORE_0_DEVICE_ID,
 	XPAR_XLINEAR_CORE_1_DEVICE_ID,
 };
-const unsigned int Linear_core_interrupt_ids[LINEAR_CORES_NUM] = {
+const u32 Linear_core_interrupt_ids[LINEAR_CORES_NUM] = {
 	XPAR_FABRIC_LINEAR_CORE_0_INTERRUPT_INTR,
 	XPAR_FABRIC_LINEAR_CORE_1_INTERRUPT_INTR,
 };
@@ -1445,12 +1418,12 @@ volatile static int Linear_core_result_avail[CONV_CORES_NUM] = {
 	0,
 };
 #elif LINEAR_CORES_NUM == 3
-const unsigned int Linear_core_device_ids[LINEAR_CORES_NUM] = {
+const u32 Linear_core_device_ids[LINEAR_CORES_NUM] = {
 	XPAR_XLINEAR_CORE_0_DEVICE_ID,
 	XPAR_XLINEAR_CORE_1_DEVICE_ID,
 	XPAR_XLINEAR_CORE_2_DEVICE_ID,
 };
-const unsigned int Linear_core_interrupt_ids[LINEAR_CORES_NUM] = {
+const u32 Linear_core_interrupt_ids[LINEAR_CORES_NUM] = {
 	XPAR_FABRIC_LINEAR_CORE_0_INTERRUPT_INTR,
 	XPAR_FABRIC_LINEAR_CORE_1_INTERRUPT_INTR,
 	XPAR_FABRIC_LINEAR_CORE_2_INTERRUPT_INTR,
@@ -1461,13 +1434,13 @@ volatile static int Linear_core_result_avail[CONV_CORES_NUM] = {
 	0,
 };
 #elif LINEAR_CORES_NUM == 4
-const unsigned int Linear_core_device_ids[LINEAR_CORES_NUM] = {
+const u32 Linear_core_device_ids[LINEAR_CORES_NUM] = {
 	XPAR_XLINEAR_CORE_0_DEVICE_ID,
 	XPAR_XLINEAR_CORE_1_DEVICE_ID,
 	XPAR_XLINEAR_CORE_2_DEVICE_ID,
 	XPAR_XLINEAR_CORE_3_DEVICE_ID,
 };
-const unsigned int Linear_core_interrupt_ids[LINEAR_CORES_NUM] = {
+const u32 Linear_core_interrupt_ids[LINEAR_CORES_NUM] = {
 	XPAR_FABRIC_LINEAR_CORE_0_INTERRUPT_INTR,
 	XPAR_FABRIC_LINEAR_CORE_1_INTERRUPT_INTR,
 	XPAR_FABRIC_LINEAR_CORE_2_INTERRUPT_INTR,
@@ -1532,9 +1505,9 @@ void Linear_core_init(Core *core, XScuGic ScuGic) {
 matrix_t *
 	Linear_core_setup(XLinear_core *Linear_core, LayerConf lc, matrix_t *x) {
 	printf("- Setup Linear_core: ");
-	XLinear_core_Set_x(Linear_core, (unsigned int) (u64) x);
-	XLinear_core_Set_weights(Linear_core, (unsigned int) (u64) lc.weightsAddr);
-	XLinear_core_Set_bias(Linear_core, (unsigned int) (u64) lc.biasAddr);
+	XLinear_core_Set_x(Linear_core, (u32) (u64) x);
+	XLinear_core_Set_weights(Linear_core, (u32) (u64) lc.weightsAddr);
+	XLinear_core_Set_bias(Linear_core, (u32) (u64) lc.biasAddr);
 	XLinear_core_Set_in_features(Linear_core, lc.inFeatures);
 	XLinear_core_Set_out_features(Linear_core, lc.outFeatures);
 	XLinear_core_Set_doReLU(Linear_core, lc.doReLU);
@@ -1546,7 +1519,7 @@ matrix_t *
 			KNRM);
 		exit(XST_FAILURE);
 	}
-	XLinear_core_Set_res(Linear_core, (unsigned int) (u64) resAddr);
+	XLinear_core_Set_res(Linear_core, (u32) (u64) resAddr);
 	printf("%sSuccess%s\n", KGRN, KNRM);
 	return resAddr;
 }
@@ -1596,8 +1569,8 @@ void Linear_conf_params_complete(LayerConf *lc) {
 
 void Linear_conf_complete(
 	NetConf *netConf,
-	unsigned int layer_index,
-	unsigned int params_index) {
+	u32 layer_index,
+	u32 params_index) {
 	LayerConf *lc = &netConf->layersConf[layer_index];
 	if (layer_index > 0) {
 		LayerConf *plc = &netConf->layersConf[layer_index - 1];
@@ -1616,7 +1589,7 @@ void Linear_conf_complete(
 	lc->biasAddr = netConf->params[params_index + 1];
 }
 
-int Linear_core_test(unsigned int testAllCores) {
+int Linear_core_test(u32 testAllCores) {
 	printf("*** Linear_core_test ***\n");
 
 	matrix_t X_VALUE = 1;
@@ -1638,19 +1611,19 @@ int Linear_core_test(unsigned int testAllCores) {
 
 	printf("- Initializing Memory: ");
 	matrix_t *x = (matrix_t *) malloc(lc.xSize * sizeof(matrix_t));
-	for (unsigned int i = 0; i < lc.xSize; i++) x[i] = X_VALUE;
+	for (u32 i = 0; i < lc.xSize; i++) x[i] = X_VALUE;
 
 	lc.weightsAddr = (matrix_t *) malloc(lc.weightsSize * sizeof(matrix_t));
-	for (unsigned int i = 0; i < lc.weightsSize; i++)
+	for (u32 i = 0; i < lc.weightsSize; i++)
 		lc.weightsAddr[i] = WEIGHT_VALUE;
 
 	lc.biasAddr = (matrix_t *) malloc(lc.biasSize * sizeof(matrix_t));
-	for (unsigned int i = 0; i < lc.biasSize; i++) lc.biasAddr[i] = BIAS_VALUE;
+	for (u32 i = 0; i < lc.biasSize; i++) lc.biasAddr[i] = BIAS_VALUE;
 	printf("%sSuccess%s\n", KGRN, KNRM);
 
 	int status = XST_SUCCESS;
-	unsigned int core_num = testAllCores ? LINEAR_CORES_NUM : 1;
-	for (unsigned int core = 0; core < core_num; core++) {
+	u32 core_num = testAllCores ? LINEAR_CORES_NUM : 1;
+	for (u32 core = 0; core < core_num; core++) {
 		printf("- Maxpool_core[%u]: ", core);
 
 		matrix_t *res = (*lc.hw_func)(lc, x);
@@ -1659,7 +1632,7 @@ int Linear_core_test(unsigned int testAllCores) {
 			X_VALUE * WEIGHT_VALUE * lc.inFeatures + BIAS_VALUE;
 		matrix_t error = 0;
 
-		for (unsigned int i = 0; i < lc.resSize; i++) {
+		for (u32 i = 0; i < lc.resSize; i++) {
 			error += abs(res[i] - pixel_value);
 		}
 
@@ -1682,8 +1655,8 @@ int Linear_core_test(unsigned int testAllCores) {
 // ----------------------------------------------
 
 void layer_conf_complete(NetConf *netConf) {
-	unsigned int params_index = 0;
-	for (unsigned int i = 0; i < netConf->layersNum; i++) {
+	u32 params_index = 0;
+	for (u32 i = 0; i < netConf->layersNum; i++) {
 		switch (netConf->layersConf[i].layerType) {
 			case CONV_LAYER_TYPE:
 				Conv_conf_complete(netConf, i, params_index);
@@ -1707,9 +1680,9 @@ void layer_conf_complete(NetConf *netConf) {
  * that is an array of matrix_t numbers, one for each class, which shows how
  * likely it is for the input image to be of a class in a logarithmic scale.
  */
-matrix_t *forward(NetConf *netConf, matrix_t *x, unsigned int useHW) {
+matrix_t *forward(NetConf *netConf, matrix_t *x, u32 useHW) {
 	printf("000/%03d", netConf->layersNum);
-	for (unsigned int i = 0; i < netConf->layersNum; i++) {
+	for (u32 i = 0; i < netConf->layersNum; i++) {
 		printf("\b\b\b\b\b\b\b");
 		printf("%03d/%03d", i, netConf->layersNum);
 		if (useHW)
@@ -1732,12 +1705,12 @@ matrix_t *forward(NetConf *netConf, matrix_t *x, unsigned int useHW) {
  */
 int inference(
 	NetConf *netConf,
-	unsigned int runForNumImages,
-	unsigned int selfCheck) {
+	u32 runForNumImages,
+	u32 selfCheck) {
 	if (runForNumImages == 0 || runForNumImages > netConf->imagesPaths->length)
 		runForNumImages = netConf->imagesPaths->length;
 
-	for (unsigned int i = 0; i < runForNumImages; i++) {
+	for (u32 i = 0; i < runForNumImages; i++) {
 		matrix_t *x = loadImage(netConf->imagesPaths->list[i]);
 		printf("- %s: ", netConf->imagesPaths->list[i]);
 
@@ -1748,10 +1721,10 @@ int inference(
 
 		/** Find the class with the greatest likelihood and print its label
 		 */
-		unsigned int xSize =
+		u32 xSize =
 			netConf->layersConf[netConf->layersNum - 1].resSize;
-		unsigned int topClass_hw = argmax(x_hw, xSize);
-		unsigned int topClass_sw =
+		u32 topClass_hw = argmax(x_hw, xSize);
+		u32 topClass_sw =
 			selfCheck ? argmax(x_sw, xSize) : topClass_hw;
 
 		if (topClass_hw == topClass_sw)
@@ -1777,7 +1750,7 @@ int Network_test() {
 	matrix_t WEIGHT_VALUE = .2;
 	matrix_t BIAS_VALUE = .1;
 
-	unsigned int LAYERS_NUMBER = 11;
+	u32 LAYERS_NUMBER = 11;
 
 	NetConf netConf;
 	netConf.layersNum = 11;
@@ -1856,24 +1829,24 @@ int Network_test() {
 	layer_conf_complete(&netConf);
 
 	printf("- Initializing Memory: ");
-	unsigned int xSize = lc[0].xSize;
+	u32 xSize = lc[0].xSize;
 	matrix_t *xAddr = (matrix_t *) malloc(xSize * sizeof(matrix_t));
-	for (unsigned int i = 0; i < xSize; i++) xAddr[i] = X_VALUE;
+	for (u32 i = 0; i < xSize; i++) xAddr[i] = X_VALUE;
 
-	unsigned int params_index = 0;
-	for (unsigned int i = 0; i < LAYERS_NUMBER; i++) {
+	u32 params_index = 0;
+	for (u32 i = 0; i < LAYERS_NUMBER; i++) {
 		if (lc[i].layerType == MAXPOOL_LAYER_TYPE) continue;
 
 		params[params_index] =
 			(matrix_t *) malloc(lc[i].weightsSize * sizeof(matrix_t));
-		for (unsigned int j = 0; j < lc[i].weightsSize; j++) {
+		for (u32 j = 0; j < lc[i].weightsSize; j++) {
 			params[params_index][j] = WEIGHT_VALUE;
 		}
 		params_index++;
 
 		params[params_index] =
 			(matrix_t *) malloc(lc[i].biasSize * sizeof(matrix_t));
-		for (unsigned int j = 0; j < lc[i].biasSize; j++) {
+		for (u32 j = 0; j < lc[i].biasSize; j++) {
 			params[params_index][j] = BIAS_VALUE;
 		}
 		params_index++;
@@ -1884,7 +1857,7 @@ int Network_test() {
 	matrix_t *res = forward(&netConf, xAddr, 1);
 	printf("- %sForwarded Successfully%s\n", KGRN, KNRM);
 
-	for (unsigned int i = 0; i < params_index; i++) free(params[i]);
+	for (u32 i = 0; i < params_index; i++) free(params[i]);
 	free(res);
 
 	return XST_SUCCESS;
@@ -1943,17 +1916,17 @@ XScuGic setup_interrupt() {
 }
 
 void setup_accelerator(XScuGic ScuGic) {
-	for (unsigned int i = 0; i < CONV_CORES_NUM; i++) {
+	for (u32 i = 0; i < CONV_CORES_NUM; i++) {
 		Conv_core_list[i] = (Core *) malloc(sizeof(Core));
 		Conv_core_list[i]->InstanceId = i;
 		Conv_core_init(Conv_core_list[i], ScuGic);
 	}
-	for (unsigned int i = 0; i < MAXPOOL_CORES_NUM; i++) {
+	for (u32 i = 0; i < MAXPOOL_CORES_NUM; i++) {
 		Maxpool_core_list[i] = (Core *) malloc(sizeof(Core));
 		Maxpool_core_list[i]->InstanceId = i;
 		Maxpool_core_init(Maxpool_core_list[i], ScuGic);
 	}
-	for (unsigned int i = 0; i < LINEAR_CORES_NUM; i++) {
+	for (u32 i = 0; i < LINEAR_CORES_NUM; i++) {
 		Linear_core_list[i] = (Core *) malloc(sizeof(Core));
 		Linear_core_list[i]->InstanceId = i;
 		Linear_core_init(Linear_core_list[i], ScuGic);
