@@ -76,15 +76,13 @@ typedef struct LayerConf_t {
 	unsigned int wout;
 	unsigned int inFeatures;
 	unsigned int outFeatures;
+	unsigned int doReLU;
 	unsigned int xSize;
 	unsigned int weightsSize;
 	unsigned int biasSize;
 	unsigned int resSize;
-	matrix_t *xAddr;
 	matrix_t *weightsAddr;
 	matrix_t *biasAddr;
-	matrix_t *resAddr;
-	unsigned int doReLU;
 	matrix_t *(*hw_func)();
 	matrix_t *(*sw_func)();
 } LayerConf;
@@ -190,6 +188,35 @@ unsigned int argmax(matrix_t *x, unsigned int xSize) {
 	return index;
 }
 
+void freeLayerConf(LayerConf *lc, unsigned int layersNum) {
+	for (unsigned int layer = 0; layer < layersNum; layer++) {
+		free(lc[layer].weightsAddr);
+		free(lc[layer].biasAddr);
+	}
+	free(lc);
+}
+
+void freeFilelist(Filelist *fl) {
+	for (unsigned int f = 0; f < fl->length; f++) free(fl->list[f]);
+	free(fl);
+}
+
+void freeNetConf(NetConf *netConf) {
+	unsigned int labelsNum =
+		netConf->layersConf[netConf->layersNum - 1].outFeatures;
+	freeLayerConf(netConf->layersConf, netConf->layersNum);
+	free(netConf->params);
+
+	for (unsigned int label = 0; label < labelsNum; label++) {
+		free(netConf->labels[label]);
+	}
+	free(netConf->labels);
+
+	freeFilelist(netConf->imagesPaths);
+
+	free(netConf);
+}
+
 // ----------------------------------------------
 
 unsigned int readUInt(FIL *f) {
@@ -220,7 +247,7 @@ float readFloat(FIL *f) {
  * @param[in] path
  * @returns Filelist *
  */
-Filelist *getFileList(char *path) {
+Filelist *getFilelist(char *path) {
 	printf("- Loading file list \"%s\": ", path);
 	DIR dp;
 	FRESULT fRes = f_opendir(&dp, path);
@@ -316,6 +343,30 @@ int close_file(FIL f) {
 		exit(XST_FAILURE);
 	}
 	return XST_SUCCESS;
+}
+
+char *selectFilePath(char *filesDir, char *msg) {
+	Filelist *configsList = getFileList(filesDir);
+	printf("%s", msg);
+	for (unsigned int i = 0; i < configsList->length; i++) {
+		printf("\t%d. %s\n", i + 1, configsList->list[i]);
+	}
+
+	unsigned int selection;
+	printf("Select a number [1-%d]: ", configsList->length);
+	scanf("%d", &selection);
+	while (selection <= 0 || selection > configsList->length) {
+		printf("\n%sWrong input.%s\n", KRED, KNRM);
+		printf("Select a number [1-%d]: ", configsList->length);
+		scanf("%d", &selection);
+	}
+
+	char *path;
+	strcpy(path, configsList->list[selection - 1]);
+
+	freeFilelist(configsList);
+
+	return path;
 }
 
 /**
@@ -583,6 +634,35 @@ NetConf *read_config(char *path) {
 	}
 	close_file(f);
 	printf("%sSuccess%s\n", KGRN, KNRM);
+	return netConf;
+}
+
+NetConf *selectNetConf(
+	char *configsDir,
+	char *labelsDir,
+	char *paramsDir,
+	char *imagesDir) {
+	char *configFile =
+		selectFilePath(configsDir, "- Select network configuration:\n");
+	char *configDir, configName;
+	sscanf(configFile, "%s/%s.conf", configDir, configName);
+
+	char *labelsFile;
+	sprintf(labelsFile, "%s/%s.labels", labelsDir, configName);
+
+	char *paramsFile;
+	sprintf(paramsFile, "%s/%s.params", paramsDir, configName);
+
+	NetConf *netConf = read_config(configFile);
+	netConf->labels = loadLabels(labelsFile);
+	netConf->params = loadParameters(paramsFile);
+	netConf->imagesPaths = getFileList(imagesDir);
+
+	free(configFile);
+	free(configName);
+	free(labelsFile);
+	free(paramsFile);
+
 	return netConf;
 }
 
@@ -935,13 +1015,14 @@ int Conv_core_test(unsigned int testAllCores) {
 
 	printf("- Initializing Memory: ");
 	matrix_t *x = (matrix_t *) malloc(lc.xSize * sizeof(matrix_t));
-	for (u32 i = 0; i < lc.xSize; i++) x[i] = X_VALUE;
+	for (unsigned int i = 0; i < lc.xSize; i++) x[i] = X_VALUE;
 
 	lc.weightsAddr = (matrix_t *) malloc(lc.weightsSize * sizeof(matrix_t));
-	for (u32 i = 0; i < lc.weightsSize; i++) lc.weightsAddr[i] = WEIGHT_VALUE;
+	for (unsigned int i = 0; i < lc.weightsSize; i++)
+		lc.weightsAddr[i] = WEIGHT_VALUE;
 
 	lc.biasAddr = (matrix_t *) malloc(lc.biasSize * sizeof(matrix_t));
-	for (u32 i = 0; i < lc.biasSize; i++) lc.biasAddr[i] = BIAS_VALUE;
+	for (unsigned int i = 0; i < lc.biasSize; i++) lc.biasAddr[i] = BIAS_VALUE;
 	printf("%sSuccess%s\n", KGRN, KNRM);
 
 	int status = XST_SUCCESS;
@@ -958,22 +1039,19 @@ int Conv_core_test(unsigned int testAllCores) {
 			X_VALUE * WEIGHT_VALUE * lc.kernelSize * lc.kernelSize * lc.din +
 			BIAS_VALUE;
 		error +=
-			abs(lc.resAddr[0 * lc.hout * lc.wout + 23 * lc.wout + 23] -
-				pixel_value);
+			abs(res[0 * lc.hout * lc.wout + 23 * lc.wout + 23] - pixel_value);
 		error +=
-			abs(lc.resAddr[1 * lc.hout * lc.wout + 23 * lc.wout + 23] -
-				pixel_value);
+			abs(res[1 * lc.hout * lc.wout + 23 * lc.wout + 23] - pixel_value);
 		pixel_value = X_VALUE * WEIGHT_VALUE * (lc.kernelSize - lc.padding) *
 				(lc.kernelSize - lc.padding) * lc.din +
 			BIAS_VALUE;
-		error += abs(lc.resAddr[0] - pixel_value);
+		error += abs(res[0] - pixel_value);
 		pixel_value = X_VALUE * WEIGHT_VALUE *
 				(lc.kernelSize - lc.padding + 1) *
 				(lc.kernelSize - lc.padding + 1) * lc.din +
 			BIAS_VALUE;
 		error +=
-			abs(lc.resAddr[0 * lc.hout * lc.wout + 54 * lc.wout + 54] -
-				pixel_value);
+			abs(res[0 * lc.hout * lc.wout + 54 * lc.wout + 54] - pixel_value);
 
 		if (error < 0.1) {
 			printf("%sSuccess%s\n", KGRN, KNRM);
@@ -1246,10 +1324,11 @@ void Maxpool_conf_complete(NetConf *netConf, unsigned int layer_index) {
 		lc->din = plc->dout;
 		lc->hin = plc->hout;
 		lc->win = plc->wout;
-		lc->xAddr = plc->resAddr;
 	}
 
 	Maxpool_conf_params_complete(lc);
+	lc->weightsAddr = NULL;
+	lc->biasAddr = NULL;
 }
 
 int Maxpool_core_test(unsigned int testAllCores) {
@@ -1274,7 +1353,7 @@ int Maxpool_core_test(unsigned int testAllCores) {
 
 	printf("- Initializing Memory: ");
 	matrix_t *x = (matrix_t *) malloc(lc.xSize * sizeof(matrix_t));
-	for (u32 i = 0; i < lc.xSize; i++) x[i] = X_VALUE;
+	for (unsigned int i = 0; i < lc.xSize; i++) x[i] = X_VALUE;
 	printf("%sSuccess%s\n", KGRN, KNRM);
 
 	int status = XST_SUCCESS;
@@ -1287,7 +1366,7 @@ int Maxpool_core_test(unsigned int testAllCores) {
 		matrix_t pixel_value = X_VALUE;
 		matrix_t error = 0;
 
-		for (u32 i = 0; i < lc.resSize; i++) {
+		for (unsigned int i = 0; i < lc.resSize; i++) {
 			error += abs(res[i] - pixel_value);
 		}
 
@@ -1298,7 +1377,7 @@ int Maxpool_core_test(unsigned int testAllCores) {
 			status = XST_FAILURE;
 		}
 
-		free(lc.resAddr);
+		free(res);
 	}
 	return status;
 }
@@ -1556,13 +1635,14 @@ int Linear_core_test(unsigned int testAllCores) {
 
 	printf("- Initializing Memory: ");
 	matrix_t *x = (matrix_t *) malloc(lc.xSize * sizeof(matrix_t));
-	for (u32 i = 0; i < lc.xSize; i++) x[i] = X_VALUE;
+	for (unsigned int i = 0; i < lc.xSize; i++) x[i] = X_VALUE;
 
 	lc.weightsAddr = (matrix_t *) malloc(lc.weightsSize * sizeof(matrix_t));
-	for (u32 i = 0; i < lc.weightsSize; i++) lc.weightsAddr[i] = WEIGHT_VALUE;
+	for (unsigned int i = 0; i < lc.weightsSize; i++)
+		lc.weightsAddr[i] = WEIGHT_VALUE;
 
 	lc.biasAddr = (matrix_t *) malloc(lc.biasSize * sizeof(matrix_t));
-	for (u32 i = 0; i < lc.biasSize; i++) lc.biasAddr[i] = BIAS_VALUE;
+	for (unsigned int i = 0; i < lc.biasSize; i++) lc.biasAddr[i] = BIAS_VALUE;
 	printf("%sSuccess%s\n", KGRN, KNRM);
 
 	int status = XST_SUCCESS;
@@ -1576,8 +1656,8 @@ int Linear_core_test(unsigned int testAllCores) {
 			X_VALUE * WEIGHT_VALUE * lc.inFeatures + BIAS_VALUE;
 		matrix_t error = 0;
 
-		for (u32 i = 0; i < lc.resSize; i++) {
-			error += abs(lc.resAddr[i] - pixel_value);
+		for (unsigned int i = 0; i < lc.resSize; i++) {
+			error += abs(res[i] - pixel_value);
 		}
 
 		if (error < 0.1) {
@@ -1636,6 +1716,55 @@ matrix_t *forward(NetConf *netConf, matrix_t *x, unsigned int useHW) {
 	}
 	printf("\b\b\b");
 	return x;
+}
+
+/**
+ * Takes an image and passes it through the network to classify it and print its
+ * label. It also measures the time in milliseconds for the forward pass to
+ * complete.
+ * @param[in] path: The image's path to pass the network
+ * @param[in] params: The network's parameters
+ * @param[in] labels: The network's classes' labels
+ * @returns the time needed in milliseconds for the forward pass to complete.
+ */
+int inference(
+	NetConf *netConf,
+	unsigned int runForNumImages,
+	unsigned int selfCheck) {
+	if (runForNumImages == 0 || runForNumImages > netConf->imagesPaths->length)
+		runForNumImages = netConf->imagesPaths->length;
+
+	for (unsigned int i = 0; i < runForNumImages; i++) {
+		matrix_t *x = loadImage(netConf->imagesPaths->list[i]);
+		printf("- %s: ", netConf->imagesPaths->list[i]);
+
+		/** Pass the image through the network */
+		matrix_t *x_hw = forward(netConf, x, 1);
+		matrix_t *x_sw = NULL;
+		if (selfCheck) x_sw = forward(netConf, x, 0);
+
+		/** Find the class with the greatest likelihood and print its label
+		 */
+		unsigned int xSize =
+			netConf->layersConf[netConf->layersNum - 1].resSize;
+		unsigned int topClass_hw = argmax(x_hw, xSize);
+		unsigned int topClass_sw =
+			selfCheck ? argmax(x_sw, xSize) : topClass_hw;
+
+		if (topClass_hw == topClass_sw)
+			printf("%s\n", netConf->labels[topClass_sw]);
+		else
+			printf("%sError. No match between sw and hw.%s\n", KRED, KNRM);
+
+		/**
+		 * Free the forward pass's resulting FloatMatrix as it is no longer
+		 * needed to avoid memory leaks
+		 */
+		free(x);
+		free(x_hw);
+		free(x_sw);
+	}
+	return XST_SUCCESS;
 }
 
 int Network_test() {
@@ -1724,24 +1853,24 @@ int Network_test() {
 	layer_conf_complete(&netConf);
 
 	printf("- Initializing Memory: ");
-	u32 xSize = lc[0].xSize;
+	unsigned int xSize = lc[0].xSize;
 	matrix_t *xAddr = (matrix_t *) malloc(xSize * sizeof(matrix_t));
-	for (u32 i = 0; i < xSize; i++) xAddr[i] = X_VALUE;
+	for (unsigned int i = 0; i < xSize; i++) xAddr[i] = X_VALUE;
 
-	u32 params_index = 0;
-	for (u32 i = 0; i < LAYERS_NUMBER; i++) {
+	unsigned int params_index = 0;
+	for (unsigned int i = 0; i < LAYERS_NUMBER; i++) {
 		if (lc[i].layerType == MAXPOOL_LAYER_TYPE) continue;
 
 		params[params_index] =
 			(matrix_t *) malloc(lc[i].weightsSize * sizeof(matrix_t));
-		for (u32 j = 0; j < lc[i].weightsSize; j++) {
+		for (unsigned int j = 0; j < lc[i].weightsSize; j++) {
 			params[params_index][j] = WEIGHT_VALUE;
 		}
 		params_index++;
 
 		params[params_index] =
 			(matrix_t *) malloc(lc[i].biasSize * sizeof(matrix_t));
-		for (u32 j = 0; j < lc[i].biasSize; j++) {
+		for (unsigned int j = 0; j < lc[i].biasSize; j++) {
 			params[params_index][j] = BIAS_VALUE;
 		}
 		params_index++;
@@ -1752,7 +1881,7 @@ int Network_test() {
 	matrix_t *res = forward(&netConf, xAddr, 1);
 	printf("- %sForwarded Successfully%s\n", KGRN, KNRM);
 
-	for (u32 i = 0; i < params_index; i++) free(params[i]);
+	for (unsigned int i = 0; i < params_index; i++) free(params[i]);
 	free(res);
 
 	return XST_SUCCESS;
