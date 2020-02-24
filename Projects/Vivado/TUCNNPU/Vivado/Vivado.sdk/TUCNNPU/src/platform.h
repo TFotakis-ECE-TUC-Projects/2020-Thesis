@@ -70,6 +70,18 @@ typedef struct {
 
 // ----------------------------------------------
 
+XScuGic ScuGic;
+
+// ----------------------------------------------
+
+void eraseCharactersTerminal(u32 num) {
+	for (u32 i = 0; i < num; i++) print("\b");
+	for (u32 i = 0; i < num; i++) print(" ");
+	for (u32 i = 0; i < num; i++) print("\b");
+}
+
+// ----------------------------------------------
+
 /**
  * Calculates the index on a 1D buffer representation of a 3D matrix
  * @param[in] dim0 - dim2: the sizes of the matrix's dimensions
@@ -355,7 +367,7 @@ matrix_t **loadParameters(char *filename) {
 	 */
 	matrix_t **params = (matrix_t **) malloc(params_len * sizeof(matrix_t *));
 	if (params == NULL) {
-		printf("\b\b\b");
+		eraseCharactersTerminal(3);
 		printf(
 			"%sError. Not enough memory on loadParameters for params.%s\n",
 			KRED,
@@ -378,7 +390,7 @@ matrix_t **loadParameters(char *filename) {
 		/** Allocate the needed memory to store all the parameters */
 		params[p] = (matrix_t *) malloc(xLen * sizeof(matrix_t));
 		if (params[p] == NULL) {
-			printf("\b\b\b");
+			eraseCharactersTerminal(3);
 			printf(
 				"%sError. Not enough memory on loadParameters for "
 				"params[%d].%s\n",
@@ -394,10 +406,10 @@ matrix_t **loadParameters(char *filename) {
 			params[p][i] = readFloat(&f);
 		}
 
-		printf("\b\b\b");
+		eraseCharactersTerminal(3);
 		printf("%02d%%", (p * 100) / params_len);
 	}
-	printf("\b\b\b");
+	eraseCharactersTerminal(3);
 	printf("%sSuccess%s\n", KGRN, KNRM);
 
 	close_file(f);
@@ -497,7 +509,7 @@ matrix_t *loadImage(char *path) {
 
 	matrix_t *x = (matrix_t *) malloc(3 * height * width * sizeof(matrix_t));
 	if (x == NULL) {
-		printf("\b\b\b");
+		eraseCharactersTerminal(3);
 		printf(
 			"%sError. Not enough memory on loadImage for x.%s\n", KRED, KNRM);
 		exit(XST_FAILURE);
@@ -749,8 +761,8 @@ matrix_t *Conv_sw(matrix_t *x, LayerConf lc) {
 }
 
 #ifdef XPAR_XCONV_CORE_NUM_INSTANCES
-#include <xconv_core.h>
-#define CONV_CORES_NUM XPAR_XCONV_CORE_NUM_INSTANCES
+	#include <xconv_core.h>
+	#define CONV_CORES_NUM XPAR_XCONV_CORE_NUM_INSTANCES
 Core *Conv_core_list[CONV_CORES_NUM];
 #endif
 
@@ -833,7 +845,7 @@ void Conv_core_isr(Core *core) {
 	Conv_core_result_avail[core->InstanceId] = 1;
 }
 
-int Conv_core_setup_interrupt(Core *core, XScuGic ScuGic) {
+int Conv_core_setup_interrupt(Core *core) {
 	// Connect the Conv_core ISR to the exception table
 	int result = XScuGic_Connect(
 		&ScuGic,
@@ -845,7 +857,7 @@ int Conv_core_setup_interrupt(Core *core, XScuGic ScuGic) {
 	return XST_SUCCESS;
 }
 
-void Conv_core_init(Core *core, XScuGic ScuGic) {
+void Conv_core_init(Core *core) {
 	printf("- Initializing Conv_core %u: ", core->InstanceId);
 	core->InstancePtr = (void *) malloc(sizeof(XConv_core));
 	int status = XConv_core_Initialize(
@@ -854,7 +866,7 @@ void Conv_core_init(Core *core, XScuGic ScuGic) {
 		printf("%sError%s\n", KRED, KNRM);
 		exit(XST_FAILURE);
 	}
-	status = Conv_core_setup_interrupt(core, ScuGic);
+	status = Conv_core_setup_interrupt(core);
 	if (status != XST_SUCCESS) {
 		printf("%sError%s\n", KRED, KNRM);
 		exit(XST_FAILURE);
@@ -885,7 +897,7 @@ matrix_t *Conv_core_setup(XConv_core *Conv_core, LayerConf lc, matrix_t *x) {
 		exit(XST_FAILURE);
 	}
 	XConv_core_Set_res(Conv_core, (u32)(u64) resAddr);
-	printf("\b\b\b\b\b\b\b\b");
+	eraseCharactersTerminal(8);
 	return resAddr;
 }
 
@@ -898,15 +910,14 @@ void Conv_core_start(void *InstancePtr) {
 	XConv_core_InterruptEnable(pAccelerator, 1);
 	XConv_core_InterruptGlobalEnable(pAccelerator);
 	XConv_core_Start(pAccelerator);
-	printf("\b\b\b\b\b\b\b\b\b\b\b");
+	eraseCharactersTerminal(11);
 	printf("Running...");
 }
 
 int Conv_core_wait_int(Core *core) {
 	while (!Conv_core_result_avail[core->InstanceId]) continue;
 	Conv_core_result_avail[core->InstanceId] = 0;
-	printf("\b\b\b\b\b\b\b\b\b\b");
-	printf("Finished\n");
+	eraseCharactersTerminal(10);
 	int status = XConv_core_Get_return(core->InstancePtr);
 	return status;
 }
@@ -994,7 +1005,6 @@ int Conv_core_test(u32 testAllCores) {
 
 		matrix_t *res = (*lc.hw_func)(lc, x);
 
-		printf("\b\b\b\b\b\b\b\b\b");
 		printf("Testing...");
 
 		matrix_t pixel_value;
@@ -1018,8 +1028,7 @@ int Conv_core_test(u32 testAllCores) {
 		error +=
 			abs(res[0 * lc.hout * lc.wout + 54 * lc.wout + 54] - pixel_value);
 
-		printf("\b\b\b\b\b\b\b\b\b\b");
-
+		eraseCharactersTerminal(10);
 		if (error < 0.1) {
 			printf("%sSuccess%s\n", KGRN, KNRM);
 		} else {
@@ -1097,8 +1106,8 @@ matrix_t *Maxpool_sw(matrix_t *x, LayerConf lc) {
 }
 
 #ifdef XPAR_XMAXPOOL_CORE_NUM_INSTANCES
-#include <xmaxpool_core.h>
-#define MAXPOOL_CORES_NUM XPAR_XMAXPOOL_CORE_NUM_INSTANCES
+	#include <xmaxpool_core.h>
+	#define MAXPOOL_CORES_NUM XPAR_XMAXPOOL_CORE_NUM_INSTANCES
 Core *Maxpool_core_list[MAXPOOL_CORES_NUM];
 #endif
 
@@ -1181,7 +1190,7 @@ void Maxpool_core_isr(Core *core) {
 	Maxpool_core_result_avail[core->InstanceId] = 1;
 }
 
-int Maxpool_core_setup_interrupt(Core *core, XScuGic ScuGic) {
+int Maxpool_core_setup_interrupt(Core *core) {
 	// Connect the Maxpool_core ISR to the exception table
 	int result = XScuGic_Connect(
 		&ScuGic,
@@ -1193,7 +1202,7 @@ int Maxpool_core_setup_interrupt(Core *core, XScuGic ScuGic) {
 	return XST_SUCCESS;
 }
 
-void Maxpool_core_init(Core *core, XScuGic ScuGic) {
+void Maxpool_core_init(Core *core) {
 	printf("- Initializing Maxpool_core %u: ", core->InstanceId);
 	core->InstancePtr = (void *) malloc(sizeof(XMaxpool_core));
 	int status = XMaxpool_core_Initialize(
@@ -1202,7 +1211,7 @@ void Maxpool_core_init(Core *core, XScuGic ScuGic) {
 		printf("%sError%s\n", KRED, KNRM);
 		exit(XST_FAILURE);
 	}
-	status = Maxpool_core_setup_interrupt(core, ScuGic);
+	status = Maxpool_core_setup_interrupt(core);
 	if (status != XST_SUCCESS) {
 		printf("%sError%s\n", KRED, KNRM);
 		exit(XST_FAILURE);
@@ -1243,7 +1252,7 @@ void Maxpool_core_start(void *InstancePtr) {
 	XMaxpool_core_InterruptEnable(pAccelerator, 1);
 	XMaxpool_core_InterruptGlobalEnable(pAccelerator);
 	XMaxpool_core_Start(pAccelerator);
-	printf("\b\b\b\b\b\b\b\b\b\b\b");
+	eraseCharactersTerminal(11);
 	printf("Running...");
 }
 
@@ -1251,8 +1260,7 @@ int Maxpool_core_wait_int(Core *core) {
 	while (!Maxpool_core_result_avail[core->InstanceId]) continue;
 	Maxpool_core_result_avail[core->InstanceId] = 0;
 	int status = XMaxpool_core_Get_return(core->InstancePtr);
-	printf("\b\b\b\b\b\b\b\b\b\b");
-	printf("Finished\n");
+	eraseCharactersTerminal(10);
 	return status;
 }
 
@@ -1328,7 +1336,6 @@ int Maxpool_core_test(u32 testAllCores) {
 
 		matrix_t *res = (*lc.hw_func)(lc, x);
 
-		printf("\b\b\b\b\b\b\b\b\b");
 		printf("Testing...");
 
 		matrix_t pixel_value = X_VALUE;
@@ -1338,7 +1345,7 @@ int Maxpool_core_test(u32 testAllCores) {
 			error += abs(res[i] - pixel_value);
 		}
 
-		printf("\b\b\b\b\b\b\b\b\b\b");
+		eraseCharactersTerminal(10);
 		if (error < 0.1) {
 			printf("%sSuccess%s\n", KGRN, KNRM);
 		} else {
@@ -1382,8 +1389,8 @@ matrix_t *Linear_sw(matrix_t *x, LayerConf lc) {
 }
 
 #ifdef XPAR_XLINEAR_CORE_NUM_INSTANCES
-#include <xlinear_core.h>
-#define LINEAR_CORES_NUM XPAR_XLINEAR_CORE_NUM_INSTANCES
+	#include <xlinear_core.h>
+	#define LINEAR_CORES_NUM XPAR_XLINEAR_CORE_NUM_INSTANCES
 Core *Linear_core_list[LINEAR_CORES_NUM];
 #endif
 
@@ -1466,7 +1473,7 @@ void Linear_core_isr(Core *core) {
 	Linear_core_result_avail[core->InstanceId] = 1;
 }
 
-int Linear_core_setup_interrupt(Core *core, XScuGic ScuGic) {
+int Linear_core_setup_interrupt(Core *core) {
 	// Connect the Linear_core ISR to the exception table
 	int result = XScuGic_Connect(
 		&ScuGic,
@@ -1478,7 +1485,7 @@ int Linear_core_setup_interrupt(Core *core, XScuGic ScuGic) {
 	return XST_SUCCESS;
 }
 
-void Linear_core_init(Core *core, XScuGic ScuGic) {
+void Linear_core_init(Core *core) {
 	printf("- Initializing Linear_core %u: ", core->InstanceId);
 	core->InstancePtr = (void *) malloc(sizeof(XLinear_core));
 	int status = XLinear_core_Initialize(
@@ -1487,7 +1494,7 @@ void Linear_core_init(Core *core, XScuGic ScuGic) {
 		printf("%sError%s\n", KRED, KNRM);
 		exit(XST_FAILURE);
 	}
-	status = Linear_core_setup_interrupt(core, ScuGic);
+	status = Linear_core_setup_interrupt(core);
 	if (status != XST_SUCCESS) {
 		printf("%sError%s\n", KRED, KNRM);
 		exit(XST_FAILURE);
@@ -1526,7 +1533,7 @@ void Linear_core_start(void *InstancePtr) {
 	XLinear_core_InterruptEnable(pAccelerator, 1);
 	XLinear_core_InterruptGlobalEnable(pAccelerator);
 	XLinear_core_Start(pAccelerator);
-	printf("\b\b\b\b\b\b\b\b\b\b\b");
+	eraseCharactersTerminal(11);
 	printf("Running...");
 }
 
@@ -1534,8 +1541,7 @@ int Linear_core_wait_int(Core *core) {
 	while (!Linear_core_result_avail[core->InstanceId]) continue;
 	Linear_core_result_avail[core->InstanceId] = 0;
 	int status = XLinear_core_Get_return(core->InstancePtr);
-	printf("\b\b\b\b\b\b\b\b\b\b");
-	printf("Finished\n");
+	eraseCharactersTerminal(10);
 	return status;
 }
 
@@ -1616,7 +1622,6 @@ int Linear_core_test(u32 testAllCores) {
 
 		matrix_t *res = (*lc.hw_func)(lc, x);
 
-		printf("\b\b\b\b\b\b\b\b\b");
 		printf("Testing...");
 
 		matrix_t pixel_value =
@@ -1627,8 +1632,7 @@ int Linear_core_test(u32 testAllCores) {
 			error += abs(res[i] - pixel_value);
 		}
 
-		printf("\b\b\b\b\b\b\b\b\b\b");
-
+		eraseCharactersTerminal(10);
 		if (error < 0.1) {
 			printf("%sSuccess%s\n", KGRN, KNRM);
 		} else {
@@ -1676,14 +1680,14 @@ void layer_conf_complete(NetConf *netConf) {
 matrix_t *forward(NetConf *netConf, matrix_t *x, u32 useHW) {
 	printf("000/%03d", netConf->layersNum);
 	for (u32 i = 0; i < netConf->layersNum; i++) {
-		printf("\b\b\b\b\b\b\b");
+		eraseCharactersTerminal(7);
 		printf("%03d/%03d", i, netConf->layersNum);
 		if (useHW)
 			x = (*netConf->layersConf[i].hw_func)(netConf->layersConf[i], x);
 		else
 			x = (*netConf->layersConf[i].sw_func)(netConf->layersConf[i], x);
 	}
-	printf("\b\b\b");
+	// eraseCharactersTerminal(7);
 	return x;
 }
 
@@ -1876,7 +1880,6 @@ XScuGic setup_interrupt() {
 		print("Interrupt Configuration Lookup Failed\n");
 		exit(XST_FAILURE);
 	}
-	XScuGic ScuGic;
 
 	result = XScuGic_CfgInitialize(&ScuGic, pCfg, pCfg->CpuBaseAddress);
 	if (result != XST_SUCCESS) {
@@ -1903,21 +1906,21 @@ XScuGic setup_interrupt() {
 	return ScuGic;
 }
 
-void setup_accelerator(XScuGic ScuGic) {
+void setup_accelerator() {
 	for (u32 i = 0; i < CONV_CORES_NUM; i++) {
 		Conv_core_list[i] = (Core *) malloc(sizeof(Core));
 		Conv_core_list[i]->InstanceId = i;
-		Conv_core_init(Conv_core_list[i], ScuGic);
+		Conv_core_init(Conv_core_list[i]);
 	}
 	for (u32 i = 0; i < MAXPOOL_CORES_NUM; i++) {
 		Maxpool_core_list[i] = (Core *) malloc(sizeof(Core));
 		Maxpool_core_list[i]->InstanceId = i;
-		Maxpool_core_init(Maxpool_core_list[i], ScuGic);
+		Maxpool_core_init(Maxpool_core_list[i]);
 	}
 	for (u32 i = 0; i < LINEAR_CORES_NUM; i++) {
 		Linear_core_list[i] = (Core *) malloc(sizeof(Core));
 		Linear_core_list[i]->InstanceId = i;
-		Linear_core_init(Linear_core_list[i], ScuGic);
+		Linear_core_init(Linear_core_list[i]);
 	}
 }
 
@@ -1925,7 +1928,7 @@ void setup_platform(char *greeting_message) {
 	setup_stdout();
 	printf("%s", greeting_message);
 	setup_cache();
-	XScuGic ScuGic = setup_interrupt();
+	setup_interrupt();
 	setup_accelerator(ScuGic);
 }
 
