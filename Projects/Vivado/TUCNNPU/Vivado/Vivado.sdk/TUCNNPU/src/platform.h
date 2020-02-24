@@ -872,7 +872,7 @@ void Conv_core_init(Core *core, XScuGic ScuGic) {
 }
 
 matrix_t *Conv_core_setup(XConv_core *Conv_core, LayerConf lc, matrix_t *x) {
-	printf("- Setup Conv_core: ");
+	printf("Setup...");
 	XConv_core_Set_x(Conv_core, (u32) (u64) x);
 	XConv_core_Set_weights(Conv_core, (u32) (u64) lc.weightsAddr);
 	XConv_core_Set_bias(Conv_core, (u32) (u64) lc.biasAddr);
@@ -894,30 +894,29 @@ matrix_t *Conv_core_setup(XConv_core *Conv_core, LayerConf lc, matrix_t *x) {
 		exit(XST_FAILURE);
 	}
 	XConv_core_Set_res(Conv_core, (u32) (u64) resAddr);
-	printf("%sSuccess%s\n", KGRN, KNRM);
+	printf("\b\b\b\b\b\b\b\b");
 	return resAddr;
 }
 
 void Conv_core_start(void *InstancePtr) {
 	XConv_core *pAccelerator = (XConv_core *) InstancePtr;
 
-	printf("- Waiting for Conv_core to get ready: ");
 	while (!XConv_core_IsReady(pAccelerator)) continue;
-	printf("%sSuccess%s\n", KGRN, KNRM);
 
-	printf("- Starting Conv_core: ");
+	printf("Starting...");
 	XConv_core_InterruptEnable(pAccelerator, 1);
 	XConv_core_InterruptGlobalEnable(pAccelerator);
 	XConv_core_Start(pAccelerator);
-	printf("%sSuccess%s\n", KGRN, KNRM);
+	printf("\b\b\b\b\b\b\b\b\b\b\b");
+	printf("Running...");
 }
 
 int Conv_core_wait_int(Core *core) {
 	while (!Conv_core_result_avail[core->InstanceId]) continue;
 	Conv_core_result_avail[core->InstanceId] = 0;
-	printf("- Interrupt received from Conv_core.\n");
+	printf("\b\b\b\b\b\b\b\b\b\b");
+	printf("Finished\n");
 	int status = XConv_core_Get_return(core->InstancePtr);
-	printf("- Return value: %d\n", status);
 	return status;
 }
 
@@ -1008,6 +1007,9 @@ int Conv_core_test(u32 testAllCores) {
 
 		matrix_t *res = (*lc.hw_func)(lc, x);
 
+		printf("\b\b\b\b\b\b\b\b\b");
+		printf("Testing...");
+
 		matrix_t pixel_value;
 		matrix_t error = 0;
 
@@ -1028,6 +1030,8 @@ int Conv_core_test(u32 testAllCores) {
 			BIAS_VALUE;
 		error +=
 			abs(res[0 * lc.hout * lc.wout + 54 * lc.wout + 54] - pixel_value);
+
+		printf("\b\b\b\b\b\b\b\b\b\b");
 
 		if (error < 0.1) {
 			printf("%sSuccess%s\n", KGRN, KNRM);
@@ -1247,23 +1251,22 @@ matrix_t *
 void Maxpool_core_start(void *InstancePtr) {
 	XMaxpool_core *pAccelerator = (XMaxpool_core *) InstancePtr;
 
-	printf("- Waiting for Maxpool_core to get ready: ");
 	while (!XMaxpool_core_IsReady(pAccelerator)) continue;
-	printf("%sSuccess%s\n", KGRN, KNRM);
 
-	printf("- Starting Maxpool_core: ");
+	printf("Starting...");
 	XMaxpool_core_InterruptEnable(pAccelerator, 1);
 	XMaxpool_core_InterruptGlobalEnable(pAccelerator);
 	XMaxpool_core_Start(pAccelerator);
-	printf("%sSuccess%s\n", KGRN, KNRM);
+	printf("\b\b\b\b\b\b\b\b\b\b\b");
+	printf("Running...");
 }
 
 int Maxpool_core_wait_int(Core *core) {
 	while (!Maxpool_core_result_avail[core->InstanceId]) continue;
 	Maxpool_core_result_avail[core->InstanceId] = 0;
-	printf("- Interrupt received from Maxpool_core.\n");
 	int status = XMaxpool_core_Get_return(core->InstancePtr);
-	printf("- Return value: %d\n", status);
+	printf("\b\b\b\b\b\b\b\b\b\b");
+	printf("Finished\n");
 	return status;
 }
 
@@ -1339,6 +1342,9 @@ int Maxpool_core_test(u32 testAllCores) {
 
 		matrix_t *res = (*lc.hw_func)(lc, x);
 
+		printf("\b\b\b\b\b\b\b\b\b");
+		printf("Testing...");
+
 		matrix_t pixel_value = X_VALUE;
 		matrix_t error = 0;
 
@@ -1346,6 +1352,7 @@ int Maxpool_core_test(u32 testAllCores) {
 			error += abs(res[i] - pixel_value);
 		}
 
+		printf("\b\b\b\b\b\b\b\b\b\b");
 		if (error < 0.1) {
 			printf("%sSuccess%s\n", KGRN, KNRM);
 		} else {
@@ -1527,23 +1534,22 @@ matrix_t *
 void Linear_core_start(void *InstancePtr) {
 	XLinear_core *pAccelerator = (XLinear_core *) InstancePtr;
 
-	printf("- Waiting for Linear_core to get ready: ");
 	while (!XLinear_core_IsReady(pAccelerator)) continue;
-	printf("%sSuccess%s\n", KGRN, KNRM);
 
-	printf("- Starting Linear_core: ");
+	printf("Starting...");
 	XLinear_core_InterruptEnable(pAccelerator, 1);
 	XLinear_core_InterruptGlobalEnable(pAccelerator);
 	XLinear_core_Start(pAccelerator);
-	printf("%sSuccess%s\n", KGRN, KNRM);
+	printf("\b\b\b\b\b\b\b\b\b\b\b");
+	printf("Running...");
 }
 
 int Linear_core_wait_int(Core *core) {
 	while (!Linear_core_result_avail[core->InstanceId]) continue;
 	Linear_core_result_avail[core->InstanceId] = 0;
-	printf("- Interrupt received from Linear_core.\n");
 	int status = XLinear_core_Get_return(core->InstancePtr);
-	printf("- Return value: %d\n", status);
+	printf("\b\b\b\b\b\b\b\b\b\b");
+	printf("Finished\n");
 	return status;
 }
 
@@ -1628,6 +1634,9 @@ int Linear_core_test(u32 testAllCores) {
 
 		matrix_t *res = (*lc.hw_func)(lc, x);
 
+		printf("\b\b\b\b\b\b\b\b\b");
+		printf("Testing...");
+
 		matrix_t pixel_value =
 			X_VALUE * WEIGHT_VALUE * lc.inFeatures + BIAS_VALUE;
 		matrix_t error = 0;
@@ -1635,6 +1644,8 @@ int Linear_core_test(u32 testAllCores) {
 		for (u32 i = 0; i < lc.resSize; i++) {
 			error += abs(res[i] - pixel_value);
 		}
+
+		printf("\b\b\b\b\b\b\b\b\b\b");
 
 		if (error < 0.1) {
 			printf("%sSuccess%s\n", KGRN, KNRM);
