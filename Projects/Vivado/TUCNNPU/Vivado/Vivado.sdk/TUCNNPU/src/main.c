@@ -16,16 +16,18 @@
 #define RUN_FOR_NUM_IMAGES 5
 
 void runTests() {
+	printf("\n");
 	Conv_core_test(TEST_ALL_CORES);
+	printf("\n");
 	Maxpool_core_test(TEST_ALL_CORES);
+	printf("\n");
 	Linear_core_test(TEST_ALL_CORES);
+	printf("\n");
 	Network_test();
 }
 
 void setup() {
-	setup_stdout();
-	printf("*** Starting ***\n");
-	setup_cache();
+	setup_platform("*** Starting ***\n");
 	mount_sd();
 
 	runTests();
