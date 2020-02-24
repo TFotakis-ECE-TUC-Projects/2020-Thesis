@@ -80,6 +80,10 @@ void eraseCharactersTerminal(u32 num) {
 	for (u32 i = 0; i < num; i++) print("\b");
 }
 
+void eraseCurrentLine() {
+	printf("\r\033[K");
+}
+
 // ----------------------------------------------
 
 /**
@@ -988,9 +992,6 @@ int Conv_core_test(u32 testAllCores) {
 	Conv_conf_params_complete(&lc);
 
 	printf("- Initializing Memory: ");
-	matrix_t *x = (matrix_t *) malloc(lc.xSize * sizeof(matrix_t));
-	for (u32 i = 0; i < lc.xSize; i++) x[i] = X_VALUE;
-
 	lc.weightsAddr = (matrix_t *) malloc(lc.weightsSize * sizeof(matrix_t));
 	for (u32 i = 0; i < lc.weightsSize; i++) lc.weightsAddr[i] = WEIGHT_VALUE;
 
@@ -1003,6 +1004,9 @@ int Conv_core_test(u32 testAllCores) {
 	for (u32 core = 0; core < core_num; core++) {
 		printf("- Conv_core[%u]: ", core);
 
+		matrix_t *x = (matrix_t *) malloc(lc.xSize * sizeof(matrix_t));
+		for (u32 i = 0; i < lc.xSize; i++) x[i] = X_VALUE;
+
 		matrix_t *res = (*lc.hw_func)(lc, x);
 
 		printf("Testing...");
@@ -1014,19 +1018,19 @@ int Conv_core_test(u32 testAllCores) {
 			X_VALUE * WEIGHT_VALUE * lc.kernelSize * lc.kernelSize * lc.din +
 			BIAS_VALUE;
 		error +=
-			abs(res[0 * lc.hout * lc.wout + 23 * lc.wout + 23] - pixel_value);
+			fabsf(res[0 * lc.hout * lc.wout + 23 * lc.wout + 23] - pixel_value);
 		error +=
-			abs(res[1 * lc.hout * lc.wout + 23 * lc.wout + 23] - pixel_value);
+			fabsf(res[1 * lc.hout * lc.wout + 23 * lc.wout + 23] - pixel_value);
 		pixel_value = X_VALUE * WEIGHT_VALUE * (lc.kernelSize - lc.padding) *
 				(lc.kernelSize - lc.padding) * lc.din +
 			BIAS_VALUE;
-		error += abs(res[0] - pixel_value);
+		error += fabsf(res[0] - pixel_value);
 		pixel_value = X_VALUE * WEIGHT_VALUE *
 				(lc.kernelSize - lc.padding + 1) *
 				(lc.kernelSize - lc.padding + 1) * lc.din +
 			BIAS_VALUE;
 		error +=
-			abs(res[0 * lc.hout * lc.wout + 54 * lc.wout + 54] - pixel_value);
+			fabsf(res[0 * lc.hout * lc.wout + 54 * lc.wout + 54] - pixel_value);
 
 		eraseCharactersTerminal(10);
 		if (error < 0.1) {
@@ -1221,7 +1225,7 @@ void Maxpool_core_init(Core *core) {
 
 matrix_t *
 	Maxpool_core_setup(XMaxpool_core *Maxpool_core, LayerConf lc, matrix_t *x) {
-	printf("- Setup Maxpool_core: ");
+	printf("Setup...");
 	XMaxpool_core_Set_x(Maxpool_core, (u32)(u64) x);
 	XMaxpool_core_Set_d(Maxpool_core, lc.din);
 	XMaxpool_core_Set_hin(Maxpool_core, lc.hin);
@@ -1239,7 +1243,7 @@ matrix_t *
 		exit(XST_FAILURE);
 	}
 	XMaxpool_core_Set_res(Maxpool_core, (u32)(u64) resAddr);
-	printf("%sSuccess%s\n", KGRN, KNRM);
+	eraseCharactersTerminal(8);
 	return resAddr;
 }
 
@@ -1324,15 +1328,13 @@ int Maxpool_core_test(u32 testAllCores) {
 
 	Maxpool_conf_params_complete(&lc);
 
-	printf("- Initializing Memory: ");
-	matrix_t *x = (matrix_t *) malloc(lc.xSize * sizeof(matrix_t));
-	for (u32 i = 0; i < lc.xSize; i++) x[i] = X_VALUE;
-	printf("%sSuccess%s\n", KGRN, KNRM);
-
 	int status = XST_SUCCESS;
 	u32 core_num = testAllCores ? MAXPOOL_CORES_NUM : 1;
 	for (u32 core = 0; core < core_num; core++) {
 		printf("- Maxpool_core[%u]: ", core);
+
+		matrix_t *x = (matrix_t *) malloc(lc.xSize * sizeof(matrix_t));
+		for (u32 i = 0; i < lc.xSize; i++) x[i] = X_VALUE;
 
 		matrix_t *res = (*lc.hw_func)(lc, x);
 
@@ -1342,7 +1344,7 @@ int Maxpool_core_test(u32 testAllCores) {
 		matrix_t error = 0;
 
 		for (u32 i = 0; i < lc.resSize; i++) {
-			error += abs(res[i] - pixel_value);
+			error += fabsf(res[i] - pixel_value);
 		}
 
 		eraseCharactersTerminal(10);
@@ -1504,7 +1506,7 @@ void Linear_core_init(Core *core) {
 
 matrix_t *
 	Linear_core_setup(XLinear_core *Linear_core, LayerConf lc, matrix_t *x) {
-	printf("- Setup Linear_core: ");
+	printf("Setup...");
 	XLinear_core_Set_x(Linear_core, (u32)(u64) x);
 	XLinear_core_Set_weights(Linear_core, (u32)(u64) lc.weightsAddr);
 	XLinear_core_Set_bias(Linear_core, (u32)(u64) lc.biasAddr);
@@ -1520,7 +1522,7 @@ matrix_t *
 		exit(XST_FAILURE);
 	}
 	XLinear_core_Set_res(Linear_core, (u32)(u64) resAddr);
-	printf("%sSuccess%s\n", KGRN, KNRM);
+	eraseCharactersTerminal(8);
 	return resAddr;
 }
 
@@ -1605,9 +1607,6 @@ int Linear_core_test(u32 testAllCores) {
 	Linear_conf_params_complete(&lc);
 
 	printf("- Initializing Memory: ");
-	matrix_t *x = (matrix_t *) malloc(lc.xSize * sizeof(matrix_t));
-	for (u32 i = 0; i < lc.xSize; i++) x[i] = X_VALUE;
-
 	lc.weightsAddr = (matrix_t *) malloc(lc.weightsSize * sizeof(matrix_t));
 	for (u32 i = 0; i < lc.weightsSize; i++) lc.weightsAddr[i] = WEIGHT_VALUE;
 
@@ -1618,7 +1617,10 @@ int Linear_core_test(u32 testAllCores) {
 	int status = XST_SUCCESS;
 	u32 core_num = testAllCores ? LINEAR_CORES_NUM : 1;
 	for (u32 core = 0; core < core_num; core++) {
-		printf("- Maxpool_core[%u]: ", core);
+		printf("- Linear_core[%u]: ", core);
+
+		matrix_t *x = (matrix_t *) malloc(lc.xSize * sizeof(matrix_t));
+		for (u32 i = 0; i < lc.xSize; i++) x[i] = X_VALUE;
 
 		matrix_t *res = (*lc.hw_func)(lc, x);
 
@@ -1628,12 +1630,12 @@ int Linear_core_test(u32 testAllCores) {
 			X_VALUE * WEIGHT_VALUE * lc.inFeatures + BIAS_VALUE;
 		matrix_t error = 0;
 
-		for (u32 i = 0; i < lc.resSize; i++) {
-			error += abs(res[i] - pixel_value);
-		}
+		for (u32 i = 0; i < lc.resSize; i++)
+			error += fabsf(res[i] - pixel_value);
 
 		eraseCharactersTerminal(10);
-		if (error < 0.1) {
+		// Todo: Check correctness
+		if (error / lc.resSize < 0.2) {
 			printf("%sSuccess%s\n", KGRN, KNRM);
 		} else {
 			printf("%sError %f%s\n", KRED, error, KNRM);
@@ -1861,6 +1863,7 @@ void setup_stdout() {
 	setbuf(stdout, NULL); // No printf flushing needed
 	printf("\033[2J");	  // Clear terminal
 	printf("\033[H");	  // Move cursor to the home position
+	printf("\033[?25l");  // Hide cursor
 }
 
 void setup_cache() {
