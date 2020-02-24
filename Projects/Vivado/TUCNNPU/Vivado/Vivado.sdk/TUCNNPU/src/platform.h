@@ -84,6 +84,33 @@ void eraseCurrentLine() {
 	printf("\r\033[K");
 }
 
+void clearTerminal() {
+	printf("\033[2J"); // Clear terminal
+	printf("\033[H");  // Move cursor to the home position
+}
+
+u32 askYesDefault(char *question) {
+	char ans;
+	do {
+		printf("%s [Y/n]: ", question);
+		scanf("%c", &ans);
+		printf("%c\n", ans);
+	} while (ans != '\0' && ans != 'y' && ans != 'n' && ans != 'Y' && ans != 'N');
+
+	return (ans == '\0' || ans == 'y' || ans == 'Y') ? 1 : 0;
+}
+
+u32 askNoDefault(char *question) {
+	char ans;
+	do {
+		printf("%s [y/N]: ", question);
+		scanf("%c", &ans);
+		printf("%c\n", ans);
+	} while (ans != '\0' && ans != 'y' && ans != 'n' && ans != 'Y' && ans != 'N');
+
+	return (ans == '\0' || ans == 'n' || ans == 'N') ? 1 : 0;
+}
+
 // ----------------------------------------------
 
 /**
@@ -143,8 +170,12 @@ matrix_t *createMatrix(u32 dim) {
  * @returns the pointer of the allocated and initialized FloatMatrix
  */
 matrix_t *zeroMatrix(u32 dim) {
-	matrix_t *res = createMatrix(dim);
-	for (u32 i = 0; i < dim; i++) res[i] = 0;
+	matrix_t *res = calloc(dim, sizeof(matrix_t));
+	if (res == NULL) {
+		printf("%sError. Not enough memory for zeroMatrix." KRED, KNRM);
+		exit(XST_FAILURE);
+	}
+
 	return res;
 }
 
@@ -406,7 +437,7 @@ matrix_t **loadParameters(char *filename) {
 		/** Allocate the needed memory to store all the parameters */
 		params[p] = (matrix_t *) malloc(xLen * sizeof(matrix_t));
 		if (params[p] == NULL) {
-			eraseCharactersTerminal(7);
+			eraseCharactersTerminal(9);
 			printf(
 				"%sError. Not enough memory on loadParameters for "
 				"params[%d].%s\n",
@@ -422,7 +453,7 @@ matrix_t **loadParameters(char *filename) {
 			params[p][i] = readFloat(&f);
 		}
 
-		eraseCharactersTerminal(7);
+		eraseCharactersTerminal(9);
 	}
 	printf("%sSuccess%s\n", KGRN, KNRM);
 
@@ -1868,8 +1899,7 @@ int Network_test() {
 
 void setup_stdout() {
 	setbuf(stdout, NULL); // No printf flushing needed
-	printf("\033[2J");	  // Clear terminal
-	printf("\033[H");	  // Move cursor to the home position
+	clearTerminal();
 	printf("\033[?25l");  // Hide cursor
 }
 
