@@ -335,12 +335,14 @@ char *selectFilePath(char *filesDir, char *msg) {
 	}
 
 	u32 selection;
-	printf("Select a number [1-%d]: ", configsList->length);
+	printf("- Select a number [1-%d]: ", configsList->length);
 	scanf("%d", &selection);
+	printf("%d\n", selection);
 	while (selection <= 0 || selection > configsList->length) {
 		printf("\n%sWrong input.%s\n", KRED, KNRM);
 		printf("Select a number [1-%d]: ", configsList->length);
 		scanf("%d", &selection);
+		printf("%d\n", selection);
 	}
 
 	char *path = (char *) malloc(200 * sizeof(char));
@@ -351,13 +353,22 @@ char *selectFilePath(char *filesDir, char *msg) {
 	return path;
 }
 
+char *getFilenameFromPath(char *filepath) {
+	char *filename = (strrchr(filepath, '/')) + 1;
+	char *ext = strchr(filepath, '.');
+	char *res = (char *) malloc(200 * sizeof(char));
+	strcpy(res, filename);
+	res[ext - filename] = '\0';
+	return res;
+}
+
 /**
  * Loads the network's parameters using the file defined on the parametersPath
  * global variable.
  * @returns a Params structure pointer containing the loaded network parameters.
  */
 matrix_t **loadParameters(char *filename) {
-	printf("- Loading \"%s\": 00%%", filename);
+	printf("- Loading \"%s\": ", filename);
 
 	/** Open the parameters file */
 	FIL f = open_file(filename);
@@ -371,7 +382,6 @@ matrix_t **loadParameters(char *filename) {
 	 */
 	matrix_t **params = (matrix_t **) malloc(params_len * sizeof(matrix_t *));
 	if (params == NULL) {
-		eraseCharactersTerminal(3);
 		printf(
 			"%sError. Not enough memory on loadParameters for params.%s\n",
 			KRED,
@@ -381,6 +391,8 @@ matrix_t **loadParameters(char *filename) {
 
 	/** For every parameters set */
 	for (u32 p = 0; p < params_len; p++) {
+		printf("(%03d/%03d)", p + 1, params_len);
+
 		/** Get the number of dimensions this parameters set consists of */
 		u32 matrix_dimsNum = readUInt(&f);
 
@@ -394,7 +406,7 @@ matrix_t **loadParameters(char *filename) {
 		/** Allocate the needed memory to store all the parameters */
 		params[p] = (matrix_t *) malloc(xLen * sizeof(matrix_t));
 		if (params[p] == NULL) {
-			eraseCharactersTerminal(3);
+			eraseCharactersTerminal(7);
 			printf(
 				"%sError. Not enough memory on loadParameters for "
 				"params[%d].%s\n",
@@ -410,10 +422,8 @@ matrix_t **loadParameters(char *filename) {
 			params[p][i] = readFloat(&f);
 		}
 
-		eraseCharactersTerminal(3);
-		printf("%02d%%", (p * 100) / params_len);
+		eraseCharactersTerminal(7);
 	}
-	eraseCharactersTerminal(3);
 	printf("%sSuccess%s\n", KGRN, KNRM);
 
 	close_file(f);
@@ -619,33 +629,32 @@ NetConf *read_config(char *path) {
 	return netConf;
 }
 
+void layer_conf_complete(NetConf *netConf);
+
 NetConf *selectNetConf(
 	char *configsDir,
 	char *labelsDir,
 	char *paramsDir,
 	char *imagesDir) {
 	char *configFile =
-		selectFilePath(configsDir, "- Select network configuration:\n");
-	char *configParentDir = (char *) malloc(200 * sizeof(char));
-	char *configName = (char *) malloc(200 * sizeof(char));
-	sscanf(configFile, "%s/%s.conf", configParentDir, configName);
+		selectFilePath(configsDir, "- Network configurations available:\n");
+	printf("\n");
 
-	char *labelsFile = (char *) malloc(200 * sizeof(char));
+	char *configName = getFilenameFromPath(configFile);
+	char labelsFile[200];
 	sprintf(labelsFile, "%s/%s.labels", labelsDir, configName);
 
-	char *paramsFile = (char *) malloc(200 * sizeof(char));
+	char paramsFile[200];
 	sprintf(paramsFile, "%s/%s.params", paramsDir, configName);
 
 	NetConf *netConf = read_config(configFile);
 	netConf->labels = loadLabels(labelsFile);
 	netConf->params = loadParameters(paramsFile);
 	netConf->imagesPaths = getFilelist(imagesDir);
+	layer_conf_complete(netConf);
 
 	free(configFile);
-	free(configParentDir);
 	free(configName);
-	free(labelsFile);
-	free(paramsFile);
 
 	return netConf;
 }
@@ -1680,16 +1689,14 @@ void layer_conf_complete(NetConf *netConf) {
  * likely it is for the input image to be of a class in a logarithmic scale.
  */
 matrix_t *forward(NetConf *netConf, matrix_t *x, u32 useHW) {
-	printf("000/%03d", netConf->layersNum);
 	for (u32 i = 0; i < netConf->layersNum; i++) {
-		eraseCharactersTerminal(7);
-		printf("%03d/%03d", i, netConf->layersNum);
+		printf("(%03d/%03d) ", i + 1, netConf->layersNum);
 		if (useHW)
 			x = (*netConf->layersConf[i].hw_func)(netConf->layersConf[i], x);
 		else
 			x = (*netConf->layersConf[i].sw_func)(netConf->layersConf[i], x);
+		eraseCharactersTerminal(10);
 	}
-	// eraseCharactersTerminal(7);
 	return x;
 }
 
@@ -1847,9 +1854,9 @@ int Network_test() {
 	}
 	printf("%sSuccess%s\n", KGRN, KNRM);
 
-	printf("- Forwarding...\n");
+	printf("- Forwarding: ");
 	matrix_t *res = forward(&netConf, xAddr, 1);
-	printf("- %sForwarded Successfully%s\n", KGRN, KNRM);
+	printf("%sSuccess%s\n", KGRN, KNRM);
 
 	for (u32 i = 0; i < params_index; i++) free(params[i]);
 	free(res);
