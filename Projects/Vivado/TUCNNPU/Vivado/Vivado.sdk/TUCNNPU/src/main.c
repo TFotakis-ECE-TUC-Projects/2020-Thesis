@@ -16,7 +16,6 @@
 #define RUN_FOR_NUM_IMAGES 5
 
 void runTests() {
-	printf("\n");
 	Conv_core_test(TEST_ALL_CORES);
 	printf("\n");
 	Maxpool_core_test(TEST_ALL_CORES);
@@ -29,8 +28,10 @@ void runTests() {
 void setup() {
 	setup_platform("*** Starting ***\n");
 	mount_sd();
+	printf("\n");
 
-	runTests();
+	// runTests();
+	// printf("\n");
 }
 
 void loop() {
@@ -38,7 +39,7 @@ void loop() {
 		NetConf *netConf =
 			selectNetConf(CONFIGS_DIR, LABELS_DIR, PARAMS_DIR, IMAGES_DIR);
 
-		printf("*** Starting Inference ***\n\n");
+		printf("\n*** Starting Inference ***\n");
 		inference(netConf, RUN_FOR_NUM_IMAGES, USE_SELF_CHECK);
 		printf("\n*** Inference finished ***\n");
 
