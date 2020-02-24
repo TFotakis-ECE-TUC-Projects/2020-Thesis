@@ -95,9 +95,9 @@ u32 askYesDefault(char *question) {
 		printf("%s [Y/n]: ", question);
 		scanf("%c", &ans);
 		printf("%c\n", ans);
-	} while (ans != '\0' && ans != 'y' && ans != 'n' && ans != 'Y' && ans != 'N');
+	} while (ans != '\r' && ans != 'y' && ans != 'n' && ans != 'Y' && ans != 'N');
 
-	return (ans == '\0' || ans == 'y' || ans == 'Y') ? 1 : 0;
+	return (ans == '\r' || ans == 'y' || ans == 'Y') ? 1 : 0;
 }
 
 u32 askNoDefault(char *question) {
@@ -106,9 +106,9 @@ u32 askNoDefault(char *question) {
 		printf("%s [y/N]: ", question);
 		scanf("%c", &ans);
 		printf("%c\n", ans);
-	} while (ans != '\0' && ans != 'y' && ans != 'n' && ans != 'Y' && ans != 'N');
+	} while (ans != '\r' && ans != 'y' && ans != 'n' && ans != 'Y' && ans != 'N');
 
-	return (ans == '\0' || ans == 'n' || ans == 'N') ? 1 : 0;
+	return (ans == '\r' || ans == 'n' || ans == 'N') ? 0 : 1;
 }
 
 // ----------------------------------------------
@@ -721,7 +721,7 @@ int mount_sd() {
  * convoluting
  * @returns a FloatMatrix pointer containing the convolution's result
  */
-matrix_t *Conv_sw(matrix_t *x, LayerConf lc) {
+matrix_t *Conv_sw(LayerConf lc, matrix_t *x) {
 	matrix_t *res = zeroMatrix(lc.resSize);
 
 	/** For every output channel */
@@ -1099,7 +1099,7 @@ int Conv_core_test(u32 testAllCores) {
  * @param[in] lc.stride: The amount of pixels to skip for every pool
  * @returns a FloatMatrix pointer containing the max pooling's result
  */
-matrix_t *Maxpool_sw(matrix_t *x, LayerConf lc) {
+matrix_t *Maxpool_sw(LayerConf lc, matrix_t *x) {
 	matrix_t *res = zeroMatrix(lc.resSize);
 
 	/** For every channel */
@@ -1408,7 +1408,7 @@ int Maxpool_core_test(u32 testAllCores) {
  * @param[in] lc: The Layer Configuration
  * @returns a FloatMatrix pointer containing the linear transformation's result
  */
-matrix_t *Linear_sw(matrix_t *x, LayerConf lc) {
+matrix_t *Linear_sw(LayerConf lc, matrix_t *x) {
 	/** Allocate and create a 1D matrix to store the result */
 	matrix_t *res = createMatrix(lc.resSize);
 
@@ -1751,7 +1751,10 @@ int inference(NetConf *netConf, u32 runForNumImages, u32 selfCheck) {
 		/** Pass the image through the network */
 		matrix_t *x_hw = forward(netConf, x, 1);
 		matrix_t *x_sw = NULL;
-		if (selfCheck) x_sw = forward(netConf, x, 0);
+		if (selfCheck) {
+			x = loadImage(netConf->imagesPaths->list[i]);
+			x_sw = forward(netConf, x, 0);
+		}
 
 		/** Find the class with the greatest likelihood and print its label
 		 */
