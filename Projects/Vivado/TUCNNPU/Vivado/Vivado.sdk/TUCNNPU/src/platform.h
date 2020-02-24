@@ -78,13 +78,7 @@ typedef struct {
  * @param[in] k: The column dimension
  * @returns the 1D representation's index of a 3D matrix
  */
-u32 calc3DIndex(
-	u32 dim0,
-	u32 dim1,
-	u32 dim2,
-	u32 i,
-	u32 j,
-	u32 k) {
+u32 calc3DIndex(u32 dim0, u32 dim1, u32 dim2, u32 i, u32 j, u32 k) {
 	return k + j * dim2 + i * dim1 * dim2;
 }
 
@@ -175,8 +169,7 @@ void freeFilelist(Filelist *fl) {
 }
 
 void freeNetConf(NetConf *netConf) {
-	u32 labelsNum =
-		netConf->layersConf[netConf->layersNum - 1].outFeatures;
+	u32 labelsNum = netConf->layersConf[netConf->layersNum - 1].outFeatures;
 	freeLayerConf(netConf->layersConf, netConf->layersNum);
 	free(netConf->params);
 
@@ -615,7 +608,6 @@ NetConf *selectNetConf(
 	char *labelsDir,
 	char *paramsDir,
 	char *imagesDir) {
-
 	char *configFile =
 		selectFilePath(configsDir, "- Select network configuration:\n");
 	char *configParentDir = (char *) malloc(200 * sizeof(char));
@@ -700,8 +692,7 @@ matrix_t *Conv_sw(matrix_t *x, LayerConf lc) {
 				/** Initialize output pixel */
 				matrix_t pixel = lc.biasAddr[out_channel];
 				/** For every input channel */
-				for (u32 in_channel = 0; in_channel < lc.din;
-					 in_channel++) {
+				for (u32 in_channel = 0; in_channel < lc.din; in_channel++) {
 					/** For lc.kernelSize rows on padded matrix */
 					for (u32 i = iStart; i < iEnd; i++) {
 						/** For lc.kernelSize pixels on each padded matrix's row
@@ -873,9 +864,9 @@ void Conv_core_init(Core *core, XScuGic ScuGic) {
 
 matrix_t *Conv_core_setup(XConv_core *Conv_core, LayerConf lc, matrix_t *x) {
 	printf("Setup...");
-	XConv_core_Set_x(Conv_core, (u32) (u64) x);
-	XConv_core_Set_weights(Conv_core, (u32) (u64) lc.weightsAddr);
-	XConv_core_Set_bias(Conv_core, (u32) (u64) lc.biasAddr);
+	XConv_core_Set_x(Conv_core, (u32)(u64) x);
+	XConv_core_Set_weights(Conv_core, (u32)(u64) lc.weightsAddr);
+	XConv_core_Set_bias(Conv_core, (u32)(u64) lc.biasAddr);
 	XConv_core_Set_din(Conv_core, lc.din);
 	XConv_core_Set_hin(Conv_core, lc.hin);
 	XConv_core_Set_win(Conv_core, lc.win);
@@ -893,7 +884,7 @@ matrix_t *Conv_core_setup(XConv_core *Conv_core, LayerConf lc, matrix_t *x) {
 			KNRM);
 		exit(XST_FAILURE);
 	}
-	XConv_core_Set_res(Conv_core, (u32) (u64) resAddr);
+	XConv_core_Set_res(Conv_core, (u32)(u64) resAddr);
 	printf("\b\b\b\b\b\b\b\b");
 	return resAddr;
 }
@@ -941,10 +932,7 @@ void Conv_conf_params_complete(LayerConf *lc) {
 	lc->sw_func = &Conv_sw;
 }
 
-void Conv_conf_complete(
-	NetConf *netConf,
-	u32 layer_index,
-	u32 params_index) {
+void Conv_conf_complete(NetConf *netConf, u32 layer_index, u32 params_index) {
 	LayerConf *lc = &netConf->layersConf[layer_index];
 	if (layer_index > 0) {
 		LayerConf *plc = &netConf->layersConf[layer_index - 1];
@@ -993,8 +981,7 @@ int Conv_core_test(u32 testAllCores) {
 	for (u32 i = 0; i < lc.xSize; i++) x[i] = X_VALUE;
 
 	lc.weightsAddr = (matrix_t *) malloc(lc.weightsSize * sizeof(matrix_t));
-	for (u32 i = 0; i < lc.weightsSize; i++)
-		lc.weightsAddr[i] = WEIGHT_VALUE;
+	for (u32 i = 0; i < lc.weightsSize; i++) lc.weightsAddr[i] = WEIGHT_VALUE;
 
 	lc.biasAddr = (matrix_t *) malloc(lc.biasSize * sizeof(matrix_t));
 	for (u32 i = 0; i < lc.biasSize; i++) lc.biasAddr[i] = BIAS_VALUE;
@@ -1096,8 +1083,7 @@ matrix_t *Maxpool_sw(matrix_t *x, LayerConf lc) {
 				 * Calculate the 1-dimensional representation's index of the
 				 * output matrix
 				 */
-				u32 resIndex =
-					calc3DIndex(lc.dout, lc.hout, lc.wout, i, j, k);
+				u32 resIndex = calc3DIndex(lc.dout, lc.hout, lc.wout, i, j, k);
 
 				/** Assign found max value to the output matrix */
 				res[resIndex] = max;
@@ -1227,7 +1213,7 @@ void Maxpool_core_init(Core *core, XScuGic ScuGic) {
 matrix_t *
 	Maxpool_core_setup(XMaxpool_core *Maxpool_core, LayerConf lc, matrix_t *x) {
 	printf("- Setup Maxpool_core: ");
-	XMaxpool_core_Set_x(Maxpool_core, (u32) (u64) x);
+	XMaxpool_core_Set_x(Maxpool_core, (u32)(u64) x);
 	XMaxpool_core_Set_d(Maxpool_core, lc.din);
 	XMaxpool_core_Set_hin(Maxpool_core, lc.hin);
 	XMaxpool_core_Set_win(Maxpool_core, lc.win);
@@ -1243,7 +1229,7 @@ matrix_t *
 			KNRM);
 		exit(XST_FAILURE);
 	}
-	XMaxpool_core_Set_res(Maxpool_core, (u32) (u64) resAddr);
+	XMaxpool_core_Set_res(Maxpool_core, (u32)(u64) resAddr);
 	printf("%sSuccess%s\n", KGRN, KNRM);
 	return resAddr;
 }
@@ -1512,9 +1498,9 @@ void Linear_core_init(Core *core, XScuGic ScuGic) {
 matrix_t *
 	Linear_core_setup(XLinear_core *Linear_core, LayerConf lc, matrix_t *x) {
 	printf("- Setup Linear_core: ");
-	XLinear_core_Set_x(Linear_core, (u32) (u64) x);
-	XLinear_core_Set_weights(Linear_core, (u32) (u64) lc.weightsAddr);
-	XLinear_core_Set_bias(Linear_core, (u32) (u64) lc.biasAddr);
+	XLinear_core_Set_x(Linear_core, (u32)(u64) x);
+	XLinear_core_Set_weights(Linear_core, (u32)(u64) lc.weightsAddr);
+	XLinear_core_Set_bias(Linear_core, (u32)(u64) lc.biasAddr);
 	XLinear_core_Set_in_features(Linear_core, lc.inFeatures);
 	XLinear_core_Set_out_features(Linear_core, lc.outFeatures);
 	XLinear_core_Set_doReLU(Linear_core, lc.doReLU);
@@ -1526,7 +1512,7 @@ matrix_t *
 			KNRM);
 		exit(XST_FAILURE);
 	}
-	XLinear_core_Set_res(Linear_core, (u32) (u64) resAddr);
+	XLinear_core_Set_res(Linear_core, (u32)(u64) resAddr);
 	printf("%sSuccess%s\n", KGRN, KNRM);
 	return resAddr;
 }
@@ -1573,10 +1559,7 @@ void Linear_conf_params_complete(LayerConf *lc) {
 	lc->sw_func = &Linear_sw;
 }
 
-void Linear_conf_complete(
-	NetConf *netConf,
-	u32 layer_index,
-	u32 params_index) {
+void Linear_conf_complete(NetConf *netConf, u32 layer_index, u32 params_index) {
 	LayerConf *lc = &netConf->layersConf[layer_index];
 	if (layer_index > 0) {
 		LayerConf *plc = &netConf->layersConf[layer_index - 1];
@@ -1620,8 +1603,7 @@ int Linear_core_test(u32 testAllCores) {
 	for (u32 i = 0; i < lc.xSize; i++) x[i] = X_VALUE;
 
 	lc.weightsAddr = (matrix_t *) malloc(lc.weightsSize * sizeof(matrix_t));
-	for (u32 i = 0; i < lc.weightsSize; i++)
-		lc.weightsAddr[i] = WEIGHT_VALUE;
+	for (u32 i = 0; i < lc.weightsSize; i++) lc.weightsAddr[i] = WEIGHT_VALUE;
 
 	lc.biasAddr = (matrix_t *) malloc(lc.biasSize * sizeof(matrix_t));
 	for (u32 i = 0; i < lc.biasSize; i++) lc.biasAddr[i] = BIAS_VALUE;
@@ -1714,10 +1696,7 @@ matrix_t *forward(NetConf *netConf, matrix_t *x, u32 useHW) {
  * @param[in] labels: The network's classes' labels
  * @returns the time needed in milliseconds for the forward pass to complete.
  */
-int inference(
-	NetConf *netConf,
-	u32 runForNumImages,
-	u32 selfCheck) {
+int inference(NetConf *netConf, u32 runForNumImages, u32 selfCheck) {
 	if (runForNumImages == 0 || runForNumImages > netConf->imagesPaths->length)
 		runForNumImages = netConf->imagesPaths->length;
 
@@ -1732,11 +1711,9 @@ int inference(
 
 		/** Find the class with the greatest likelihood and print its label
 		 */
-		u32 xSize =
-			netConf->layersConf[netConf->layersNum - 1].resSize;
+		u32 xSize = netConf->layersConf[netConf->layersNum - 1].resSize;
 		u32 topClass_hw = argmax(x_hw, xSize);
-		u32 topClass_sw =
-			selfCheck ? argmax(x_sw, xSize) : topClass_hw;
+		u32 topClass_sw = selfCheck ? argmax(x_sw, xSize) : topClass_hw;
 
 		if (topClass_hw == topClass_sw)
 			printf("%s\n", netConf->labels[topClass_sw]);
@@ -1878,8 +1855,8 @@ int Network_test() {
 
 void setup_stdout() {
 	setbuf(stdout, NULL); // No printf flushing needed
-	printf("\033[2J");	// Clear terminal
-	printf("\033[H");	 // Move cursor to the home position
+	printf("\033[2J");	  // Clear terminal
+	printf("\033[H");	  // Move cursor to the home position
 }
 
 void setup_cache() {
