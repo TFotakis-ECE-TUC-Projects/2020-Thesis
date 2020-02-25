@@ -9,7 +9,7 @@
 #define RUN_FOR_NUM_IMAGES 5
 
 void runTests() {
-	if (askNoDefault("- Run tests?")) return;
+	if (!askNoDefault("- Run tests?")) return;
 
 	u32 testAllCores = askNoDefault("- Test all core instances?");
 	Conv_core_test(testAllCores);
