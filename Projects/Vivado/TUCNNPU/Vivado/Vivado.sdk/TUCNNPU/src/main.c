@@ -49,5 +49,6 @@ void loop() {
 int main() {
 	setup();
 	loop();
+	cleanup_platform();
 	return XST_SUCCESS;
 }

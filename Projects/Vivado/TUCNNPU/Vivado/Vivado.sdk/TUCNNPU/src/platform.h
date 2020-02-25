@@ -95,7 +95,8 @@ u32 askYesDefault(char *question) {
 		printf("%s [Y/n]: ", question);
 		scanf("%c", &ans);
 		printf("%c\n", ans);
-	} while (ans != '\r' && ans != 'y' && ans != 'n' && ans != 'Y' && ans != 'N');
+	} while (ans != '\r' && ans != 'y' && ans != 'n' && ans != 'Y' &&
+			 ans != 'N');
 
 	return (ans == '\r' || ans == 'y' || ans == 'Y') ? 1 : 0;
 }
@@ -106,7 +107,8 @@ u32 askNoDefault(char *question) {
 		printf("%s [y/N]: ", question);
 		scanf("%c", &ans);
 		printf("%c\n", ans);
-	} while (ans != '\r' && ans != 'y' && ans != 'n' && ans != 'Y' && ans != 'N');
+	} while (ans != '\r' && ans != 'y' && ans != 'n' && ans != 'Y' &&
+			 ans != 'N');
 
 	return (ans == '\r' || ans == 'n' || ans == 'N') ? 0 : 1;
 }
@@ -212,17 +214,18 @@ void freeLayerConf(LayerConf *lc, u32 layersNum) {
 
 void freeFilelist(Filelist *fl) {
 	for (u32 f = 0; f < fl->length; f++) free(fl->list[f]);
+	free(fl->list);
 	free(fl);
 }
 
 void freeNetConf(NetConf *netConf) {
 	u32 labelsNum = netConf->layersConf[netConf->layersNum - 1].outFeatures;
 	freeLayerConf(netConf->layersConf, netConf->layersNum);
+
 	free(netConf->params);
 
-	for (u32 label = 0; label < labelsNum; label++) {
+	for (u32 label = 0; label < labelsNum; label++)
 		free(netConf->labels[label]);
-	}
 	free(netConf->labels);
 
 	freeFilelist(netConf->imagesPaths);
@@ -271,7 +274,10 @@ Filelist *getFilelist(char *path) {
 
 	Filelist *filelist = (Filelist *) malloc(sizeof(Filelist));
 	if (filelist == NULL) {
-		printf("%sError. Not enough memory.%s\n", KRED, KNRM);
+		printf(
+			"%sError. Not enough memory for filelist in getFilelist.%s\n",
+			KRED,
+			KNRM);
 		exit(XST_FAILURE);
 	}
 
@@ -298,7 +304,10 @@ Filelist *getFilelist(char *path) {
 
 	char **pathsArr = (char **) malloc(filesCount * sizeof(char *));
 	if (pathsArr == NULL) {
-		printf("%sError. Not enough memory.%s\n", KRED, KNRM);
+		printf(
+			"%sError. Not enough memory for pathsArr in getFilelist.%s\n",
+			KRED,
+			KNRM);
 		exit(XST_FAILURE);
 	}
 
@@ -376,7 +385,15 @@ char *selectFilePath(char *filesDir, char *msg) {
 		printf("%d\n", selection);
 	}
 
-	char *path = (char *) malloc(200 * sizeof(char));
+	char *path = (char *) malloc(
+		(strlen(configsList->list[selection - 1]) + 1) * sizeof(char));
+	if (path == NULL) {
+		printf(
+			"%sError. Not enough memory for path in selectFilePath.%s\n",
+			KRED,
+			KNRM);
+		exit(XST_FAILURE);
+	}
 	strcpy(path, configsList->list[selection - 1]);
 
 	freeFilelist(configsList);
@@ -387,7 +404,14 @@ char *selectFilePath(char *filesDir, char *msg) {
 char *getFilenameFromPath(char *filepath) {
 	char *filename = (strrchr(filepath, '/')) + 1;
 	char *ext = strchr(filepath, '.');
-	char *res = (char *) malloc(200 * sizeof(char));
+	char *res = (char *) malloc((strlen(filename) + 1) * sizeof(char));
+	if (res == NULL) {
+		printf(
+			"%sError. Not enough memory for res in getFilenameFromPath.%s\n",
+			KRED,
+			KNRM);
+		exit(XST_FAILURE);
+	}
 	strcpy(res, filename);
 	res[ext - filename] = '\0';
 	return res;
@@ -449,17 +473,18 @@ matrix_t **loadParameters(char *filename) {
 
 		u32 bytes_read;
 
-		FRESULT fRes = f_read(&f, params[p], xLen * sizeof(matrix_t), &bytes_read);
+		FRESULT fRes =
+			f_read(&f, params[p], xLen * sizeof(matrix_t), &bytes_read);
 		if (fRes != FR_OK || bytes_read != xLen * sizeof(matrix_t)) {
 			printf("%sError %d. Cannot read parameters.%s\n", KRED, fRes, KNRM);
 			exit(XST_FAILURE);
 		}
 
-//		/** For every parameter */
-//		for (u32 i = 0; i < xLen; i++) {
-//			/** Read parameter */
-//			params[p][i] = readFloat(&f);
-//		}
+		//		/** For every parameter */
+		//		for (u32 i = 0; i < xLen; i++) {
+		//			/** Read parameter */
+		//			params[p][i] = readFloat(&f);
+		//		}
 
 		eraseCharactersTerminal(9);
 	}
@@ -492,7 +517,10 @@ char **loadLabels(char *labelsPath) {
 	/** Allocate the needed memory to store the labels array */
 	char **labels = (char **) malloc(labelsNum * sizeof(char *));
 	if (labels == NULL) {
-		printf("%sError. Not enough memory.%s\n", KRED, KNRM);
+		printf(
+			"%sError. Not enough memory for labels on loadLabels.%s\n",
+			KRED,
+			KNRM);
 		exit(XST_FAILURE);
 	}
 
@@ -912,6 +940,14 @@ int Conv_core_setup_interrupt(Core *core) {
 void Conv_core_init(Core *core) {
 	printf("- Initializing Conv_core %u: ", core->InstanceId);
 	core->InstancePtr = (void *) malloc(sizeof(XConv_core));
+	if (core->InstancePtr == NULL) {
+		printf(
+			"%sError. Not enough memory for core->InstancePtr in "
+			"Conv_core_init.%s\n",
+			KRED,
+			KNRM);
+		exit(XST_FAILURE);
+	}
 	int status = XConv_core_Initialize(
 		core->InstancePtr, Conv_core_device_ids[core->InstanceId]);
 	if (status != XST_SUCCESS) {
@@ -1001,8 +1037,7 @@ void Conv_conf_complete(NetConf *netConf, u32 layer_index, u32 params_index) {
 		LayerConf *plc = &netConf->layersConf[layer_index - 1];
 		if (plc->layerType == LINEAR_RELU_LAYER_TYPE ||
 			plc->layerType == LINEAR_LAYER_TYPE) {
-			printf("Error. Linear layer cannot be followed by Conv "
-				   "layer.\n");
+			printf("Error. Linear layer cannot be followed by Conv layer.\n");
 			exit(XST_FAILURE);
 		}
 		lc->din = plc->dout;
@@ -1041,9 +1076,24 @@ int Conv_core_test(u32 testAllCores) {
 
 	printf("- Initializing Memory: ");
 	lc.weightsAddr = (matrix_t *) malloc(lc.weightsSize * sizeof(matrix_t));
+	if (lc.weightsAddr == NULL) {
+		printf(
+			"%sError. Not enough memory for lc.weightsAddr in "
+			"Conv_core_test.%s\n",
+			KRED,
+			KNRM);
+		exit(XST_FAILURE);
+	}
 	for (u32 i = 0; i < lc.weightsSize; i++) lc.weightsAddr[i] = WEIGHT_VALUE;
 
 	lc.biasAddr = (matrix_t *) malloc(lc.biasSize * sizeof(matrix_t));
+	if (lc.biasAddr == NULL) {
+		printf(
+			"%sError. Not enough memory for lc.biasAddr in Conv_core_test.%s\n",
+			KRED,
+			KNRM);
+		exit(XST_FAILURE);
+	}
 	for (u32 i = 0; i < lc.biasSize; i++) lc.biasAddr[i] = BIAS_VALUE;
 	printf("%sSuccess%s\n", KGRN, KNRM);
 
@@ -1053,6 +1103,13 @@ int Conv_core_test(u32 testAllCores) {
 		printf("- Conv_core[%u]: ", core);
 
 		matrix_t *x = (matrix_t *) malloc(lc.xSize * sizeof(matrix_t));
+		if (x == NULL) {
+			printf(
+				"%sError. Not enough memory for x in Conv_core_test.%s\n",
+				KRED,
+				KNRM);
+			exit(XST_FAILURE);
+		}
 		for (u32 i = 0; i < lc.xSize; i++) x[i] = X_VALUE;
 
 		matrix_t *res = (*lc.hw_func)(lc, x);
@@ -1257,6 +1314,14 @@ int Maxpool_core_setup_interrupt(Core *core) {
 void Maxpool_core_init(Core *core) {
 	printf("- Initializing Maxpool_core %u: ", core->InstanceId);
 	core->InstancePtr = (void *) malloc(sizeof(XMaxpool_core));
+	if (core->InstancePtr == NULL) {
+		printf(
+			"%sError. Not enough memory for core->InstancePtr in "
+			"Maxpool_core_init.%s\n",
+			KRED,
+			KNRM);
+		exit(XST_FAILURE);
+	}
 	int status = XMaxpool_core_Initialize(
 		core->InstancePtr, Maxpool_core_device_ids[core->InstanceId]);
 	if (status != XST_SUCCESS) {
@@ -1342,8 +1407,8 @@ void Maxpool_conf_complete(NetConf *netConf, u32 layer_index) {
 		LayerConf *plc = &netConf->layersConf[layer_index - 1];
 		if (plc->layerType == LINEAR_RELU_LAYER_TYPE ||
 			plc->layerType == LINEAR_LAYER_TYPE) {
-			printf("Error. Linear layer cannot be followed by Maxpool "
-				   "layer.\n");
+			printf(
+				"Error. Linear layer cannot be followed by Maxpool layer.\n");
 			exit(XST_FAILURE);
 		}
 		lc->din = plc->dout;
@@ -1382,6 +1447,13 @@ int Maxpool_core_test(u32 testAllCores) {
 		printf("- Maxpool_core[%u]: ", core);
 
 		matrix_t *x = (matrix_t *) malloc(lc.xSize * sizeof(matrix_t));
+		if (x == NULL) {
+			printf(
+				"%sError. Not enough memory for x in Maxpool_core_test.%s\n",
+				KRED,
+				KNRM);
+			exit(XST_FAILURE);
+		}
 		for (u32 i = 0; i < lc.xSize; i++) x[i] = X_VALUE;
 
 		matrix_t *res = (*lc.hw_func)(lc, x);
@@ -1538,6 +1610,14 @@ int Linear_core_setup_interrupt(Core *core) {
 void Linear_core_init(Core *core) {
 	printf("- Initializing Linear_core %u: ", core->InstanceId);
 	core->InstancePtr = (void *) malloc(sizeof(XLinear_core));
+	if (core->InstancePtr == NULL) {
+		printf(
+			"%sError. Not enough memory for core->InstancePtr in "
+			"Linear_core_init.%s\n",
+			KRED,
+			KNRM);
+		exit(XST_FAILURE);
+	}
 	int status = XLinear_core_Initialize(
 		core->InstancePtr, Linear_core_device_ids[core->InstanceId]);
 	if (status != XST_SUCCESS) {
@@ -1656,9 +1736,25 @@ int Linear_core_test(u32 testAllCores) {
 
 	printf("- Initializing Memory: ");
 	lc.weightsAddr = (matrix_t *) malloc(lc.weightsSize * sizeof(matrix_t));
+	if (lc.weightsAddr == NULL) {
+		printf(
+			"%sError. Not enough memory for lc.weightsAddr in "
+			"Linear_core_test.%s\n",
+			KRED,
+			KNRM);
+		exit(XST_FAILURE);
+	}
 	for (u32 i = 0; i < lc.weightsSize; i++) lc.weightsAddr[i] = WEIGHT_VALUE;
 
 	lc.biasAddr = (matrix_t *) malloc(lc.biasSize * sizeof(matrix_t));
+	if (lc.biasAddr == NULL) {
+		printf(
+			"%sError. Not enough memory for lc.biasAddr in "
+			"Linear_core_test.%s\n",
+			KRED,
+			KNRM);
+		exit(XST_FAILURE);
+	}
 	for (u32 i = 0; i < lc.biasSize; i++) lc.biasAddr[i] = BIAS_VALUE;
 	printf("%sSuccess%s\n", KGRN, KNRM);
 
@@ -1668,6 +1764,13 @@ int Linear_core_test(u32 testAllCores) {
 		printf("- Linear_core[%u]: ", core);
 
 		matrix_t *x = (matrix_t *) malloc(lc.xSize * sizeof(matrix_t));
+		if (x == NULL) {
+			printf(
+				"%sError. Not enough memory for x in Linear_core_test.%s\n",
+				KRED,
+				KNRM);
+			exit(XST_FAILURE);
+		}
 		for (u32 i = 0; i < lc.xSize; i++) x[i] = X_VALUE;
 
 		matrix_t *res = (*lc.hw_func)(lc, x);
@@ -1779,7 +1882,6 @@ int inference(NetConf *netConf, u32 runForNumImages, u32 selfCheck) {
 		 * Free the forward pass's resulting FloatMatrix as it is no longer
 		 * needed to avoid memory leaks
 		 */
-		free(x);
 		free(x_hw);
 		free(x_sw);
 	}
@@ -1874,6 +1976,13 @@ int Network_test() {
 	printf("- Initializing Memory: ");
 	u32 xSize = lc[0].xSize;
 	matrix_t *xAddr = (matrix_t *) malloc(xSize * sizeof(matrix_t));
+	if (xAddr == NULL) {
+		printf(
+			"%sError. Not enough memory for xAddr in Network_test.%s\n",
+			KRED,
+			KNRM);
+		exit(XST_FAILURE);
+	}
 	for (u32 i = 0; i < xSize; i++) xAddr[i] = X_VALUE;
 
 	u32 params_index = 0;
@@ -1882,6 +1991,15 @@ int Network_test() {
 
 		params[params_index] =
 			(matrix_t *) malloc(lc[i].weightsSize * sizeof(matrix_t));
+		if (params[params_index] == NULL) {
+			printf(
+				"%sError. Not enough memory for params[%d] in "
+				"Network_test.%s\n",
+				KRED,
+				params_index,
+				KNRM);
+			exit(XST_FAILURE);
+		}
 		for (u32 j = 0; j < lc[i].weightsSize; j++) {
 			params[params_index][j] = WEIGHT_VALUE;
 		}
@@ -1889,6 +2007,15 @@ int Network_test() {
 
 		params[params_index] =
 			(matrix_t *) malloc(lc[i].biasSize * sizeof(matrix_t));
+		if (params[params_index] == NULL) {
+			printf(
+				"%sError. Not enough memory for params[%d] in "
+				"Network_test.%s\n",
+				KRED,
+				params_index,
+				KNRM);
+			exit(XST_FAILURE);
+		}
 		for (u32 j = 0; j < lc[i].biasSize; j++) {
 			params[params_index][j] = BIAS_VALUE;
 		}
@@ -1911,7 +2038,7 @@ int Network_test() {
 void setup_stdout() {
 	setbuf(stdout, NULL); // No printf flushing needed
 	clearTerminal();
-	printf("\033[?25l");  // Hide cursor
+	printf("\033[?25l"); // Hide cursor
 }
 
 void setup_cache() {
@@ -1960,16 +2087,43 @@ XScuGic setup_interrupt() {
 void setup_accelerator() {
 	for (u32 i = 0; i < CONV_CORES_NUM; i++) {
 		Conv_core_list[i] = (Core *) malloc(sizeof(Core));
+		if (Conv_core_list[i] == NULL) {
+			printf(
+				"%sError. Not enough memory for Conv_core_list[%d] in "
+				"setup_accelerator.%s\n",
+				KRED,
+				i,
+				KNRM);
+			exit(XST_FAILURE);
+		}
 		Conv_core_list[i]->InstanceId = i;
 		Conv_core_init(Conv_core_list[i]);
 	}
 	for (u32 i = 0; i < MAXPOOL_CORES_NUM; i++) {
 		Maxpool_core_list[i] = (Core *) malloc(sizeof(Core));
+		if (Maxpool_core_list[i] == NULL) {
+			printf(
+				"%sError. Not enough memory for Maxpool_core_list[%d] in "
+				"setup_accelerator.%s\n",
+				KRED,
+				i,
+				KNRM);
+			exit(XST_FAILURE);
+		}
 		Maxpool_core_list[i]->InstanceId = i;
 		Maxpool_core_init(Maxpool_core_list[i]);
 	}
 	for (u32 i = 0; i < LINEAR_CORES_NUM; i++) {
 		Linear_core_list[i] = (Core *) malloc(sizeof(Core));
+		if (Linear_core_list[i] == NULL) {
+			printf(
+				"%sError. Not enough memory for Linear_core_list[%d] in "
+				"setup_accelerator.%s\n",
+				KRED,
+				i,
+				KNRM);
+			exit(XST_FAILURE);
+		}
 		Linear_core_list[i]->InstanceId = i;
 		Linear_core_init(Linear_core_list[i]);
 	}
@@ -1981,6 +2135,25 @@ void setup_platform(char *greeting_message) {
 	setup_cache();
 	setup_interrupt();
 	setup_accelerator(ScuGic);
+}
+
+void cleanup_accelerator() {
+	for (u32 i = 0; i < CONV_CORES_NUM; i++) {
+		free(Conv_core_list[i]->InstancePtr);
+		free(Conv_core_list[i]);
+	}
+	for (u32 i = 0; i < MAXPOOL_CORES_NUM; i++) {
+		free(Maxpool_core_list[i]->InstancePtr);
+		free(Maxpool_core_list[i]);
+	}
+	for (u32 i = 0; i < LINEAR_CORES_NUM; i++) {
+		free(Linear_core_list[i]->InstancePtr);
+		free(Linear_core_list[i]);
+	}
+}
+
+void cleanup_platform() {
+	cleanup_accelerator();
 }
 
 #endif /* SRC_PLATFORM_H_ */
