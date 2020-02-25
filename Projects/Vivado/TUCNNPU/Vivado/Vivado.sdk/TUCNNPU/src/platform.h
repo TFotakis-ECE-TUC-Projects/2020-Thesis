@@ -447,11 +447,19 @@ matrix_t **loadParameters(char *filename) {
 			exit(XST_FAILURE);
 		}
 
-		/** For every parameter */
-		for (u32 i = 0; i < xLen; i++) {
-			/** Read parameter */
-			params[p][i] = readFloat(&f);
+		u32 bytes_read;
+
+		FRESULT fRes = f_read(&f, params[p], xLen * sizeof(matrix_t), &bytes_read);
+		if (fRes != FR_OK || bytes_read != xLen * sizeof(matrix_t)) {
+			printf("%sError %d. Cannot read parameters.%s\n", KRED, fRes, KNRM);
+			exit(XST_FAILURE);
 		}
+
+//		/** For every parameter */
+//		for (u32 i = 0; i < xLen; i++) {
+//			/** Read parameter */
+//			params[p][i] = readFloat(&f);
+//		}
 
 		eraseCharactersTerminal(9);
 	}
