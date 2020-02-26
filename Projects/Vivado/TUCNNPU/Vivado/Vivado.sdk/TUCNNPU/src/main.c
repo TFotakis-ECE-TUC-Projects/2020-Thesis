@@ -36,13 +36,18 @@ void loop() {
 			selectNetConf(CONFIGS_DIR, LABELS_DIR, PARAMS_DIR, IMAGES_DIR);
 		printf("\n");
 		u32 useSelfCheck = askNoDefault("- Use self check?");
+		u32 runForNumImages = askNumber(
+			"- Forward N images",
+			1,
+			netConf->imagesPaths->length,
+			netConf->imagesPaths->length);
+
 		printf("\n");
 		printf("*** Starting Inference ***\n");
-		inference(netConf, RUN_FOR_NUM_IMAGES, useSelfCheck);
+		inference(netConf, runForNumImages, useSelfCheck);
 		printf("*** Inference finished ***\n");
 
 		freeNetConf(netConf);
-		break;
 	}
 }
 

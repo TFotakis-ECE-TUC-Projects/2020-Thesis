@@ -113,6 +113,36 @@ u32 askNoDefault(char *question) {
 	return (ans == '\r' || ans == 'n' || ans == 'N') ? 0 : 1;
 }
 
+u32 askNumber(char *question, u32 min, u32 max, u32 defaultAns) {
+	//	Max U32: 4294967295
+	char ans[11];
+	char c;
+	u32 num = 0;
+	do {
+		printf("%s [%d - %d] (default: %d): ", question, min, max, defaultAns);
+
+		u32 index = 0;
+		ans[0] = '\r';
+		while ((c = getchar()) != '\r' && index < 10) {
+			if (c >= 48 && c <= 57) {
+				putc(c, stdout);
+				ans[index] = c;
+				index++;
+			}
+		}
+		if (ans[0] == '\r') {
+			num = defaultAns;
+			printf("%u\n", num);
+		} else {
+			ans[index] = '\0';
+			putc('\n', stdout);
+			num = atoi(ans);
+		}
+	} while (num < min || num > max);
+
+	return num;
+}
+
 // ----------------------------------------------
 
 /**
@@ -257,6 +287,10 @@ float readFloat(FIL *f) {
 	return num;
 }
 
+int pstrcmp(const void *a, const void *b) {
+	return strcmp(*(const char **) a, *(const char **) b);
+}
+
 /**
  * Reads a path and creates a Filelist which contains all files contained in
  * the given path's children directories
@@ -337,6 +371,9 @@ Filelist *getFilelist(char *path) {
 		pathsArr[index] = dest;
 		index++;
 	}
+
+	qsort(pathsArr, filesCount, sizeof(char *), pstrcmp);
+
 	filelist->list = pathsArr;
 
 	fRes = f_closedir(&dp);
@@ -374,16 +411,7 @@ char *selectFilePath(char *filesDir, char *msg) {
 		printf("\t%d. %s\n", i + 1, configsList->list[i]);
 	}
 
-	u32 selection;
-	printf("- Select a number [1-%d]: ", configsList->length);
-	scanf("%d", &selection);
-	printf("%d\n", selection);
-	while (selection <= 0 || selection > configsList->length) {
-		printf("\n%sWrong input.%s\n", KRED, KNRM);
-		printf("Select a number [1-%d]: ", configsList->length);
-		scanf("%d", &selection);
-		printf("%d\n", selection);
-	}
+	u32 selection = askNumber("- Select a number", 1, configsList->length, 1);
 
 	char *path = (char *) malloc(
 		(strlen(configsList->list[selection - 1]) + 1) * sizeof(char));
@@ -2035,6 +2063,10 @@ int Network_test() {
 
 // ----------------------------------------------
 
+void setup_stdin() {
+	setvbuf(stdin, NULL, _IONBF, 0); // No buffering
+}
+
 void setup_stdout() {
 	setbuf(stdout, NULL); // No printf flushing needed
 	clearTerminal();
@@ -2131,6 +2163,7 @@ void setup_accelerator() {
 
 void setup_platform(char *greeting_message) {
 	setup_stdout();
+	setup_stdin();
 	printf("%s", greeting_message);
 	setup_cache();
 	setup_interrupt();
