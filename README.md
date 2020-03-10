@@ -91,7 +91,9 @@ DSP				| **D**igital **S**ignal **P**rocessor
 FC				| **F**ully **C**onnected  
 FF				| **F**lip **F**lops
 FPGA			| **F**ield **P**rogrammable **G**ate **A**rray  
+GDDR6			| **G**raphics **D**ouble **D**ata **R**ate type **6** memory
 GPU				| **G**raphic **P**rocessor **U**nit  
+HBM				| **H**igh **B**andwidth **M**emory
 HLS				| **H**igh **L**evel **S**ynthesis
 LUT				| **L**ook **U**p **T**able
 ML				| **M**achine **L**earning  
@@ -104,13 +106,26 @@ TDP				| **T**hermal **D**esign **P**ower
 TPU				| **T**ensor **P**rocessor **U**nit  
 <!-- spell-checker: enable -->
 # Chapter 1: Introduction
-Since the invention of the first computer, humankind is rapidly solving problems that are intellectually difficult for human beings but relatively easy for computers, as such problems can be described in detail with a formal list of mathematical rules. However, problems that are easy for humans, that are solved intuitively, like distinguishing the difference between a car and a person, or a spoken word and a bird's chirp, is a real challenge for computers and engineers [8]. Those problems cannot be described, at the time of writing, with sharply defined mathematical rules. Artificial Intelligence (AI) and Machine Learning (ML) study those types of problems, with many successes in the cost of highly computationally complex algorithms.  
-It is estimated that by the year 2025, the total amount of data created worldwide will rise to 163 ZettaBytes, while every minute of the year 2019, Americans used more than 4.4 PetaBytes of data [6]. It is evident that data management systems and knowledge extraction from them, also called Data Analysis, are urgent. Although such problems can be tackled using Artificial Intelligence and Machine Learning, it is extremely computationally intensive, if not even non-feasible, in a reasonable amount of time.  
-Fortunately, most of the algorithms used to tackle such problems come with great parallelism. Therefore, they can be expanded in the space domain, in other words, they can utilize more hardware resources in order to cut down on needs from the time domain. Of course, there are many different types of hardware resources, each one of them with their advantages and disadvantages, from parallelism capabilities and energy efficiency to cost of production and reconfigurability.
+Since the invention of the first computer, humankind is rapidly solving problems that are intellectually difficult for human beings but relatively easy for computers, as such problems can be described in detail with a formal list of mathematical rules. However, problems that are easy for humans, that are solved intuitively, like distinguishing the difference between a car and a person, or a spoken word and a bird's chirp, is a real challenge for computers and engineers [[8]](#references). Those problems cannot be described, at the time of writing, with sharply defined mathematical rules. Artificial Intelligence (AI) and Machine Learning (ML) study those types of problems, with many successes in the cost of highly computationally complex algorithms.  
+It is estimated that by the year 2025, the total amount of data created worldwide will rise to 163 ZettaBytes, while every minute of the year 2019, Americans used more than 4.4 PetaBytes of data [[6]](#external-links). It is evident that data management systems and knowledge extraction from them, also called Data Analysis, are urgent. Although such problems can be tackled using Artificial Intelligence and Machine Learning, it is extremely computationally intensive, if not even non-feasible, in a reasonable amount of time.  
+Fortunately, most of the algorithms used to tackle such problems come with great parallelism. Therefore, they can be expanded in the space domain, in other words, they can utilize more hardware resources in order to cut down on needs from the time domain. Of course, there are many different types of hardware resources, each one of them with their advantages and disadvantages, from parallelism capabilities and energy efficiency to cost of production, reconfigurability and reusability.
 ## 1.1 Motivation
-Nowadays, the computational complexity of the aforementioned algorithms makes hardware acceleration a necessity, since running them on Central Processing Units (CPUs) is, while possible, the least efficient and fast solution. Although writing software for CPUs may be fast and easy, its running speed due to low parallelism and high power consumption, as a general propose piece of hardware, are far from ideal. For reference, at the time of writing, a top grade server CPU, AMD EPYC 7002 Series, can provide up to 64 cores and 128 threads, at up to 2.25GHz base clock and 3.4GHz boost clock, with a rated Thermal Design Power (TDP) of 225Watts, with a list price of 4425USD [].  
-Graphics Processing Units (GPUs), on the other hand, provide much higher parallelism, while still being relatively easy for their software to be written. However, they can be costly to scale up, and their power consumption can be really high.  
-Moreover, there are Application Specific Integrated Circuits (ASICs), which for a particular application can provide the best parallelism capabilities and the lowest power consumption. Unfortunately, they are very expensive to develop and produce, and they can only serve a single purpose, a single application.  
+Nowadays, the computational complexity of the aforementioned algorithms makes hardware acceleration a necessity, since running them on Central Processing Units (CPUs) is, while possible, the least efficient and fast solution. Although writing software for CPUs may be fast and easy, its running speed due to low parallelism and high power consumption, as a general propose piece of hardware, are far from ideal. For reference, at the time of writing, a top grade server CPU, AMD EPYC 7002 Series, can provide up to 64 cores and 128 threads, at up to 2.25GHz base clock and 3.4GHz boost clock, with a rated Thermal Design Power (TDP) of 225Watts, and a list price of 4,425 USD [[7]](#external-links). 
+
+![AMD-EPYC-Chip](Documentation/Assets/Hardware/amd-epyc.png)  
+![AMD-EPYC-Chip](Documentation/Assets/Hardware/amd-epyc-dies.png)  
+[AMD Epyc 7002 series chip](https://www.amd.com/en/processors/epyc-7002-series)
+
+Graphics Processing Units (GPUs), on the other hand, provide much higher parallelism, while still being relatively easy for their software to be written. However, they can be costly to scale up, and their power consumption can be really high. For reference, at the time of writing, a top grade GPU for ML, NVIDIA Titan RTX, provides up to 72 Streaming Multiprocessors, up to 4,608 CUDA Cores and up to 576 Tensor cores, with a rated base clock of 1,350 MHz and boost clock of 1,770 MHz, 24 GB of Graphics Double Data Rate (GDDR6) Memory and a power consumption of 280 Watts at a price of 2,500 USD [[9]](#external-links).  
+
+![NVIDIA-Titan-RTX](Documentation/Assets/Hardware/NVIDIA-Titan-RTX.png)  
+[NVIDIA Titan RTX card](https://www.nvidia.com/en-us/deep-learning-ai/products/titan-rtx/)
+
+Moreover, there are Application Specific Integrated Circuits (ASICs), which for a particular application can provide the best parallelism capabilities and the lowest power consumption. Unfortunately, they are very expensive to develop and produce, and they can only serve a single purpose, a single application. An example of such an ASIC is the Google Cloud Tensor Processing Unit (TPU), which, for the third version (v3), in a single chip there are two TPU cores, each of which contains two scalar, vector and matrix units (MXUs), and 16 GB of High Bandwidth Memory (HBM) [[10]](#external-links).  
+
+![TPU-v3](Documentation/Assets/Hardware/tpu-v3.png)  
+[Google's TPU v3 - 4 chips, 2 cores per chip](https://cloud.google.com/tpu/docs/system-architecture)
+
 Field Programmable Gate Arrays (FPGAs), on the contrary, are bridging the gap between the GPUs' flexibility and the ASICs' performance and power consumption.  
 In this work, the FPGAs' benefits are being utilized in order to create a hardware accelerator that can speed up the inference of Convolutional Neural Networks (CNNs), a branch of Deep Neural Networks (DNNs), which is a subfield of Machine Learning.  
 ## 1.2 Scientific Contributions
@@ -126,7 +141,7 @@ In this section this thesis organization is outlined.
 The theoretical background of Machine Learning and Convolutional Neural Networks is being described below.
 
 ## 2.1 Machine Learning
-Machine Learning, the name of which was first proposed in 1959 by Arthur Samuel [1], is a subset of Artificial Intelligence and a Computer Science (CS) field that studies algorithms and statistical models capable of performing specific tasks, such as prediction or decision making, without being explicitly programmed. Instead, sample data are used, also known as "training data", for the machine to "learn" to distinguish useful patterns on the input data capable of creating the needed output, e.g., decision or prediction. There are numerous approaches [2] on the learning algorithms types, as well as on the model types used to get trained.
+Machine Learning, the name of which was first proposed in 1959 by Arthur Samuel [[1]](#references), is a subset of Artificial Intelligence and a Computer Science (CS) field that studies algorithms and statistical models capable of performing specific tasks, such as prediction or decision making, without being explicitly programmed. Instead, sample data are used, also known as "training data", for the machine to "learn" to distinguish useful patterns on the input data capable of creating the needed output, e.g., decision or prediction. There are numerous approaches [[2]](#external-links) on the learning algorithms types, as well as on the model types used to get trained.
 Such algorithm types, at the time of writing, include, but are not limited to:
 - Supervised Learning: Algorithms that learn by using "labeled" sample data, data that contain both the inputs and their desired outputs to be used for classification and regression.
 - Unsupervised Learning: In contrast with the Supervised Learning, "unlabeled" sample data are used to discover structures that could group or cluster them.
@@ -141,7 +156,7 @@ Such model types, at the time of writing, include, but are not limited to:
 - Support Vector Machines (SVM): Used for classification and regression, mostly famous as non-probabilistic, binary, linear classifiers. They can also be used for non-linear classification using the "kernel trick".
 - Bayesian Networks: Represented as directed acyclic graphs, they can include probabilistic relationships.
 
-Nowadays, most industries have already used Machine Learning in some sort, indicating the significance and variety of its capabilities. It is estimated [3] that by the year 2021, A.I. and M.L. spending will reach $57.6 Billion. Its applications include but are not limited to [4] [5], web page ranking, image recognition, email filtering and spam detection, database mining, handwriting recognition, speech recognition, natural language processing, computer vision, image/video/text/speech generation, personalized marketing, travelling, dynamic pricing, healthcare, facial & fingerprint recognition and intrusion detection.
+Nowadays, most industries have already used Machine Learning in some sort, indicating the significance and variety of its capabilities. It is estimated [[3]](#external-links) that by the year 2021, A.I. and M.L. spending will reach $57.6 Billion. Its applications include but are not limited to [[4]](#external-links) [[5]](#external-links), web page ranking, image recognition, email filtering and spam detection, database mining, handwriting recognition, speech recognition, natural language processing, computer vision, image/video/text/speech generation, personalized marketing, travelling, dynamic pricing, healthcare, facial & fingerprint recognition and intrusion detection.
 ## 2.2 Artificial Neural Network
 It is widely accepted that the brain's greatest ability is pattern recognition, which is used to combine "data" from the organism's senses in a way to better understand its environment. Artificial Neural Networks (ANN), a highly popular sub-field of Machine Learning, try to imitate the brain's structure to solve such problems, a structure that has been developing and proving its capabilities for thousands of years.
 
@@ -299,15 +314,19 @@ Pipelined K*OC Parallelism: 3.48 ms
 # References
 <!-- Todo: Fix Reference Numbers -->
 [1] Samuel, Arthur (1959). "Some Studies in Machine Learning Using the Game of Checkers". IBM Journal of Research and Development. 3 (3): 210–229. CiteSeerX 10.1.1.368.2254. doi:10.1147/rd.33.0210. *url:* https://ieeexplore.ieee.org/document/5392560.  
-[x] Alex Krizhevsky, Ilya Sutskever, Geoffrey E. Hinton: *ImageNet classification with deep convolutional neural networks*, (2017) Communications of the ACM. 60 (6): 84–90. doi:10.1145/3065386. ISSN 0001-0782. *url:* https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf.  
 [8] Ian Goodfellow, Yoshua Bengio, Aaron Courville. (2016) Deep Learning (page 1), MIT Press. *url:* http://www.deeplearningbook.org/  
+[x] Alex Krizhevsky, Ilya Sutskever, Geoffrey E. Hinton: *ImageNet classification with deep convolutional neural networks*, (2017) Communications of the ACM. 60 (6): 84–90. doi:10.1145/3065386. ISSN 0001-0782. *url:* https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf.  
 # External Links
 <!-- Todo: Fix Reference Numbers -->
 [2] Machine learning - Wikipedia, (23 September 2019) *url:* https://en.wikipedia.org/wiki/Machine_learning#Approaches.  
-[5] Roundup Of Machine Learning Forecasts And Market Estimates, 2018
 [3] Machine Learning – Applications *url:* https://www.geeksforgeeks.org/machine-learning-introduction/  
 [4] Top Machine Learning Applications in 2019 *url:* https://www.geeksforgeeks.org/top-machine-learning-applications-in-2019/  
+[5] Roundup Of Machine Learning Forecasts And Market Estimates, 2018
  *url:* https://www.forbes.com/sites/louiscolumbus/2018/02/18/roundup-of-machine-learning-forecasts-and-market-estimates-2018/#536446aa2225  
+[6] Forbes - How Much Data Is Collected Every Minute Of The Day (August 7 2019). *url:* https://www.forbes.com/sites/nicolemartin1/2019/08/07/how-much-data-is-collected-every-minute-of-the-day/#747555a33d66.
+[7] AMD EPYC™ 7002 Series Processors. *url:* https://www.amd.com/en/processors/epyc-7002-series.
+[9] NVIDIA Titan RTX GPU. *url:* https://www.nvidia.com/en-us/deep-learning-ai/products/titan-rtx/.
+[10] Google Cloud TPU. *url:* https://cloud.google.com/tpu/docs/system-architecture.
 [x] Udacity Intro to Deep Learning with PyTorch by Facebook AI. *url:* https://www.udacity.com/course/deep-learning-pytorch--ud188.  
 [x] Kaggle. *url:* https://www.kaggle.com/.  
 [x] MATLAB. *url:* https://www.mathworks.com/.  
@@ -315,8 +334,6 @@ Pipelined K*OC Parallelism: 3.48 ms
 [x] PyTorch. *url:* https://pytorch.org/.  
 [x] Vivado Design Suite - HLx Editions. *url:* https://www.xilinx.com/products/design-tools/vivado.html.  
 [x] ZCU102 User Guide. *url:* https://www.xilinx.com/support/documentation/boards_and_kits/zcu102/ug1182-zcu102-eval-bd.pdf.  
-[6] Forbes - How Much Data Is Collected Every Minute Of The Day (August 7 2019). *url:* https://www.forbes.com/sites/nicolemartin1/2019/08/07/how-much-data-is-collected-every-minute-of-the-day/#747555a33d66.
-[7] AMD EPYC™ 7002 Series Processors. *url:* https://www.amd.com/en/processors/epyc-7002-series.
 
 <!-- Reference links -->
 [dollasPage]: https://www.ece.tuc.gr/index.php?id=4531&tx_tuclabspersonnel_list%5Bperson%5D=289&tx_tuclabspersonnel_list%5Baction%5D=person&tx_tuclabspersonnel_list%5Bcontroller%5D=List
