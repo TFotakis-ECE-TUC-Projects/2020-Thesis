@@ -1,0 +1,14 @@
+*
+!.gitignore
+
+!Appendices
+!Appendices/*.tex
+
+!Chapters
+!Chapters/*.tex
+
+!*.tex
+!*.cls
+!*.bib
+
+main-blx.bib
