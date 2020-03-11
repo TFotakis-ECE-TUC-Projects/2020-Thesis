@@ -77,33 +77,38 @@ Thesis Committee:
 <!-- spell-checker: disable -->
 Abbreviation	| Meaning
 --- 			| ---
-AI				| **A**rtificial **I**ntelligence  
-ANN				| **A**rtificial **N**eural **N**etwork  
-ASIC			| **A**pplication **S**pecific **I**ntegrated **C**ircuit  
+AI				| **A**rtificial **I**ntelligence
+ANN				| **A**rtificial **N**eural **N**etwork
+ASIC			| **A**pplication **S**pecific **I**ntegrated **C**ircuit
 B-RAM			| **B**lock **R**andom **A**ccess **M**emory
 CNN				| **C**onvolutional **N**eural **N**etwork
-CPU				| **C**entral **P**rocessor **U**nit  
-CS				| **C**omputer **S**cience  
+CPU				| **C**entral **P**rocessor **U**nit
+CS				| **C**omputer **S**cience
+DDR4			| **D**ouble **D**ata **R**ate type 4 memory
 D-RAM			| **D**ynamic **R**andom **A**ccess **M**emory
-DNN				| **D**eep **N**eural **N**etwork  
-DP				| **D**eep **L**earning  
+DNN				| **D**eep **N**eural **N**etwork
+DP				| **D**eep **L**earning
 DSP				| **D**igital **S**ignal **P**rocessor
-FC				| **F**ully **C**onnected  
+FC				| **F**ully **C**onnected
 FF				| **F**lip **F**lops
-FPGA			| **F**ield **P**rogrammable **G**ate **A**rray  
+FPGA			| **F**ield **P**rogrammable **G**ate **A**rray
+FORTH			| **Fo**undation of **R**esearch and **T**echnology **H**ellas
 GDDR6			| **G**raphics **D**ouble **D**ata **R**ate type **6** memory
-GPU				| **G**raphic **P**rocessor **U**nit  
+GPU				| **G**raphic **P**rocessor **U**nit
 HBM				| **H**igh **B**andwidth **M**emory
 HLS				| **H**igh **L**evel **S**ynthesis
+HPC				| **H**ight **P**erformance **C**omputing
 LUT				| **L**ook **U**p **T**able
-ML				| **M**achine **L**earning  
+ML				| **M**achine **L**earning
+MPSoC			| **M**ulti **P**rocessor **S**ystem **o**n **C**hip
 QFDB			| **Q**uad **F**PGA **D**aughter **B**oard
 RAM				| **R**andom Access Memory
 ReLU			| **R**ectified **L**inear **U**nit
 SDK				| **S**oftware **D**evelopment **K**it
 SLC				| **S**econd **L**evel **C**odebook
-TDP				| **T**hermal **D**esign **P**ower  
-TPU				| **T**ensor **P**rocessor **U**nit  
+SSD				| **S**olid **S**tate **D**rive
+TDP				| **T**hermal **D**esign **P**ower
+TPU				| **T**ensor **P**rocessor **U**nit
 <!-- spell-checker: enable -->
 # Chapter 1: Introduction
 Since the invention of the first computer, humankind is rapidly solving problems that are intellectually difficult for human beings but relatively easy for computers, as such problems can be described in detail with a formal list of mathematical rules. However, problems that are easy for humans, that are solved intuitively, like distinguishing the difference between a car and a person, or a spoken word and a bird's chirp, is a real challenge for computers and engineers [[8]](#references). Those problems cannot be described, at the time of writing, with sharply defined mathematical rules. Artificial Intelligence (AI) and Machine Learning (ML) study those types of problems, with many successes in the cost of highly computationally complex algorithms.  
@@ -114,19 +119,23 @@ Nowadays, the computational complexity of the aforementioned algorithms makes ha
 
 ![AMD-EPYC-Chip](Documentation/Assets/Hardware/amd-epyc.png)  
 ![AMD-EPYC-Chip](Documentation/Assets/Hardware/amd-epyc-dies.png)  
-[AMD Epyc 7002 series chip](https://www.amd.com/en/processors/epyc-7002-series)
+[AMD Epyc 7002 series chip.](https://www.amd.com/en/processors/epyc-7002-series)
 
 Graphics Processing Units (GPUs), on the other hand, provide much higher parallelism, while still being relatively easy for their software to be written. However, they can be costly to scale up, and their power consumption can be really high. For reference, at the time of writing, a top grade GPU for ML, NVIDIA Titan RTX, provides up to 72 Streaming Multiprocessors, up to 4,608 CUDA Cores and up to 576 Tensor cores, with a rated base clock of 1,350 MHz and boost clock of 1,770 MHz, 24 GB of Graphics Double Data Rate (GDDR6) Memory and a power consumption of 280 Watts at a price of 2,500 USD [[9]](#external-links).  
 
 ![NVIDIA-Titan-RTX](Documentation/Assets/Hardware/NVIDIA-Titan-RTX.png)  
-[NVIDIA Titan RTX card](https://www.nvidia.com/en-us/deep-learning-ai/products/titan-rtx/)
+[NVIDIA Titan RTX card.](https://www.nvidia.com/en-us/deep-learning-ai/products/titan-rtx/)
 
 Moreover, there are Application Specific Integrated Circuits (ASICs), which for a particular application can provide the best parallelism capabilities and the lowest power consumption. Unfortunately, they are very expensive to develop and produce, and they can only serve a single purpose, a single application. An example of such an ASIC is the Google Cloud Tensor Processing Unit (TPU), which, for the third version (v3), in a single chip there are two TPU cores, each of which contains two scalar, vector and matrix units (MXUs), and 16 GB of High Bandwidth Memory (HBM) [[10]](#external-links).  
 
 ![TPU-v3](Documentation/Assets/Hardware/tpu-v3.png)  
-[Google's TPU v3 - 4 chips, 2 cores per chip](https://cloud.google.com/tpu/docs/system-architecture)
+[Google's TPU v3 - 4 chips, 2 cores per chip.](https://cloud.google.com/tpu/docs/system-architecture)
 
-Field Programmable Gate Arrays (FPGAs), on the contrary, are bridging the gap between the GPUs' flexibility and the ASICs' performance and power consumption.  
+Field Programmable Gate Arrays (FPGAs), on the contrary, are bridging the gap between the GPUs' flexibility and the ASICs' performance and power consumption. An example FPGA Hardware targeted for High Performance Computing (HPC) is the Quad-FPGA Daughter Board (QFDB) [[12]](#references), developed by the Foundation of Research and Technology Hellas (FORTH) [[11]](#external-links), combines 4 interconnected Xilinx Zynq Ultrascale+ Multi Processor Systems on Chip (MPSoCs), with 16GB of DDR4 memory and a M.2 Solid State Drive(SSD).
+
+![QFDB-top-and-bottom-view](Documentation/Assets/Hardware/QFDB.png)  
+[FORTH QFDB, top-view (left) and bottom-view (right).](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=8945720)
+
 In this work, the FPGAs' benefits are being utilized in order to create a hardware accelerator that can speed up the inference of Convolutional Neural Networks (CNNs), a branch of Deep Neural Networks (DNNs), which is a subfield of Machine Learning.  
 ## 1.2 Scientific Contributions
 ## 1.3 Thesis Outline
@@ -138,8 +147,7 @@ In this section this thesis organization is outlined.
 * **Chapter 6:** Chapter 6 description
 * **Chapter 7:** Chapter 7 description
 # Chapter 2: Theoretical Background
-The theoretical background of Machine Learning and Convolutional Neural Networks is being described below.
-
+The theoretical background of Machine Learning and Convolutional Neural Networks is being described below.  
 ## 2.1 Machine Learning
 Machine Learning, the name of which was first proposed in 1959 by Arthur Samuel [[1]](#references), is a subset of Artificial Intelligence and a Computer Science (CS) field that studies algorithms and statistical models capable of performing specific tasks, such as prediction or decision making, without being explicitly programmed. Instead, sample data are used, also known as "training data", for the machine to "learn" to distinguish useful patterns on the input data capable of creating the needed output, e.g., decision or prediction. There are numerous approaches [[2]](#external-links) on the learning algorithms types, as well as on the model types used to get trained.
 Such algorithm types, at the time of writing, include, but are not limited to:
@@ -312,11 +320,15 @@ Pipelined K*OC Parallelism: 3.48 ms
 ## 7.1 Conclusions
 ## 7.2 Future Work
 # References
+<!-- spell-checker: disable -->
 <!-- Todo: Fix Reference Numbers -->
 [1] Samuel, Arthur (1959). "Some Studies in Machine Learning Using the Game of Checkers". IBM Journal of Research and Development. 3 (3): 210–229. CiteSeerX 10.1.1.368.2254. doi:10.1147/rd.33.0210. *url:* https://ieeexplore.ieee.org/document/5392560.  
-[8] Ian Goodfellow, Yoshua Bengio, Aaron Courville. (2016) Deep Learning (page 1), MIT Press. *url:* http://www.deeplearningbook.org/  
+[8] Ian Goodfellow, Yoshua Bengio, Aaron Courville. (2016) Deep Learning (page 1), MIT Press. *url:* http://www.deeplearningbook.org/.  
+[12] F. Chaix, A.D. Ioannou, N. Kossifidis, N. Dimou, G. Ieronymakis, M. Marazakis, V. Papaefstathiou, V. Flouris, M. Ligerakis, G. Ailamakis, T.C. Vavouris, A. Damianakis, M. G.H. Katevenis, I. Mavroidis (2019). Implementation and impact of an ultra-compact multi-FPGA board for large system prototyping. 2019 IEEE/ACM International Workshop on Heterogeneous High-performance Reconfigurable Computing (H2RC). *url:* https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=8945720.
 [x] Alex Krizhevsky, Ilya Sutskever, Geoffrey E. Hinton: *ImageNet classification with deep convolutional neural networks*, (2017) Communications of the ACM. 60 (6): 84–90. doi:10.1145/3065386. ISSN 0001-0782. *url:* https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf.  
+<!-- spell-checker: enable -->
 # External Links
+<!-- spell-checker: disable -->
 <!-- Todo: Fix Reference Numbers -->
 [2] Machine learning - Wikipedia, (23 September 2019) *url:* https://en.wikipedia.org/wiki/Machine_learning#Approaches.  
 [3] Machine Learning – Applications *url:* https://www.geeksforgeeks.org/machine-learning-introduction/  
@@ -327,6 +339,7 @@ Pipelined K*OC Parallelism: 3.48 ms
 [7] AMD EPYC™ 7002 Series Processors. *url:* https://www.amd.com/en/processors/epyc-7002-series.
 [9] NVIDIA Titan RTX GPU. *url:* https://www.nvidia.com/en-us/deep-learning-ai/products/titan-rtx/.
 [10] Google Cloud TPU. *url:* https://cloud.google.com/tpu/docs/system-architecture.
+[11] Foundation of Research and Technology Hellas (FORTH). *url:* https://www.forth.gr/.  
 [x] Udacity Intro to Deep Learning with PyTorch by Facebook AI. *url:* https://www.udacity.com/course/deep-learning-pytorch--ud188.  
 [x] Kaggle. *url:* https://www.kaggle.com/.  
 [x] MATLAB. *url:* https://www.mathworks.com/.  
@@ -334,6 +347,7 @@ Pipelined K*OC Parallelism: 3.48 ms
 [x] PyTorch. *url:* https://pytorch.org/.  
 [x] Vivado Design Suite - HLx Editions. *url:* https://www.xilinx.com/products/design-tools/vivado.html.  
 [x] ZCU102 User Guide. *url:* https://www.xilinx.com/support/documentation/boards_and_kits/zcu102/ug1182-zcu102-eval-bd.pdf.  
+<!-- spell-checker: enable -->
 
 <!-- Reference links -->
 [dollasPage]: https://www.ece.tuc.gr/index.php?id=4531&tx_tuclabspersonnel_list%5Bperson%5D=289&tx_tuclabspersonnel_list%5Baction%5D=person&tx_tuclabspersonnel_list%5Bcontroller%5D=List
