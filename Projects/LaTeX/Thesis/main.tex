@@ -5,7 +5,6 @@
 %
 % This template was downloaded from:
 % http://www.LaTeXTemplates.com
-% Template page: http://www.latextemplates.com/template/masters-doctoral-thesis
 %
 % Version 2.x major modifications by:
 % Vel (vel@latextemplates.com)
@@ -24,19 +23,19 @@
 %----------------------------------------------------------------------------------------
 
 \documentclass[
-11pt, % The default document font size, options: 10pt, 11pt, 12pt
-%oneside, % Two side (alternating margins) for binding by default, uncomment to switch to one side
-english, % ngerman for German
-singlespacing, % Single line spacing, alternatives: onehalfspacing or doublespacing
-%draft, % Uncomment to enable draft mode (no pictures, no links, overfull hboxes indicated)
-%nolistspacing, % If the document is onehalfspacing or doublespacing, uncomment this to set spacing in lists to single
-liststotoc, % Uncomment to add the list of figures/tables/etc to the table of contents
-toctotoc, % Uncomment to add the main table of contents to the table of contents
-parskip, % Uncomment to add space between paragraphs
-%nohyperref, % Uncomment to not load the hyperref package
-headsepline, % Uncomment to get a line under the header
-chapterinoneline, % Uncomment to place the chapter title next to the number on one line
-% consistentlayout, % Uncomment to change the layout of the declaration, abstract and acknowledgements pages to match the default layout
+	11pt, % The default document font size, options: 10pt, 11pt, 12pt
+	%oneside, % Two side (alternating margins) for binding by default, uncomment to switch to one side
+	english, % ngerman for German
+	singlespacing, % Single line spacing, alternatives: onehalfspacing or doublespacing
+	%draft, % Uncomment to enable draft mode (no pictures, no links, overfull hboxes indicated)
+	%nolistspacing, % If the document is onehalfspacing or doublespacing, uncomment this to set spacing in lists to single
+	liststotoc, % Uncomment to add the list of figures/tables/etc to the table of contents
+	toctotoc, % Uncomment to add the main table of contents to the table of contents
+	parskip, % Uncomment to add space between paragraphs
+	%nohyperref, % Uncomment to not load the hyperref package
+	headsepline, % Uncomment to get a line under the header
+	chapterinoneline, % Uncomment to place the chapter title next to the number on one line
+	% consistentlayout, % Uncomment to change the layout of the declaration, abstract and acknowledgements pages to match the default layout
 ]{MastersDoctoralThesis} % The class file specifying the document structure
 
 \usepackage[utf8]{inputenc} % Required for inputting international characters
@@ -44,11 +43,34 @@ chapterinoneline, % Uncomment to place the chapter title next to the number on o
 
 \usepackage{mathpazo} % Use the Palatino font by default
 
-\usepackage[backend=bibtex,style=authoryear,natbib=true]{biblatex} % Use the bibtex backend with the authoryear citation style (which resembles APA)
+\usepackage[backend=bibtex,style=numeric,natbib=true]{biblatex} % Use the bibtex backend with the authoryear citation style (which resembles APA)
 
-\addbibresource{example.bib} % The filename of the bibliography
+\addbibresource{References.bib} % The filename of the bibliography
 
 \usepackage[autostyle=true]{csquotes} % Required to generate language-dependent quotes in the bibliography
+
+\usepackage[section]{placeins}
+\usepackage{float}
+
+\makeatletter
+
+% \AtBeginDocument{
+% 	\expandafter\renewcommand\expandafter\subsection\expandafter{
+% 		\expandafter\@fb@secFB\subsection
+% 	}
+% }
+
+\makeatother
+
+\addtocontents{loa}{\def\string\figurename{Algorithm}}
+
+\usepackage{comment}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{hyperref}
+
+\usepackage{graphicx}
+\def\infinity{\rotatebox{90}{8}}
 
 %----------------------------------------------------------------------------------------
 %	MARGIN SETTINGS
@@ -61,31 +83,33 @@ chapterinoneline, % Uncomment to place the chapter title next to the number on o
 	bindingoffset=.5cm, % Binding offset
 	top=1.5cm, % Top margin
 	bottom=1.5cm, % Bottom margin
-	% showframe, % Uncomment to show how the type block is set on the page
+	%showframe, % Uncomment to show how the type block is set on the page
 }
 
 %----------------------------------------------------------------------------------------
 %	THESIS INFORMATION
 %----------------------------------------------------------------------------------------
 
-\thesistitle{Thesis Title} % Your thesis title, this is used in the title and abstract, print it elsewhere with \ttitle
-\supervisor{Dr. James \textsc{Smith}} % Your supervisor's name, this is used in the title page, print it elsewhere with \supname
+\thesistitle{Design and Implementation of AlexNet Deep Learning Network using Reconfigurable Logic} % Your thesis title, this is used in the title and abstract, print it elsewhere with \ttitle
+\supervisor{Pr. Apostolos \textsc{Dollas}} % Your supervisor's name, this is used in the title page, print it elsewhere with \supname
 \examiner{} % Your examiner's name, this is not currently used anywhere in the template, print it elsewhere with \examname
-\degree{Doctor of Philosophy} % Your degree name, this is used in the title page and abstract, print it elsewhere with \degreename
-\author{John \textsc{Smith}} % Your name, this is used in the title page and abstract, print it elsewhere with \authorname
+\degree{Electrical and Computer Engineer} % Your degree name, this is used in the title page and abstract, print it elsewhere with \degreename
+\author{Tzanis \textsc{Fotakis}} % Your name, this is used in the title page and abstract, print it elsewhere with \authorname
 \addresses{} % Your address, this is not currently used anywhere in the template, print it elsewhere with \addressname
 
-\subject{Biological Sciences} % Your subject area, this is not currently used anywhere in the template, print it elsewhere with \subjectname
+\subject{Electrical and Computer Engineering} % Your subject area, this is not currently used anywhere in the template, print it elsewhere with \subjectname
 \keywords{} % Keywords for your thesis, this is not currently used anywhere in the template, print it elsewhere with \keywordnames
-\university{\href{http://www.university.com}{University Name}} % Your university's name and URL, this is used in the title page and abstract, print it elsewhere with \univname
-\department{\href{http://department.university.com}{Department or School Name}} % Your department's name and URL, this is used in the title page and abstract, print it elsewhere with \deptname
-\group{\href{http://researchgroup.university.com}{Research Group Name}} % Your research group's name and URL, this is used in the title page, print it elsewhere with \groupname
-\faculty{\href{http://faculty.university.com}{Faculty Name}} % Your faculty's name and URL, this is used in the title page and abstract, print it elsewhere with \facname
+\university{\href{https://www.tuc.gr/}{Technical University of Crete}} % Your university's name and URL, this is used in the title page and abstract, print it elsewhere with \univname
+\department{\href{https://www.ece.tuc.gr/}{School of Electrical and Computer Engineering}} % Your department's name and URL, this is used in the title page and abstract, print it elsewhere with \deptname
+\group{\href{https://www.mhl.tuc.gr/}{Microprocessor and Hardware Laboratory}} % Your research group's name and URL, this is used in the title page, print it elsewhere with \groupname
+\faculty{
+		% \href{http://faculty.university.com}{Faculty Name}
+} % Your faculty's name and URL, this is used in the title page and abstract, print it elsewhere with \facname
 
 \AtBeginDocument{
-\hypersetup{pdftitle=\ttitle} % Set the PDF's title to your title
-\hypersetup{pdfauthor=\authorname} % Set the PDF's author to your name
-\hypersetup{pdfkeywords=\keywordnames} % Set the PDF's keywords to your keywords
+	\hypersetup{pdftitle=\ttitle} % Set the PDF's title to your title
+	\hypersetup{pdfauthor=\authorname} % Set the PDF's author to your name
+	\hypersetup{pdfkeywords=\keywordnames} % Set the PDF's keywords to your keywords
 }
 
 \begin{document}
@@ -103,7 +127,7 @@ chapterinoneline, % Uncomment to place the chapter title next to the number on o
 
 		\vspace*{.06\textheight}
 		{\scshape\LARGE \univname\par}\vspace{1.5cm} % University name
-		\textsc{\Large Doctoral Thesis}\\[0.5cm] % Thesis type
+		\textsc{\Large Diploma Thesis}\\[0.5cm] % Thesis type
 
 		\HRule \\[0.4cm] % Horizontal line
 		{\huge \bfseries \ttitle\par}\vspace{0.4cm} % Thesis title
@@ -112,21 +136,26 @@ chapterinoneline, % Uncomment to place the chapter title next to the number on o
 		\begin{minipage}[t]{0.4\textwidth}
 			\begin{flushleft} \large
 				\emph{Author:}\\
-				\href{http://www.johnsmith.com}{\authorname} % Author name - remove the \href bracket to remove the link
+				\href{https://www.linkedin.com/in/fotakistzanis/}{\authorname} % Author name - remove the \href bracket to remove the link
 			\end{flushleft}
 		\end{minipage}
-		\begin{minipage}[t]{0.4\textwidth}
+		\begin{minipage}[t]{0.5\textwidth}
 			\begin{flushright} \large
-				\emph{Supervisor:} \\
-				\href{http://www.jamessmith.com}{\supname} % Supervisor name - remove the \href bracket to remove the link
+				\emph{Thesis Committee:} \\
+				\href{https://www.ece.tuc.gr/index.php?id=4531&tx_tuclabspersonnel_list%5Bperson%5D=289&tx_tuclabspersonnel_list%5Baction%5D=person&tx_tuclabspersonnel_list%5Bcontroller%5D=List}{Prof. Apostolos \textsc{Dollas}}\\ % Supervisor name - remove the \href bracket to remove the link
+				\href{https://www.ece.tuc.gr/index.php?id=4531&tx_tuclabspersonnel_list%5Bperson%5D=313&tx_tuclabspersonnel_list%5Baction%5D=person&tx_tuclabspersonnel_list%5Bcontroller%5D=List}{Prof. Michail \textsc{Lagoudakis}}\\
+				\href{https://www.linkedin.com/in/christos-kozanitis-a3b173a8/}{Dr. Christos \textsc{Kozanitis}}
 			\end{flushright}
-		\end{minipage}\\[3cm]
+		\end{minipage}\\[0.2cm]
+
+		\includegraphics[scale=0.21]{Images/TUC_logo.png} % University/department logo - uncomment to place it
+		\\[0.5cm]
 
 		\vfill
 
-		\large \textit{A thesis submitted in fulfillment of the requirements\\ for the degree of \degreename}\\[0.3cm] % University requirement text
+		\large \textit{A thesis submitted in fulfillment of the requirements\\ for the diploma of \degreename}\\[0.3cm] % University requirement text
 		\textit{in the}\\[0.4cm]
-		\groupname\\\deptname\\[2cm] % Research group name and department name
+		\deptname\\\groupname\\[2cm] % Research group name and department name
 
 		\vfill
 
@@ -141,6 +170,7 @@ chapterinoneline, % Uncomment to place the chapter title next to the number on o
 %	DECLARATION PAGE
 %----------------------------------------------------------------------------------------
 
+\begin{comment}
 \begin{declaration}
 	\addchaptertocentry{\authorshipname} % Add the declaration to the table of contents
 	\noindent I, \authorname, declare that this thesis titled, \enquote{\ttitle} and the work presented in it are my own. I confirm that:
@@ -162,16 +192,19 @@ chapterinoneline, % Uncomment to place the chapter title next to the number on o
 \end{declaration}
 
 \cleardoublepage
+\end{comment}
 
 %----------------------------------------------------------------------------------------
 %	QUOTATION PAGE
 %----------------------------------------------------------------------------------------
 
+\begin{comment}
 \vspace*{0.2\textheight}
 
 \noindent\enquote{\itshape Thanks to my solid academic training, today I can write hundreds of words on virtually any topic without possessing a shred of information, which is how I got a good job in journalism.}\bigbreak
 
 \hfill Dave Barry
+\end{comment}
 
 %----------------------------------------------------------------------------------------
 %	ABSTRACT PAGE
@@ -179,6 +212,7 @@ chapterinoneline, % Uncomment to place the chapter title next to the number on o
 
 \begin{abstract}
 	\addchaptertocentry{\abstractname} % Add the abstract to the table of contents
+	% Todo: Add Abstract
 	The Thesis Abstract is written here (and usually kept to just this page). The page is kept centered vertically so can expand into the blank space above the title too\ldots
 \end{abstract}
 
@@ -188,6 +222,7 @@ chapterinoneline, % Uncomment to place the chapter title next to the number on o
 
 \begin{acknowledgements}
 	\addchaptertocentry{\acknowledgementname} % Add the acknowledgements to the table of contents
+	% Todo: Add Acknowledgements
 	The acknowledgments and the people to thank go here, don't forget to include your project advisor\ldots
 \end{acknowledgements}
 
@@ -201,21 +236,58 @@ chapterinoneline, % Uncomment to place the chapter title next to the number on o
 
 \listoftables % Prints the list of tables
 
+\listofalgorithms % Prints the list of algorithms
+\addcontentsline{toc}{chapter}{List of Algorithms}
+
 %----------------------------------------------------------------------------------------
 %	ABBREVIATIONS
 %----------------------------------------------------------------------------------------
 
+% spell-checker: disable
 \begin{abbreviations}{ll} % Include a list of abbreviations (a table of two columns)
 
-	\textbf{LAH} & \textbf{L}ist \textbf{A}bbreviations \textbf{H}ere\\
-	\textbf{WSF} & \textbf{W}hat (it) \textbf{S}tands \textbf{F}or\\
+	\textbf{AI}		& \textbf{A}rtificial \textbf{I}ntelligence\\
+	\textbf{ANN}	& \textbf{A}rtificial \textbf{N}eural \textbf{N}etwork\\
+	\textbf{ASIC}	& \textbf{A}pplication \textbf{S}pecific \textbf{I}ntegrated \textbf{C}ircuit\\
+	\textbf{B-RAM}	& \textbf{B}lock \textbf{R}andom \textbf{A}ccess \textbf{M}emory\\
+	\textbf{CNN}	& \textbf{C}onvolutional \textbf{N}eural \textbf{N}etwork\\
+	\textbf{CPU}	& \textbf{C}entral \textbf{P}rocessor \textbf{U}nit\\
+	\textbf{CS}		& \textbf{C}omputer \textbf{S}cience\\
+	\textbf{DDR4}	& \textbf{D}ouble \textbf{D}ata \textbf{R}ate type texbf{4} memory\\
+	\textbf{D-RAM}	& \textbf{D}ynamic \textbf{R}andom \textbf{A}ccess \textbf{M}emory\\
+	\textbf{DNN}	& \textbf{D}eep \textbf{N}eural \textbf{N}etwork\\
+	\textbf{DP}		& \textbf{D}eep \textbf{L}earning\\
+	\textbf{DSP}	& \textbf{D}igital \textbf{S}ignal \textbf{P}rocessor\\
+	\textbf{FC}		& \textbf{F}ully \textbf{C}onnected\\
+	\textbf{FF}		& \textbf{F}lip \textbf{F}lops\\
+	\textbf{FPGA}	& \textbf{F}ield \textbf{P}rogrammable \textbf{G}ate \textbf{A}rray\\
+	\textbf{FORTH}	& \textbf{F}undation of \textbf{R}esearch and \textbf{T}echnology \textbf{H}ellas\\
+	\textbf{GDDR6}	& \textbf{G}raphics \textbf{D}ouble \textbf{D}ata \textbf{R}ate type \textbf{6} memory\\
+	\textbf{GPU}	& \textbf{G}raphic \textbf{P}rocessor \textbf{U}nit\\
+	\textbf{HBM}	& \textbf{H}igh \textbf{B}andwidth \textbf{M}emory\\
+	\textbf{HLS}	& \textbf{H}igh \textbf{L}evel \textbf{S}ynthesis\\
+	\textbf{HPC}	& \textbf{H}ight \textbf{P}erformance \textbf{C}omputing\\
+	\textbf{LUT}	& \textbf{L}ook \textbf{U}p \textbf{T}able\\
+	\textbf{ML}		& \textbf{M}achine \textbf{L}earning\\
+	\textbf{MPSoC}	& \textbf{M}ulti \textbf{P}rocessor \textbf{S}ystem \textbf{o}n \textbf{C}hip\\
+	\textbf{QFDB}	& \textbf{Q}uad \textbf{F}PGA \textbf{D}aughter \textbf{B}oard\\
+	\textbf{RAM}	& \textbf{R}andom Access Memory\\
+	\textbf{ReLU}	& \textbf{R}ectified \textbf{L}inear \textbf{U}nit\\
+	\textbf{SDK}	& \textbf{S}oftware \textbf{D}evelopment \textbf{K}it\\
+	\textbf{SLC}	& \textbf{S}econd \textbf{L}evel \textbf{C}odebook\\
+	\textbf{SSD}	& \textbf{S}olid \textbf{S}tate \textbf{D}rive\\
+	\textbf{TDP}	& \textbf{T}hermal \textbf{D}esign \textbf{P}ower\\
+	\textbf{TPU}	& \textbf{T}ensor \textbf{P}rocessor \textbf{U}nit\\
+	\textbf{USD}	& \textbf{U}nited \textbf{S}tates \textbf{D}ollar\\
 
 \end{abbreviations}
+% spell-checker: enable
 
 %----------------------------------------------------------------------------------------
 %	PHYSICAL CONSTANTS/OTHER DEFINITIONS
 %----------------------------------------------------------------------------------------
 
+\begin{comment}
 \begin{constants}{lr@{${}={}$}l} % The list of physical constants is a three column table
 
 	% The \SI{}{} command is provided by the siunitx package, see its documentation for instructions on how to use it
@@ -224,11 +296,13 @@ chapterinoneline, % Uncomment to place the chapter title next to the number on o
 	%Constant Name & $Symbol$ & $Constant Value$ with units\\
 
 \end{constants}
+\end{comment}
 
 %----------------------------------------------------------------------------------------
 %	SYMBOLS
 %----------------------------------------------------------------------------------------
 
+\begin{comment}
 \begin{symbols}{lll} % Include a list of Symbols (a three column table)
 
 	$a$ & distance & \si{\meter} \\
@@ -240,12 +314,13 @@ chapterinoneline, % Uncomment to place the chapter title next to the number on o
 	$\omega$ & angular frequency & \si{\radian} \\
 
 \end{symbols}
+\end{comment}
 
 %----------------------------------------------------------------------------------------
 %	DEDICATION
 %----------------------------------------------------------------------------------------
 
-\dedicatory{For/Dedicated to/To my\ldots}
+\dedicatory{Dedicated to my family and friends\ldots}
 
 %----------------------------------------------------------------------------------------
 %	THESIS CONTENT - CHAPTERS
@@ -259,7 +334,8 @@ chapterinoneline, % Uncomment to place the chapter title next to the number on o
 % Uncomment the lines as you write the chapters
 
 \include{Chapters/Chapter1}
-%\include{Chapters/Chapter2}
+\include{Chapters/Introduction}
+\include{Chapters/TheoreticalBackground}
 %\include{Chapters/Chapter3}
 %\include{Chapters/Chapter4}
 %\include{Chapters/Chapter5}
@@ -281,7 +357,13 @@ chapterinoneline, % Uncomment to place the chapter title next to the number on o
 %	BIBLIOGRAPHY
 %----------------------------------------------------------------------------------------
 
-\printbibliography[heading=bibintoc]
+% \printbibliography[heading=bibintoc]
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{References}
+\printbibliography[keyword={References}, title={References}]
+\printbibliography[keyword={Link}, title={External Links}]
 
 %----------------------------------------------------------------------------------------
 
