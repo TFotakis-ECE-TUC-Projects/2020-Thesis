@@ -109,6 +109,7 @@ SLC				| **S**econd **L**evel **C**odebook
 SSD				| **S**olid **S**tate **D**rive
 TDP				| **T**hermal **D**esign **P**ower
 TPU				| **T**ensor **P**rocessor **U**nit
+USD				| **U**nited **S**tates **D**ollar
 <!-- spell-checker: enable -->
 # Chapter 1: Introduction
 Since the invention of the first computer, humankind is rapidly solving problems that are intellectually difficult for human beings but relatively easy for computers, as such problems can be described in detail with a formal list of mathematical rules. However, problems that are easy for humans, that are solved intuitively, like distinguishing the difference between a car and a person, or a spoken word and a bird's chirp, is a real challenge for computers and engineers [[8]](#references). Those problems cannot be described, at the time of writing, with sharply defined mathematical rules. Artificial Intelligence (AI) and Machine Learning (ML) study those types of problems, with many successes in the cost of highly computationally complex algorithms.  
@@ -324,7 +325,7 @@ Pipelined K*OC Parallelism: 3.48 ms
 <!-- Todo: Fix Reference Numbers -->
 [1] Samuel, Arthur (1959). "Some Studies in Machine Learning Using the Game of Checkers". IBM Journal of Research and Development. 3 (3): 210–229. CiteSeerX 10.1.1.368.2254. doi:10.1147/rd.33.0210. *url:* https://ieeexplore.ieee.org/document/5392560.  
 [8] Ian Goodfellow, Yoshua Bengio, Aaron Courville. (2016) Deep Learning (page 1), MIT Press. *url:* http://www.deeplearningbook.org/.  
-[12] F. Chaix, A.D. Ioannou, N. Kossifidis, N. Dimou, G. Ieronymakis, M. Marazakis, V. Papaefstathiou, V. Flouris, M. Ligerakis, G. Ailamakis, T.C. Vavouris, A. Damianakis, M. G.H. Katevenis, I. Mavroidis (2019). Implementation and impact of an ultra-compact multi-FPGA board for large system prototyping. 2019 IEEE/ACM International Workshop on Heterogeneous High-performance Reconfigurable Computing (H2RC). *url:* https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=8945720.
+[12] F. Chaix, A.D. Ioannou, N. Kossifidis, N. Dimou, G. Ieronymakis, M. Marazakis, V. Papaefstathiou, V. Flouris, M. Ligerakis, G. Ailamakis, T.C. Vavouris, A. Damianakis, M. G. H. Katevenis, I. Mavroidis (2019). Implementation and impact of an ultra-compact multi-FPGA board for large system prototyping. 2019 IEEE/ACM International Workshop on Heterogeneous High-performance Reconfigurable Computing (H2RC). *url:* https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=8945720.
 [x] Alex Krizhevsky, Ilya Sutskever, Geoffrey E. Hinton: *ImageNet classification with deep convolutional neural networks*, (2017) Communications of the ACM. 60 (6): 84–90. doi:10.1145/3065386. ISSN 0001-0782. *url:* https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf.  
 <!-- spell-checker: enable -->
 # External Links
