@@ -5,8 +5,7 @@
 The theoretical background of Machine Learning and Convolutional Neural Networks is being described below.
 
 \section{Machine Learning}
-
-Machine Learning, the name of which was first proposed in 1959 by Arthur Samuel \cite{Some-Studies-in-Machine-Learning-Using-the-Game-of-Checkers}, is a subset of Artificial Intelligence and a Computer Science (CS) field that studies algorithms and statistical models capable of performing specific tasks, such as prediction or decision making, without being explicitly programmed. Instead, sample data are used, also known as "training data", for the machine to "learn" to distinguish useful patterns on the input data capable of creating the needed output, e.g., decision or prediction. There are numerous approaches \cite{Machine-learning-Wikipedia} on the learning algorithms types, as well as on the model types used to get trained.
+Machine Learning, the name of which was first proposed in 1959 by Arthur Samuel \cite{Some-Studies-in-Machine-Learning-Using-the-Game-of-Checkers}, is a subset of Artificial Intelligence, a Computer Science (CS) field that studies algorithms and statistical models capable of performing specific tasks, such as prediction or decision making, without being explicitly programmed. Instead, sample data are used, also known as "training data", for the machine to "learn" to distinguish useful patterns on the input data capable of creating the needed output, e.g., decision or prediction. There are numerous approaches \cite{Machine-learning-Wikipedia} on the learning algorithms types, as well as on the model types used to get trained.
 
 Such algorithm types, at the time of writing, include, but are not limited to:
 \begin{itemize}
@@ -29,12 +28,11 @@ Such model types, at the time of writing, include, but are not limited to:
 Nowadays, most industries have already used Machine Learning in some sort, indicating the significance and variety of its capabilities. It is estimated \cite{Machine-Learning-Applications} that by the year 2021, A.I. and M.L. spending will reach 57.6 Billion USD. Its applications include but are not limited to \cite{Top-Machine-Learning-Applications-in-2019} \cite{Roundup-Of-Machine-Learning-Forecasts-And-Market-Estimates}, web page ranking, image recognition, email filtering and spam detection, database mining, handwriting recognition, speech recognition, natural language processing, computer vision, image / video / text / speech generation, personalized marketing, travelling, dynamic pricing, healthcare, facial and fingerprint recognition and intrusion detection.
 
 \section{Artificial Neural Network}
-
 It is widely accepted that the brain's greatest ability is pattern recognition, which is used to combine "data" from the organism's senses in a way to better understand its environment. Artificial Neural Networks (ANN), a highly popular sub-field of Machine Learning, try to imitate the brain's structure to solve such problems, a structure that has been developing and proving its capabilities for thousands of years.
 
 While ANNs are inspired by the biological neural networks, they are not identical. A neural network is a collection of connected neurons, through which electrical signals from sensor organs or other neurons are passed and processed. A biological neuron is comprised of four main parts; Dendrites, Cell body, Axon and Synaptic terminals (Figure \ref{fig:Standard-structure-of-a-biological-neuron}). A Dendrite and its Dendritic branches are used as the neuron's input, where sensors or other neurons get connected. A neuron can have multiple Dendrites. The neuron's cell body collects all the input signals and applies an "activation" function to create the output signal. Afterwards, the output signal is transported through the Axon and then distributed to the next neurons through the Synaptic terminals. The Synaptic terminals to Dendrites connections are called Synapses.
 
-\begin{figure} [h]
+\begin{figure} [ht]
 	\centering
 	\includegraphics[width=\textwidth]{Images/Biological-Neuron.png}
 	\decoRule
@@ -42,7 +40,63 @@ While ANNs are inspired by the biological neural networks, they are not identica
 	\label{fig:Standard-structure-of-a-biological-neuron}
 \end{figure}
 
-Similarly to the biological neural networks, an ANN can be represented as a graph, whose vertices represent the biological neurons' cell bodies and its edges the biological synapses. The electrical signal used in biological neurons is represented as a real number and their outputs are calculated by some non-linear function of the inputs' weighted sum. Each edge typically has a weight set during the training process, which amplifies or weakens the edge's signal.
+\subsection{ANNs Basic components}
+Similarly to the biological neural networks, an ANN can be represented as a directed, weighted graph (Figure \ref{fig:simplified-neural-network-graph}), whose vertices represent the biological neurons' cell bodies and its edges the biological synapses. The electrical signal used in biological neurons can be represented as a real number and their outputs can be calculated by some non-linear function of the inputs' weighted sum. Each edge typically can have a weight, set during the training process, which amplifies or weakens the vertex's signal.
+
+\begin{figure} [ht]
+	\centering
+	\includegraphics[scale=0.6]{Images/simplified-neural-network-graph.png}
+	\decoRule
+	\caption[Simplified Neural Network Graph]{Simplified Neural Network Graph: \href{https://en.wikipedia.org/wiki/Artificial_neural_network}{URL}}
+	\label{fig:simplified-neural-network-graph}
+\end{figure}
+
+\subsubsection{Neuron}
+A neuron receives real numbers as inputs, which then using an activation function, are combined with their internal state, also known as activation, and an optional threshold in order to produce the neuron's output.
+
+\subsubsection{Connections and Weights}
+Each neuron can be connected with multiple other neurons to be used as inputs and to feed them with its own output. Each connection is characterized by its weight, which represents its relative importance.
+
+\subsubsection{Propagation Function}
+The propagation function calculates the weighted sum of each neurons inputs and adds a bias term.
+
+\subsubsection{Activation Function}
+The activation function receives the propagation function's result and applies a transformation, which creates the neurons final output. There are a lot of different activation functions, each of which with their own characteristics for the training and / or inference process. However, they all provide a smooth and differentiable transition as the input values change. The most commonly used ones are shown below \cite{Activation-Function-Wikipedia}.
+\begin{itemize}
+	\item \textbf{Identity:} $f(x) = x$
+
+	\item \textbf{Binary Step:} $
+		      f(x) =
+		      \begin{cases}
+			      0 & x < 0 \\
+			      1 & x > 0
+		      \end{cases}
+	      $
+
+	\item \textbf{Logistic (Sigmoid or Soft step):} $
+		      f(x) = \sigma(x) = \frac{1}{1 + e^{-x}}
+	      $
+
+	\item \textbf{TanH:} $
+		      f(x) = tanh(x) = \frac{e^{x} - e^{-x}}{e^{x} - e^{-x}}
+	      $
+
+	\item \textbf{Rectified Linear Unit (ReLU):} $
+		      f(x) =
+		      \begin{cases}
+			      0 & x < 0 \\
+			      x & x > 0
+		      \end{cases}
+	      $
+
+	\item \textbf{Softmax:} $
+		      f_i(\textbf{x}) = \frac{
+		      e^{x_i}
+		      }{
+		      \sum_{j=1}^{J}e^{x_j}
+			  }
+		  $, for i = 1, ..., J
+\end{itemize}
 
 % Todo: Add Basic components, e.g. neurons, activations, etc
 % Todo: Explain what is a DNN

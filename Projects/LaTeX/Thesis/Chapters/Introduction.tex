@@ -12,7 +12,7 @@ Fortunately, most of the algorithms used to tackle such problems come with great
 
 Nowadays, the computational complexity of the aforementioned algorithms makes hardware acceleration a necessity, since running them on Central Processing Units (CPUs) is, while possible, the least efficient and fast solution. Although writing software for CPUs may be fast and easy, its running speed due to low parallelism and high power consumption, as a general propose piece of hardware, are far from ideal. For reference, at the time of writing, a top grade server CPU, AMD EPYC 7002 Series (Figure \ref{fig:amd-epyc-7002-chip}), can provide up to 64 cores and 128 threads, at up to 2.25GHz base clock and 3.4GHz boost clock, with a rated Thermal Design Power (TDP) of 225Watts, and a list price of 4,425 USD \cite{AMD-EPYC-7002-Series-Processors}.
 
-\begin{figure} [h]
+\begin{figure} [ht]
 	\centering
 	\includegraphics[scale=0.45]{Images/Hardware/amd-epyc.png}
 	\includegraphics[scale=0.45]{Images/Hardware/amd-epyc-dies.png}
@@ -23,7 +23,7 @@ Nowadays, the computational complexity of the aforementioned algorithms makes ha
 
 Graphics Processing Units (GPUs), on the other hand, provide much higher parallelism, while still being relatively easy for their software to be written. However, they can be costly to scale up, and their power consumption can be really high. For reference, at the time of writing, a top grade GPU for ML, NVIDIA Titan RTX (Figure \ref{fig:nvidia-titan-rtx-explosion-view}), provides up to 72 Streaming Multiprocessors, up to 4,608 CUDA Cores and up to 576 Tensor cores, with a rated base clock of 1,350 MHz and boost clock of 1,770 MHz, 24 GB of Graphics Double Data Rate (GDDR6) Memory and a power consumption of 280 Watts at a price of 2,500 USD \cite{NVIDIA-Titan-RTX-GPU}.
 
-\begin{figure} [h]
+\begin{figure} [ht]
 	\centering
 	\includegraphics[width=\textwidth]{Images/Hardware/NVIDIA-Titan-RTX.png}
 	\decoRule
@@ -33,7 +33,7 @@ Graphics Processing Units (GPUs), on the other hand, provide much higher paralle
 
 Moreover, there are Application Specific Integrated Circuits (ASICs), which for a particular application can provide the best parallelism capabilities and the lowest power consumption. Unfortunately, they are very expensive to develop and produce, and they can only serve a single purpose, a single application. An example of such an ASIC is the Google Cloud Tensor Processing Unit (TPU) (Figure \ref{fig:google-tpu-motherboard}), which, for the third version (v3), in a single chip there are two TPU cores, each of which contains two scalar, vector and matrix units (MXUs), and 16 GB of High Bandwidth Memory (HBM) \cite{Google-Cloud-TPU}.
 
-\begin{figure} [h]
+\begin{figure} [ht]
 	\centering
 	\includegraphics[width=\textwidth]{Images/Hardware/tpu-v3.png}
 	\decoRule
@@ -43,7 +43,7 @@ Moreover, there are Application Specific Integrated Circuits (ASICs), which for 
 
 Field Programmable Gate Arrays (FPGAs), on the contrary, are bridging the gap between the GPUs' flexibility and the ASICs' performance and power consumption. An example FPGA Hardware targeted for High Performance Computing (HPC) is the Quad-FPGA Daughter Board (QFDB) (Figure \ref{fig:forth-qfdb-daughterboard}) \cite{Implementation-and-Impact-of-an-Ultra-Compact-Multi-FPGA-Board-for-Large-System-Prototyping}, developed by the Foundation of Research and Technology Hellas (FORTH) \cite{FORTH}, combines 4 interconnected Xilinx Zynq Ultrascale+ Multi Processor Systems on Chip (MPSoCs), with 16GB of DDR4 memory and a M.2 Solid State Drive (SSD).
 
-\begin{figure} [h]
+\begin{figure} [ht]
 	\centering
 	\includegraphics[width=\textwidth]{Images/Hardware/QFDB.png}\\[0.5cm]
 	\decoRule
