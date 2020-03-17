@@ -25,12 +25,12 @@ Such model types, at the time of writing, include, but are not limited to:
 	\item \textbf{Bayesian Networks:} Represented as directed acyclic graphs, they can include probabilistic relationships.
 \end{itemize}
 
-Nowadays, most industries have already used Machine Learning in some sort, indicating the significance and variety of its capabilities. It is estimated \cite{Machine-Learning-Applications} that by the year 2021, A.I. and M.L. spending will reach 57.6 Billion USD. Its applications include but are not limited to \cite{Top-Machine-Learning-Applications-in-2019} \cite{Roundup-Of-Machine-Learning-Forecasts-And-Market-Estimates}, web page ranking, image recognition, email filtering and spam detection, database mining, handwriting recognition, speech recognition, natural language processing, computer vision, image / video / text / speech generation, personalized marketing, travelling, dynamic pricing, healthcare, facial and fingerprint recognition and intrusion detection.
+Nowadays, most industries have already used Machine Learning in some sort, indicating the significance and variety of its capabilities. It is estimated \cite{Machine-Learning-Applications} that by the year 2021, AI and ML spending will reach 57.6 Billion USD. Its applications include but are not limited to \cite{Top-Machine-Learning-Applications-in-2019} \cite{Roundup-Of-Machine-Learning-Forecasts-And-Market-Estimates}, web page ranking, image recognition, email filtering, and spam detection, database mining, handwriting recognition, speech recognition, natural language processing, computer vision, image/video/text/speech generation, personalized marketing, traveling, dynamic pricing, healthcare, facial and fingerprint recognition and intrusion detection.
 
 \section{Artificial Neural Network}
-It is widely accepted that the brain's greatest ability is pattern recognition, which is used to combine "data" from the organism's senses in a way to better understand its environment. Artificial Neural Networks (ANN), a highly popular sub-field of Machine Learning, try to imitate the brain's structure to solve such problems, a structure that has been developing and proving its capabilities for thousands of years.
+It is widely accepted that the brain's most exceptional ability is pattern recognition, which is used to combine "data" from the organism's senses in a way to better understand its environment. Artificial Neural Networks (ANN), a highly popular sub-field of Machine Learning, try to imitate the brain's structure to solve such problems, a structure that has been developing and proving its capabilities for thousands of years.
 
-While ANNs are inspired by the biological neural networks, they are not identical. A neural network is a collection of connected neurons, through which electrical signals from sensor organs or other neurons are passed and processed. A biological neuron is comprised of four main parts; Dendrites, Cell body, Axon and Synaptic terminals (Figure \ref{fig:Standard-structure-of-a-biological-neuron}). A Dendrite and its Dendritic branches are used as the neuron's input, where sensors or other neurons get connected. A neuron can have multiple Dendrites. The neuron's cell body collects all the input signals and applies an "activation" function to create the output signal. Afterwards, the output signal is transported through the Axon and then distributed to the next neurons through the Synaptic terminals. The Synaptic terminals to Dendrites connections are called Synapses.
+While ANNs are inspired by biological neural networks, they are not identical. A neural network is a collection of connected neurons, through which electrical signals from sensor organs or other neurons are passed and processed. A biological neuron is comprised of four main parts; Dendrites, Cell body, Axon, and Synaptic terminals (Figure \ref{fig:Standard-structure-of-a-biological-neuron}). A Dendrite and its Dendritic branches are used as the neuron's input, where sensors or other neurons get connected. A neuron can have multiple Dendrites. The neuron's cell body collects all the input signals and applies an "activation" function to create the output signal. Afterward, the output signal is transported through the Axon and then distributed to the next neurons through the Synaptic terminals. The Synaptic terminals to Dendrites connections are called Synapses.
 
 \begin{figure} [ht]
 	\centering
@@ -41,7 +41,7 @@ While ANNs are inspired by the biological neural networks, they are not identica
 \end{figure}
 
 \subsection{ANNs Basic components}
-Similarly to the biological neural networks, an ANN can be represented as a directed, weighted graph (Figure \ref{fig:simplified-neural-network-graph}), whose vertices represent the biological neurons' cell bodies and its edges the biological synapses. The electrical signal used in biological neurons can be represented as a real number and their outputs can be calculated by some non-linear function of the inputs' weighted sum. Each edge typically can have a weight, set during the training process, which amplifies or weakens the vertex's signal.
+Similarly to the biological neural networks, an ANN can be represented as a directed, weighted graph (Figure \ref{fig:simplified-neural-network-graph}), whose vertices represent the biological neurons' cell bodies and its edges the biological synapses. The electrical signal used in biological neurons can be represented as a real number, and their outputs can be calculated by some non-linear function of the inputs' weighted sum. Each edge typically can have a weight, set during the training process, which amplifies or weakens the vertex's signal.
 
 \begin{figure} [ht]
 	\centering
@@ -55,13 +55,13 @@ Similarly to the biological neural networks, an ANN can be represented as a dire
 A neuron receives real numbers as inputs, which then using an activation function, are combined with their internal state, also known as activation, and an optional threshold in order to produce the neuron's output.
 
 \subsubsection{Connections and Weights}
-Each neuron can be connected with multiple other neurons to be used as inputs and to feed them with its own output. Each connection is characterized by its weight, which represents its relative importance.
+Each neuron can be connected with multiple other neurons to be used as inputs and to feed them with its output. Each connection is characterized by its weight, which represents its relative importance.
 
 \subsubsection{Propagation Function}
-The propagation function calculates the weighted sum of each neurons inputs and adds a bias term.
+The propagation function calculates the weighted sum of each neuron's inputs and adds a bias term.
 
 \subsubsection{Activation Function}
-The activation function receives the propagation function's result and applies a transformation, which creates the neurons final output. There are a lot of different activation functions, each of which with their own characteristics for the training and / or inference process. However, they all provide a smooth and differentiable transition as the input values change. The most commonly used ones are shown below \cite{Activation-Function-Wikipedia}.
+The activation function receives the propagation function's result and applies a transformation, which creates the neuron's final output. There are a lot of different activation functions, with specific characteristics for the training and inference process. However, they all provide a smooth and differentiable transition as the input values change. The most commonly used ones are shown below \cite{Activation-Function-Wikipedia}.
 \begin{itemize}
 	\item \textbf{Identity:} $f(x) = x$
 
@@ -98,12 +98,45 @@ The activation function receives the propagation function's result and applies a
 		  $, for i = 1, ..., J
 \end{itemize}
 
-% Todo: Explain what is a DNN
-% Todo: Add NN architectures types, e.g. CNN, RNN, LSTM, etc
+\subsection{Organization}
+An ANN's neurons are typically organized into groups, called layers, in which each neuron has the same distance from the inputs as all the other neurons of its group. The input layer is the layer that gets as inputs the external data, and the output layer, the last layer in the graph, is the one that produces the final output results. Any in-between layer is called a hidden layer. An ANN is called a Deep Neural Network (DNN), when, by convention, it has three or more hidden layers.
+
+\subsection{ANN Architectures}
+There are many ANN architectures, each one serving different use cases. They are separated into two main groups, Feedforward networks and Recurrent networks \cite{Types-of-Artificial-Neural-Networks}.
+
+\subsubsection{Feedforward Networks}
+The basic idea with the feedforward networks is that the data flows from the input layer through the hidden layers to the output layer without any cycles, so they can be represented as directed, acyclic graphs. Some architectures of this group are:
+\begin{itemize}
+	\item Multiclass Perceptron
+	\item Group method of data handling
+	\item Autoencoder
+	\item Probabilistic
+	\item Time delay
+	\item Convolutional
+	\item Deep stacking network
+\end{itemize}
+
+\subsubsection{Recurrent Networks}
+Recurrent Neural Networks (RNN), similarly to the Feedforward networks, data flows from the input layer through the hidden layers to the output layer. However, they allow for data cycles, in other words, outputs of the $layer_n$ can be fed to the inputs of the $layer_{n-1}$, so they can be represented as directed, cyclic graphs. Some architectures of this group are:
+\begin{itemize}
+	\item Fully recurrent
+	\item Simple recurrent
+	\item Reservoir computing
+	\item Long short-term memory
+	\item Bi-directional
+	\item Hierarchical
+	\item Stochastic
+	\item Genetic Scale
+\end{itemize}
+
+This work is focused on the Convolutional Neural Networks (CNN), which are described in detail below.
 
 \section{Convolutional Neural Network}
-\section{Structure of Convolutional Neural Network}
-\subsection{Convolution Layer}
-\subsection{Pooling}
-\subsection{Activation Function}
+Convolutional Neural Networks (CNN) are deep feedforward neural networks, ty\-pi\-cal\-ly used in visual imagery analysis. Some of their applications are image and video recognition, image classification, object detection, recommender systems, me\-di\-cal image analysis, natural language processing and financial time series.
+
+\subsection{Structure of Convolutional Neural Network}
+
+\subsubsection{Convolution Layer}
+\subsubsection{Pooling}
+\subsubsection{Activation Function}
 \section{Typical Architecture of AlexNet}
