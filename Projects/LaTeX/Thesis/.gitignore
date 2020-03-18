@@ -7,6 +7,11 @@
 !Chapters
 !Chapters/*.tex
 
+!Images
+!Images/*
+!Images/*/*
+
+
 !*.tex
 !*.cls
 !*.bib
