@@ -94,8 +94,8 @@ The activation function receives the propagation function's result and applies a
 		      e^{x_i}
 		      }{
 		      \sum_{j=1}^{J}e^{x_j}
-			  }
-		  $, for i = 1, ..., J
+		      }
+	      $, for i = 1, ..., J
 \end{itemize}
 
 \subsection{Organization}
@@ -128,15 +128,88 @@ Recurrent Neural Networks (RNN), similarly to the Feedforward networks, data flo
 	\item Stochastic
 	\item Genetic Scale
 \end{itemize}
+For every ANN Architecture, there are specific types of layers that apply different kinds of mathematical operations on their input data. Each layer type has characteristics on the way its mathematical operations are applied to its input. Those characteristics are generally called as hyper-parameters. For example, in a Fully-Connected layer, a hyperparameter is its number of outputs. Hyperparameters are set by the engineers during the training phase, which are fine-tuned, concerning the application's input data.
 
 This work is focused on the Convolutional Neural Networks (CNN), which are described in detail below.
 
-\section{Convolutional Neural Network}
-Convolutional Neural Networks (CNN) are deep feedforward neural networks that specialize in processing data with grid-like topologies, and are typically used in visual imagery analysis. Some of their applications are image and video recognition, image classification, object detection, recommender systems, medical image analysis, natural language processing and financial time series \cite{Convolutional-neural-networks-wikipedia}. They are simple neural networks that for at least one of their layers, they use the convolution mathematical operation instead of the general matrix multiplication \cite{Goodfellow-et-al-2016}.
+\section{Convolutional Neural Networks}
+Convolutional Neural Networks (CNNs) are deep feedforward neural networks that specialize in processing data with grid-like topologies and are typically used in visual imagery analysis. They are simple neural networks that, for at least one of their layers, use the convolution mathematical operation instead of the general matrix multiplication \cite{Goodfellow-et-al-2016}.
 
-\subsection{Structure of Convolutional Neural Network}
+CNNs imitate the brain's visual cortex, which is the area responsible for the visual processes. Cortical neurons cover small areas of the visual field, with partial overlaps resulting in full visual field coverage.
 
-\subsubsection{Convolution Layer}
-\subsubsection{Pooling}
+CNNs most significant advantage over other image classification algorithms is their little need for pre-processing, meaning that their filters are learned during the training phase while using traditional algorithms, they have to be hand-engineered.
+
+Some of their applications are image and video recognition, image classification, object detection, recommendation systems, medical image analysis, natural language processing, and financial time series \cite{Convolutional-neural-networks-wikipedia}.
+
+\subsection{Structure}
+A typical CNN consists of two parts. The first part includes multiple convolutional and pooling layers, which extract features from the given input. The second part, also called the classifier, includes multiple fully connected layers, which classify the given input using the features extracted from the first part (Figure \ref{fig:typical-cnn-architecture}).
+
+\begin{figure} [ht]
+	\centering
+	\includegraphics[width=\textwidth]{Images/typical-cnn-architecture.png}
+	\decoRule
+	\caption[Typical CNN Architecture]{Typical CNN Architecture - First five layers (Convolution + Max Pooling layers) used for feature extraction, last three layers (Fully-Connected) used for classification, also called the classifier: \href{https://www.kaggle.com/mauddib/digit-recogniser-tutorial-using-a-cnn-tensorflow}{URL}}
+	\label{fig:typical-cnn-architecture}
+\end{figure}
+
+The input data are typically structured as multidimensional arrays, also known as tensors. For example, if the input data are RGB images, then the input tensor's shape is (number of images) x (image width) x (image height) x (image depth), where image depth is called the image's color channels, in this example 3 channels. Moreover, the input data can also be grayscale images or even hyperspectral images. Hyperspectral images have multiple color channels, even in the non-visible for the human eye spectrum, with applications including the medical and space fields. There are also implementations such as 1D and 3D CNNs, but this work examines 2D CNNs only.
+
+\subsubsection{Convolutional Layer}
+A convolutional layer creates and outputs a similarity map between the input data and the convolution's filters, also known as kernels. More specifically, every filter is convolved across the input's width and height, producing the dot product of them. The result is multiple two-dimensional arrays, whose each cell holds the similarity of each filter to some spatial position in the input.
+
+Each filter is a specific type of feature, depending on the training set. For example, in image classification, a filter can be a rough shape of cats' mustaches, so that after the convolution, it can be indicated if they are contained somewhere in the input image. If they are, then, to some probability defined during the training phase, there might be a cat in the input image.
+
+Each convolutional layer is defined by its hyperparameters. Those are:
+\begin{itemize}
+	\item \textbf{Kernel size:} The width and height of the kernels' (filters') size.
+	\item \textbf{Output channels:} The number of feature maps to be created as outputs. Consequently, the number of kernels to be used in this operation also equals to the output channels number.
+	\item \textbf{Stride:} The number of pixels to be skipped horizontally and vertically in each partial convolution. Typically, this number does not differ between the two dimensions.
+	\item \textbf{Zero padding:} There might be a need for zero-padding the input to include as much data as possible in the final computation. There are three different ways of padding:
+	\begin{itemize}
+		\item \textbf{Valid:} No padding is applied; some data may not be included in the computation.
+		\item \textbf{Same:} Applies the amount of padding needed to result in the same width and height as the input.
+		\item \textbf{Full:} Applies padding on the input's edges with a specified number of pixels per dimension.
+	\end{itemize}
+\end{itemize}
+
+The mathematical expression of the convolution operation is defined bellow (Equation \ref{eqn:convolution}).
+
+Let \emph{I} be the input with \emph{C} channels, \emph{H} height and \emph{W} width, and let \emph{K} be the kernels with \emph{N} number of kernels, \emph{C} channels, \emph{KH} height and \emph{KW} width. Also, let \emph{B} be the bias with K values, and let \emph{S} be the stride size and \emph{P} be the padding size. So the convolution operation's output, \emph{Out}, is defined as:
+\begin{equation}
+	I_{padded}(c, i, j) = \begin{cases}
+		0,                  & i \in [1, P], j \in [1, P]                         \\
+		I(c, i - P, j - P), & i \in [P + 1, P + 1 + H], j \in [P + 1, P + 1 + W] \\
+		0,                  & i \in [H + 1, H + 1 + P], j \in [W + 1, W + 1 + P] \\
+	\end{cases}
+\end{equation}
+
+\begin{equation}
+	OH = \frac{H + 2P - KH}{S}
+\end{equation}
+
+\begin{equation}
+	OW = \frac{W + 2P - KW}{S}
+\end{equation}
+
+\begin{equation}
+	\label{eqn:convolution}
+	\begin{split}
+		Out(k, i, j) = B(k) +
+		\sum_{c = 1}^{C} \sum_{kh = 1}^{KH} \sum_{kw = 1}^{KW}
+		I_{padded}(c, kh + i * KH, kw + j * KW) K(k, c, kh, kw),\\
+		\mbox{for k = 1, 2, ..., C},\\
+		\mbox{for i = 1, 2, ..., OH},\\
+		\mbox{for j = 1, 2, ..., OW}\\
+	\end{split}
+\end{equation}
+
+\subsubsection{Pooling Layer}
+
+
+\subsubsection{Fully connected Layer}
+
+
 \subsubsection{Activation Function}
+
+
 \section{Typical Architecture of AlexNet}
