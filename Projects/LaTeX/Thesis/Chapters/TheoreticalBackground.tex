@@ -128,7 +128,7 @@ Recurrent Neural Networks (RNN), similarly to the Feedforward networks, data flo
 	\item Stochastic
 	\item Genetic Scale
 \end{itemize}
-For every ANN Architecture, there are specific types of layers that apply different kinds of mathematical operations on their input data. Each layer type has characteristics on the way its mathematical operations are applied to its input. Those characteristics are generally called as hyper-parameters. For example, in a Fully-Connected layer, a hyperparameter is its number of outputs. Hyperparameters are set by the engineers during the training phase, which are fine-tuned, concerning the application's input data.
+For every ANN Architecture, there are specific types of layers that apply different kinds of mathematical operations on their input data. Each layer type has characteristics on the way its mathematical operations are applied to its input. Those characteristics are generally called hyperparameters. For example, in a Fully-Connected layer, a hyperparameter is its number of outputs. Hyperparameters are set by the engineers during the training phase, which are fine-tuned, concerning the application's input data.
 
 This work is focused on the Convolutional Neural Networks (CNN), which are described in detail below.
 
@@ -161,15 +161,15 @@ Each filter is a specific type of feature, depending on the training set. For ex
 
 Each convolutional layer is defined by its hyperparameters. Those are:
 \begin{itemize}
-	\item \textbf{Kernel size:} The width and height of the kernels' (filters') size.
+	\item \textbf{Kernel size:} The width and height of the kernels' (filters') size, typically, small\-er than the given input.
 	\item \textbf{Output channels:} The number of feature maps to be created as outputs. Consequently, the number of kernels to be used in this operation also equals to the output channels number.
 	\item \textbf{Stride:} The number of pixels to be skipped horizontally and vertically in each partial convolution. Typically, this number does not differ between the two dimensions.
 	\item \textbf{Zero padding:} There might be a need for zero-padding the input to include as much data as possible in the final computation. There are three different ways of padding:
-	\begin{itemize}
-		\item \textbf{Valid:} No padding is applied; some data may not be included in the computation.
-		\item \textbf{Same:} Applies the amount of padding needed to result in the same width and height as the input.
-		\item \textbf{Full:} Applies padding on the input's edges with a specified number of pixels per dimension.
-	\end{itemize}
+	      \begin{itemize}
+		      \item \textbf{Valid:} No padding is applied; some data may not be included in the computation.
+		      \item \textbf{Same:} Applies the amount of padding needed to result in the same width and height as the input.
+		      \item \textbf{Full:} Applies padding on the input's edges with a specified number of pixels per dimension.
+	      \end{itemize}
 \end{itemize}
 
 The mathematical expression of the convolution operation is defined bellow (Equation \ref{eqn:convolution}).
@@ -184,11 +184,11 @@ Let \emph{I} be the input with \emph{C} channels, \emph{H} height and \emph{W} w
 \end{equation}
 
 \begin{equation}
-	OH = \frac{H + 2P - KH}{S}
+	OH = \frac{H + 2P - KH}{S} + 1
 \end{equation}
 
 \begin{equation}
-	OW = \frac{W + 2P - KW}{S}
+	OW = \frac{W + 2P - KW}{S} + 1
 \end{equation}
 
 \begin{equation}
@@ -204,7 +204,55 @@ Let \emph{I} be the input with \emph{C} channels, \emph{H} height and \emph{W} w
 \end{equation}
 
 \subsubsection{Pooling Layer}
+A pooling layer sub-samples its input not only to decrease the computation footprint needed for the next layer, but also to make the network more prone to over-fitting. It reduces the input dimensions by combining multiple neurons into a single neuron. Max-Pooling layers combine groups of neurons by outputting their maximum value. Average-Pooling layers combine groups of neurons by outputting their average value.
 
+Similarly to the convolutional layer, a pooling layer slides a window of some size, called kernel size, across the input data. The data to be combined are those that the sliding window has selected. In 2D CNNs, the pooling layers have 2D windows; the channels are not combined.
+
+A pooling layer can be local, combining small groups of neurons, which also means that the layer's kernel size is small compared to the input size. It can also be global, combining the whole input to a single neuron.
+
+Each pooling layer is defined by its hyperparameters. Those are:
+\begin{itemize}
+	\item \textbf{Kernel size:} The kernel's (sliding window's) width and height.
+	\item \textbf{Stride:} The number of pixels to be skipped horizontally and vertically in each slide. Typically, this number does not differ between the two dimensions.
+\end{itemize}
+
+The mathematical expression of the average-pooling operation (Equation \ref{eqn:avg-pooling}) and max-pooling operation (Equation \ref{eqn:max-pooling}) is defined bellow.
+
+Let \emph{I} be the input with \emph{C} channels, \emph{H} height and \emph{W} width, let \emph{KH} be the kernel's height, let \emph{KW} be the kernel's width, and let \emph{S} be the stride size. So the pooling operations are defined as:
+\begin{equation}
+	OH = \frac{H - KH}{S} + 1
+\end{equation}
+
+\begin{equation}
+	OW = \frac{W - KW}{S} + 1
+\end{equation}
+
+\begin{equation}
+	\label{eqn:avg-pooling}
+	\begin{split}
+		AvgPool(c, i, j) =
+		\frac{
+			\sum_{kh = 1}^{KH} \sum_{kw = 1}^{KW}
+			I(c, kh + i * KH, kw + j * KW)
+		}{
+			KH * KW
+		},\\
+		\mbox{for c = 1, 2, ..., C},\\
+		\mbox{for i = 1, 2, ..., OH},\\
+		\mbox{for j = 1, 2, ..., OW}\\
+	\end{split}
+\end{equation}
+
+\begin{equation}
+	\label{eqn:max-pooling}
+	\begin{split}
+		MaxPool(c, i, j) = \max_{1 \leq kh \leq KH, 1 \leq kw \leq KW}
+		I(c, kh + i * KH, kw + j * KW),\\
+		\mbox{for c = 1, 2, ..., C},\\
+		\mbox{for i = 1, 2, ..., OH},\\
+		\mbox{for j = 1, 2, ..., OW}\\
+	\end{split}
+\end{equation}
 
 \subsubsection{Fully connected Layer}
 
