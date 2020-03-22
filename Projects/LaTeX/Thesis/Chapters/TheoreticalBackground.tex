@@ -34,20 +34,20 @@ While ANNs are inspired by biological neural networks, they are not identical. A
 
 \begin{figure} [ht]
 	\centering
-	\includegraphics[width=\textwidth]{Images/Biological-Neuron.png}
+	\includegraphics[scale=0.25]{Images/Biological-Neuron.png}
 	\decoRule
 	\caption[Standard structure of a biological neuron]{Standard structure of a biological neuron: \href{https://nurseslabs.com/nervous-system/}{URL}}
 	\label{fig:Standard-structure-of-a-biological-neuron}
 \end{figure}
 
-\subsection{ANNs Basic components}
+\subsection{ANNs Basic components} \label{subsection:ANNs-Basic-components}
 Similarly to the biological neural networks, an ANN can be represented as a directed, weighted graph (Figure \ref{fig:simplified-neural-network-graph}), whose vertices represent the biological neurons' cell bodies and its edges the biological synapses. The electrical signal used in biological neurons can be represented as a real number, and their outputs can be calculated by some non-linear function of the inputs' weighted sum. Each edge typically can have a weight, set during the training process, which amplifies or weakens the vertex's signal.
 
 \begin{figure} [ht]
 	\centering
-	\includegraphics[scale=0.6]{Images/simplified-neural-network-graph.png}
+	\includegraphics[scale=0.5]{Images/simplified-neural-network-graph.png}
 	\decoRule
-	\caption[Simplified Neural Network Graph]{Simplified Neural Network Graph: \href{https://en.wikipedia.org/wiki/Artificial_neural_network}{URL}}
+	\caption[Activation Function Graphs]{Simplified Neural Network Graph: \href{https://en.wikipedia.org/wiki/Artificial_neural_network}{URL}}
 	\label{fig:simplified-neural-network-graph}
 \end{figure}
 
@@ -97,6 +97,14 @@ The activation function receives the propagation function's result and applies a
 		      }
 	      $, for i = 1, ..., J
 \end{itemize}
+
+\begin{figure} [ht]
+	\centering
+	\includegraphics[width=\textwidth]{Images/Activation_functions.png}
+	\decoRule
+	\caption[Activation Function Graphs]{Activation Function Graphs}
+	\label{fig:activation-functions}
+\end{figure}
 
 \subsection{Organization}
 An ANN's neurons are typically organized into groups, called layers, in which each neuron has the same distance from the inputs as all the other neurons of its group. The input layer is the layer that gets as inputs the external data, and the output layer, the last layer in the graph, is the one that produces the final output results. Any in-between layer is called a hidden layer. An ANN is called a Deep Neural Network (DNN), when, by convention, it has three or more hidden layers.
@@ -254,10 +262,25 @@ Let \emph{I} be the input with \emph{C} channels, \emph{H} height and \emph{W} w
 	\end{split}
 \end{equation}
 
-\subsubsection{Fully connected Layer}
+\subsubsection{Fully-Connected Layer}
+The CNNs classifier part is comprised of several Fully-Connected layers, which serve as the high-level reasoning. It is the part that finally classifies the given input.
 
+A Fully-Connected layer is the simplest type of layer, as it is the one used in Multi-Layer Perceptron (MLP) neural networks. More specifically, it receives input, with which it computes a weighted sum for each of its output values. This input is derived from the flattened output of several convolutional and pooling layers.
 
-\subsubsection{Activation Function}
+Each Fully-Connected layer is defined by its hyperparameters. Those are:
+\begin{itemize}
+	\item \textbf{Output Features:} The number of features to output. Consequently, this also configures the number of weights needed for the computation, hence, its memory and computation footprint.
+\end{itemize}
 
+The mathematical expression of the Fully-Connected layer's operation (Equation \ref{eqn:fully-connected}) is defined bellow.
+
+Let \emph{I} be the input with \emph{N} input features, let \emph{W} be the layers weights, let \emph{B} be the layer's bias, and let \emph{M} be the layer's output features. So the Fully-Connected layer's output, \emph{Out}, is defined as:
+\begin{equation}
+	\label{eqn:fully-connected}
+	Out(i) = B(i) + \sum_{j = 1}^{N} I(j)W(i, j), \mbox{for i = 1, 2, ..., M}
+\end{equation}
+
+\subsubsection{Activation Layer}
+After each Convolutional and Fully-Connected layer, there can be an Activation layer, which applies an activation function on the output of its previous layer. An activation layer increases the network's nonlinearity without affecting the convolutional layers' receptive fields. The activation function can be one of those presented in section \ref{subsection:ANNs-Basic-components}, but ReLU is generally preferred, due to its fast training characteristics and its low penalty on generalization accuracy.
 
 \section{Typical Architecture of AlexNet}
