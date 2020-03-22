@@ -63,7 +63,8 @@ The propagation function calculates the weighted sum of each neuron's inputs and
 \subsubsection{Activation Function}
 The activation function receives the propagation function's result and applies a transformation, which creates the neuron's final output. There are a lot of different activation functions, with specific characteristics for the training and inference process. However, they all provide a smooth and differentiable transition as the input values change. The most commonly used ones are shown below \cite{Activation-Function-Wikipedia}.
 \begin{itemize}
-	\item \textbf{Identity:} $f(x) = x$
+	\item \textbf{Identity:} $f(x) = x$\\
+	No transformation is applied.
 
 	\item \textbf{Binary Step:} $
 		      f(x) =
@@ -71,15 +72,18 @@ The activation function receives the propagation function's result and applies a
 			      0 & x < 0 \\
 			      1 & x > 0
 		      \end{cases}
-	      $
+		  $\\
+		  While being the original activation function developed when neural networks were invented, it is no longer used as it is incompatible with backpropagation. Backpropagation is the process of updating the weights during the training phase using the gradient descent algorithm. The binary step function is not convex; hence, gradient descent is unable to find a local minimum.
 
 	\item \textbf{Logistic (Sigmoid or Soft step):} $
 		      f(x) = \sigma(x) = \frac{1}{1 + e^{-x}}
-	      $
+		  $\\
+		  Often used, however, in real-world neural networks, it is avoided due to the vanishing gradient problem.
 
 	\item \textbf{TanH:} $
 		      f(x) = tanh(x) = \frac{e^{x} - e^{-x}}{e^{x} - e^{-x}}
-	      $
+		  $\\
+		  Same as Logistic.
 
 	\item \textbf{Rectified Linear Unit (ReLU):} $
 		      f(x) =
@@ -87,7 +91,8 @@ The activation function receives the propagation function's result and applies a
 			      0 & x < 0 \\
 			      x & x > 0
 		      \end{cases}
-	      $
+		  $\\
+		  The most popular activation function, due to its fast backpropagation speeds and its low penalty on generalization accuracy.
 
 	\item \textbf{Softmax:} $
 		      f_i(\textbf{x}) = \frac{
@@ -95,7 +100,8 @@ The activation function receives the propagation function's result and applies a
 		      }{
 		      \sum_{j=1}^{J}e^{x_j}
 		      }
-	      $, for i = 1, ..., J
+		  $, for i = 1, ..., J\\
+		  Commonly used as a final output activation function for multiclass classification. It normalizes the output to [0, 1], and makes the outputs' sum equal to 1. After this transformation, the i-th output's value designates the probability of the input to be the class i.
 \end{itemize}
 
 \begin{figure} [ht]
