@@ -32,7 +32,7 @@ It is widely accepted that the brain's most exceptional ability is pattern recog
 
 While ANNs are inspired by biological neural networks, they are not identical. A neural network is a collection of connected neurons, through which electrical signals from sensor organs or other neurons are passed and processed. A biological neuron is comprised of four main parts; Dendrites, Cell body, Axon, and Synaptic terminals (Figure \ref{fig:Standard-structure-of-a-biological-neuron}). A Dendrite and its Dendritic branches are used as the neuron's input, where sensors or other neurons get connected. A neuron can have multiple Dendrites. The neuron's cell body collects all the input signals and applies an "activation" function to create the output signal. Afterward, the output signal is transported through the Axon and then distributed to the next neurons through the Synaptic terminals. The Synaptic terminals to Dendrites connections are called Synapses.
 
-\begin{figure} [ht]
+\begin{figure} [H]
 	\centering
 	\includegraphics[scale=0.25]{Images/Biological-Neuron.png}
 	\decoRule
@@ -43,7 +43,7 @@ While ANNs are inspired by biological neural networks, they are not identical. A
 \subsection{ANNs Basic components} \label{subsection:ANNs-Basic-components}
 Similarly to the biological neural networks, an ANN can be represented as a directed, weighted graph (Figure \ref{fig:simplified-neural-network-graph}), whose vertices represent the biological neurons' cell bodies and its edges the biological synapses. The electrical signal used in biological neurons can be represented as a real number, and their outputs can be calculated by some non-linear function of the inputs' weighted sum. Each edge typically can have a weight, set during the training process, which amplifies or weakens the vertex's signal.
 
-\begin{figure} [ht]
+\begin{figure} [H]
 	\centering
 	\includegraphics[scale=0.5]{Images/simplified-neural-network-graph.png}
 	\decoRule
@@ -104,7 +104,7 @@ The activation function receives the propagation function's result and applies a
 		  Commonly used as a final output activation function for multiclass classification. It normalizes the output to [0, 1], and makes the outputs' sum equal to 1. After this transformation, the i-th output's value designates the probability of the input to be the class i.
 \end{itemize}
 
-\begin{figure} [ht]
+\begin{figure} [H]
 	\centering
 	\includegraphics[width=\textwidth]{Images/Activation_functions.png}
 	\decoRule
@@ -158,7 +158,7 @@ Some of their applications are image and video recognition, image classification
 \subsection{Structure}
 A typical CNN consists of two parts. The first part includes multiple convolutional and pooling layers, which extract features from the given input. The second part, also known as the classifier, includes multiple fully connected layers, which classify the given input using the features extracted from the first part (Figure \ref{fig:typical-cnn-architecture}).
 
-\begin{figure} [ht]
+\begin{figure} [H]
 	\centering
 	\includegraphics[width=\textwidth]{Images/typical-cnn-architecture.png}
 	\decoRule
