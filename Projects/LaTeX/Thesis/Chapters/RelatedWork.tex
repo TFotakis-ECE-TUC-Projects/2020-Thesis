@@ -99,9 +99,11 @@ PyTorch \cite{PyTorch-Official-site} \cite{PyTorch-Wikipedia} developed by Faceb
 TensorFlow \cite{TensorFlow-Official-site} \cite{TensorFlow-Wikipedia} is the most popular deep learning framework nowadays. Developed by Google, it has interfaces for Python, Javascript, C++, C\#, Java, Go, and Julia. It is the most used framework for production, with support of CPU, GPU, and TPU acceleration. It can, not only, run on powerful computing clusters, but also, on mobile platforms and embedded systems. While it is a lower-level framework and needs much coding, it provides high configurability. In contrast to PyTorch, it operates with a static computation graph, which enhances its efficiency but sacrifices the ease of model modifications; for every modification, a model retrain is needed.
 
 \section{GPU Approach}
+Most of the aforementioned deep learning frameworks support GPU acceleration. GPUs can have hundreds of even thousands of more cores compared to CPUs, with even specialized ones called Tensor core for tensor operations, which makes them ideal for executing algorithms with high parallelism characteristics, such as those used in deep learning. In addition, due to the large amounts of data that deep learning algorithms need to handle, High Bandwidth Memory (HBM) can be a perfect fit providing up to 750 GB/s compare to only 50 GB/s offered by traditional CPUs. Moreover, multiple GPUs in a single system can be utilized to further expand its parallelism capabilities.
 
+As of right now, only NVIDIA GPUs are widely supported by most frameworks. NVIDIA's GPUs are optimized for deep learning frameworks with compatibility for Compute Unified Device Architecture Software Development Kit (CUDA SDK) \cite{NVIDIA-CUDA}, which supports many programming languages such as C and C++, increasing the GPUs usability. NVIDIA has also developed the CUDA Deep Neural Network library (cuDNN) \cite{NVIDIA-cuDNN}, designed to accelerate frameworks such as TensorFlow and PyTorch by providing highly optimized implementations of routines like forward and backward convolution. Furthermore, NVIDIA's TensorRT \cite{NVIDIA-TensorRT} is an SDK for highly optimized inference applications, delivering low latency and high throughput. PyTorch also supports PyCUDA \cite{NVIDIA-PyCUDA}, NVIDIA's CUDA parallel computation API for Python.
 
-\subsection{Tensor Processing Unit (TPU)}
+\section{Tensor Processing Unit (TPU)}
 
 \section{The FPGA Perspective}
 \subsection{Xilinx CHaiDNN}
