@@ -3,6 +3,7 @@
 \label{Chapter-Related-Work}
 
 \section{CNN Architectures}
+\label{section:CNN-Architectures}
 The essential part of every machine learning application is its dataset. A dataset is the collection of data that a machine learning application can be based on; for a neural network application, a dataset is the collection of data that the network is trained and tested. Nowadays, there are numerous datasets for visual recognition applications, with various sizes and qualities. The size of a dataset defines the number of data per class, and its quality can define many aspects of the data, such as their noise characteristics and their real correctness on their assigned labels (the creators of the dataset may wrongly label data). Some of the most popular datasets are MNIST with grayscale images of handwritten digits \cite{The-MNIST-database-of-handwritten-digits} \cite{MNIST-database-Wikipedia}, Fashion-MNIST with grayscale images of various pieces of clothing \cite{Fashion-MNIST-a-Novel-Image-Dataset-for-Benchmarking-Machine-Learning-Algorithms} \cite{Fashion-MNIST-Github}, CIFAR-10 \& CIFAR-100 with color images of 10 and 100 classes, respectively, of everyday items \cite{CIFAR-10-CIFAR-100} \cite{CIFAR-10-CIFAR-100-Wikipedia}, Microsoft COCO with color images for object recognition / detection of everyday items \cite{Microsoft-COCO-Common-Objects-in-Context} \cite{MS-COCO} and ImageNet with high resolution color images of 22000 classes of everyday items \cite{ImageNet-Official-site} \cite{ImageNet-Wikipedia}.
 
 ImageNet is one of the biggest datasets, containing more than 14 million hand-annotated images and more than 1 million bounding boxes for those images. Since 2010, the ImageNet Large Scale Visual Recognition Challenge (ILSVRC) is organized annually by the ImageNet project, where software programs compete in the classification of a trimmed list of one thousand non-overlapping classes. The contestant softwares have been of many different types throughout the years; however, from the ILSVRC 2012 and then on, Convolutional Neural Networks have dominated the challenge, achieving near human-like accuracy. A CNN called AlexNet \cite{ImageNet-classification-with-deep-convolutional-neural-networks} managed to achieve a top-5 error of 15.3\% in the ILSVRC 2012, where the top-5 error rate is the fraction of test data for which the correct label is not among the five most probable labels.
@@ -82,11 +83,24 @@ ResNet \cite{Deep-Residual-Learning-for-Image-Recognition} (Figure \ref{fig:ResN
 \subsection{Summary}
 One can observe that all the aforementioned architectures use the same types of layers found on classical CNNs. They only differ in some training techniques, their depths, and hyperparameters. In this work, AlexNet is the primary benchmark used to test the various hardware architectures, because of its simplicity and its high complexity.
 
+\section{Deep Learning Frameworks}
+There are many software frameworks available for developers to use for their deep learning applications. Their differences, apart from their syntax, are found on the amount of abstraction, portability, and their environment. Some of the most popular ones are described below.
+
+\subsection{Keras}
+Keras \cite{Keras-Official-site} \cite{Keras-Wikipedia} is a high-level library for Python, built on top of other lower-level frameworks such as TensorFlow, Theano and CNTK. While the high-level approach reduces the creation of massive deep learning models to single-line functions, it also makes the library's environment less configurable. It is best suited for learning and prototyping, with the abstraction of the mathematical operations applied.
+
+\subsection{CAFFE}
+CAFFE (Convolutional Architecture for Fast Feature Embedding) \cite{Caffe-Official-site} \cite{Caffe-Wikipedia} is a deep learning framework written in C++, with a Python interface, originally developed at University of California, Berkley. It supports CNN, RCNN, LSTM, and Fully-Connected neural network models, with both CPU and GPU acceleration. Its successor, CAFFE2, also supports RNNs. CAFFE2 is now merged into PyTorch.
+
+\subsection{PyTorch}
+PyTorch \cite{PyTorch-Official-site} \cite{PyTorch-Wikipedia} developed by Facebook, is a lower-level framework based on Torch, which supports any kind of neural networks. It contains many pre-trained models, most of those in section \ref{section:CNN-Architectures}, and can also utilize GPU acceleration. It operates with a dynamically updated graph, which allows for changes to the architecture in the process. It is best suited for small projects, prototyping, and research purposes.
+
+\subsection{TensorFlow}
+TensorFlow \cite{TensorFlow-Official-site} \cite{TensorFlow-Wikipedia} is the most popular deep learning framework nowadays. Developed by Google, it has interfaces for Python, Javascript, C++, C\#, Java, Go, and Julia. It is the most used framework for production, with support of CPU, GPU, and TPU acceleration. It can, not only, run on powerful computing clusters, but also, on mobile platforms and embedded systems. While it is a lower-level framework and needs much coding, it provides high configurability. In contrast to PyTorch, it operates with a static computation graph, which enhances its efficiency but sacrifices the ease of model modifications; for every modification, a model retrain is needed.
+
 \section{GPU Approach}
 
-\section{Google Brain Project}
-\subsection{DistBelief}
-\subsection{TensorFlow}
+
 \subsection{Tensor Processing Unit (TPU)}
 
 \section{The FPGA Perspective}
