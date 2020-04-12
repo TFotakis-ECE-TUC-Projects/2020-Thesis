@@ -190,7 +190,7 @@ Each convolutional layer is defined by its hyperparameters. Those are:
 	      \end{itemize}
 \end{itemize}
 
-The mathematical expression of the convolution operation is defined bellow (Equation \ref{eqn:convolution}).
+The mathematical expression of the convolution operation is defined bellow (Equation \ref{eqn:convolution}) and visualized on Figure \ref{fig:convolution-operation}.
 
 Let \emph{I} be the input with \emph{C} channels, \emph{H} height and \emph{W} width, and let \emph{K} be the kernels with \emph{N} number of kernels, \emph{C} channels, \emph{KH} height and \emph{KW} width. Also, let \emph{B} be the bias with K values, and let \emph{S} be the stride size and \emph{P} be the padding size. So the convolution operation's output, \emph{Out}, is defined as:
 \begin{equation}
@@ -223,6 +223,15 @@ Let \emph{I} be the input with \emph{C} channels, \emph{H} height and \emph{W} w
 	\end{split}
 \end{equation}
 
+\begin{figure} [H]
+	\centering
+	\includegraphics[scale=0.6]{Images/CNNArchitectures/convolution-operation.png}
+	% \includegraphics[width=\textwidth]{Images/CNNArchitectures/convolution-operation.png}
+	\decoRule
+	\caption[Convolution Operation]{Convolution Operation - A 2x2 Kernel filter is applied on the 4x3 example input matrix with stride 1 and valid padding. Figure from \cite{Goodfellow-et-al-2016}.}
+	\label{fig:convolution-operation}
+\end{figure}
+
 Nowadays, most applications might require multiple Convolutional layers to extract useful features from their complex inputs. Deeper architectures, in general, create more detailed characteristics. Furthermore, activation functions can be interjected between adjacent Convolutional layers to enhance the network's nonlinearity. Activation functions can make the network function as a universal function approximator \cite{Approximation-capabilities-of-multilayer-feedforward-networks}.
 
 \subsubsection{Pooling Layer}
@@ -238,7 +247,7 @@ Each pooling layer is defined by its hyperparameters. Those are:
 	\item \textbf{Stride:} The number of pixels to be skipped horizontally and vertically in each slide. Typically, this number does not differ between the two dimensions.
 \end{itemize}
 
-The mathematical expression of the average-pooling operation (Equation \ref{eqn:avg-pooling}) and max-pooling operation (Equation \ref{eqn:max-pooling}) is defined bellow.
+The mathematical expression of the average-pooling operation (Equation \ref{eqn:avg-pooling}) and max-pooling operation (Equation \ref{eqn:max-pooling}) is defined and visualized (Figure \ref{fig:max-pooling-operation}) bellow.
 
 Let \emph{I} be the input with \emph{C} channels, \emph{H} height and \emph{W} width, let \emph{KH} be the kernel's height, let \emph{KW} be the kernel's width, and let \emph{S} be the stride size. So the pooling operations are defined as:
 \begin{equation}
@@ -276,6 +285,15 @@ Let \emph{I} be the input with \emph{C} channels, \emph{H} height and \emph{W} w
 	\end{split}
 \end{equation}
 
+\begin{figure} [H]
+	\centering
+	\includegraphics[scale=0.6]{Images/CNNArchitectures/maxpooling-operation.png}
+	% \includegraphics[width=\textwidth]{Images/CNNArchitectures/maxpooling-operation.png}
+	\decoRule
+	\caption[Max-Pooling Operation]{Max-Pooling Operation - A max operation is applied with a 2x2 Kernel on the 4x4 example input matrix with stride 2. Figure from \cite{Goodfellow-et-al-2016}.}
+	\label{fig:max-pooling-operation}
+\end{figure}
+
 \subsubsection{Fully-Connected Layer}
 The CNNs classifier part is comprised of several Fully-Connected layers, which serve as the high-level reasoning. It is the part that finally classifies the given input.
 
@@ -300,5 +318,3 @@ The final Fully-Connected layers is typically followed by a Softmax activation l
 
 \subsubsection{Activation Layer}
 After each Convolutional and Fully-Connected layer, there can be an Activation layer, which applies an activation function on the output of its previous layer. An activation layer increases the network's nonlinearity without affecting the convolutional layers' receptive fields. The activation function can be one of those presented in section \ref{subsection:ANNs-Basic-components}, but ReLU and its variants are generally preferred, due to its fast training characteristics and its low penalty on generalization accuracy.
-
-% \section{Typical Architecture of Large Scale Visual Recognition 2D CNNs}
