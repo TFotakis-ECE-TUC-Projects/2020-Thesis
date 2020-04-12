@@ -83,7 +83,7 @@ ResNet \cite{Deep-Residual-Learning-for-Image-Recognition} (Figure \ref{fig:ResN
 \subsection{Summary}
 One can observe that all the aforementioned architectures use the same types of layers found on classical CNNs. They only differ in some training techniques, their depths, and hyperparameters. In this work, AlexNet is the primary benchmark used to test the various hardware architectures, because of its simplicity and its high complexity.
 
-\section{Deep Learning Frameworks}
+\section{Deep Learning Software Frameworks}
 There are many software frameworks available for developers to use for their deep learning applications. Their differences, apart from their syntax, are found on the amount of abstraction, portability, and their environment. Some of the most popular ones are described below.
 
 \subsection{Keras}
@@ -98,12 +98,22 @@ PyTorch \cite{PyTorch-Official-site} \cite{PyTorch-Wikipedia} developed by Faceb
 \subsection{TensorFlow}
 TensorFlow \cite{TensorFlow-Large-Scale-Machine-Learning-on-Heterogeneous-Distributed-Systems} \cite{TensorFlow-Official-site} \cite{TensorFlow-Wikipedia} is the most popular deep learning framework nowadays. Developed by Google, it has interfaces for Python, Javascript, C++, C\#, Java, Go, and Julia. It is the most used framework for production, with support of CPU, GPU, and TPU acceleration. It can, not only, run on powerful computing clusters, but also, on mobile platforms and embedded systems. While it is a lower-level framework and needs much coding, it provides high configurability. In contrast to PyTorch, it operates with a static computation graph, which enhances its efficiency but sacrifices the ease of model modifications; for every modification, a model retrain is needed.
 
-\section{GPU Approach}
+\section{Hardware Solutions}
+The most considerable portion of the computation needed in CNNs comes from the Multiply-Accumulate (MAC) operations on floating-point numbers. Usually, networks are trained on GPUs, because they can fulfill the high parallelism needs. For even more exceptional performance on training, TPUs can be used. However, the training phase is considered, most of the time, to be a one-time procedure. Hence, the research community is more focused on accelerating the inference phase. While being a much less computationally intensive procedure compared to training, the inference phase can still be intensive enough to be able to achieve real-time or even faster applications.
+
+Neural networks' inference can be run on CPUs, GPUs, ASICs such as the TPU, and also FPGAs. A brief description of each platform's advantages and limitations is given below.
+
+\subsection{CPUs}
+CPUs are multi-purpose processors that can be very flexible in the types of operations they can execute while being very easy to program. They can also execute Single Instruction Multiple Data (SIMD) instructions using the Advanced Vector Extensions (AVX) \cite{AVX-Wikipedia} and utilize multiple cores. Though they lack the vast amount of computation power compared to other solutions and they can have high power consumption.
+
+\subsection{GPUs}
 Most of the aforementioned deep learning frameworks support GPU acceleration. GPUs can have hundreds or even thousands of more cores compared to CPUs, with even specialized ones called Tensor core for tensor operations, which makes them ideal for executing algorithms with high parallelism characteristics, such as those used in deep learning. In addition, due to the massive amounts of data that deep learning algorithms need to handle, High Bandwidth Memory (HBM) can be a perfect fit providing up to 750 GB/s compared to only 50 GB/s offered by traditional CPUs. Moreover, multiple GPUs in a single system can be utilized to further expand its parallelism capabilities.
 
 As of right now, only NVIDIA GPUs are widely supported by most frameworks. NVIDIA's GPUs are optimized for deep learning frameworks with compatibility for Compute Unified Device Architecture Software Development Kit (CUDA SDK) \cite{NVIDIA-CUDA}, which supports many programming languages such as C and C++, increasing the GPUs usability. NVIDIA has also developed the CUDA Deep Neural Network library (cuDNN) \cite{cuDNN-Efficient-Primitives-for-Deep-Learning} \cite{NVIDIA-cuDNN}, designed to accelerate frameworks such as TensorFlow and PyTorch by providing highly-optimized implementations of routines like forward and backward convolution. Furthermore, NVIDIA's TensorRT \cite{NVIDIA-TensorRT} is an SDK for high\-ly optimized inference applications, delivering low latency and high throughput. PyTorch also supports PyCUDA \cite{NVIDIA-PyCUDA}, NVIDIA's CUDA parallel computation API for Python.
 
-\section{Tensor Processing Unit (TPU)}
+Although GPUs provide very high performance and throughput, they can be very power inefficient and can introduce high latency per result.
+
+\subsection{Tensor Processing Units (TPU)}
 Tensor Processing Unit (TPU) \cite{In-Datacenter-Performance-Analysis-of-a-Tensor-Processing-Unit} is a custom Application Specific Integrated Circuit (ASIC), designed by Google, that accelerates the inference phase on neural networks. It is deployed to their datacenters since 2015, with the first architecture generation achieving up to 200x speedup compared to a server-class Intel Haswell CPU and up to 70x speedup compared to an NVIDIA K80 GPU. Nowadays, they have designed another two generations of its TPU (latest is TPU v3), and an edge computing solution called Coral Edge TPU \cite{Coral-Edge-TPU}, which comes in various form factors, achieving up to 4 TOPS using only 2 Watts. The first generation of TPUs was targeted for inference applications, accelerating Google's 95\% of its datacenters' neural network load, and was designed for high volume of low precision computation, with as low as 8-bit precision. However, from the second generation, TPUs support floating-point arithmetic making them ideal for training accelerators. Google also made its TPU infrastructure available to the public on its Google Compute Engine.
 
 Every TPU v3 board is comprised of 4 chips (Figure \ref{fig:google-tpu-motherboard}), with each chip containing 2 TPU cores. Each TPU core provides 2 MXUs and is provided 16GB of HBM. Each MXU is capable of 16k Multiply-Accumulate (MAC) operation per cycle, which gives the bulk of the compute power. TPU boards are organized into pods (Figure \ref{fig:tpu-v3-pods}), with each pod containing up to 2048 TPU cores and 32TB total memory \cite{Google-Cloud-TPU}, providing a total of up to 92 PetaFLOPS of performance \cite{Tensor-Processing-Unit-Wikipedia}.
@@ -111,6 +121,8 @@ Every TPU v3 board is comprised of 4 chips (Figure \ref{fig:google-tpu-motherboa
 The TensorFlow framework is used to run applications on TPUs, with a reduced bfloat16 precision. Google created the bfloat16 16-bit floating-point representation standard to provide better training and model accuracy compared to IEEE half-precision representation.
 
 In general, TPUs are worth using with very large models, needing weeks or even months of training, dominated by matrix computations, and no custom TensorFlow operations inside the main training loop. Otherwise, GPUs or ever CPUs may be more suitable and cost-effective \cite{Cloud-Tensor-Processing-Units}.
+
+ASICs, like Google's TPUs, are very costly to design and produce. While they provide the best performance and efficiency, they can become deprecated fast, due to the speed the AI field is developing.
 
 \begin{figure} [H]
 	\centering
@@ -120,7 +132,15 @@ In general, TPUs are worth using with very large models, needing weeks or even m
 	\label{fig:tpu-v3-pods}
 \end{figure}
 
+\subsection{FPGAs}
+FPGAs provide high flexibility in terms of hardware architecture, unlike all other hardware solutions that are limited to their fixed architecture. For every application, a custom design is developed to provide the computation units in types and volume needed. Computation units are then placed on the so-called FPGA fabric, the programmable part of the chip, to create systems that accelerate specific applications. FPGAs can come with hard processor cores in the same chip that can be used for communication, scheduling, and data pre and post-processing. FPGAs are a perfect match for fields that come with rapid pace of development, such as AI and ML. Furthermore, they provide high energy efficiency and low latency per result due to the design being specific to the application. Even though FPGAs have Block RAM (BRAM), which is a high-speed type of memory inside the FPGA fabric, they can be bottlenecked due to BRAM's limited size. Hence, FPGAs are often provided with big DRAM modules. However, compared to GPUs', which are provided with HBM, FPGAs can still face bandwidth limitations. Such limitations can be overcome the same way ASICs do; by reducing data precision. Reducing data precision can be accomplished by converting them from floating-point to a lower bitwidth floating point or even to fixed point. It can also be achieved by data reuse or quantization.
+
+\section{Quantization}
+
+
 \section{The FPGA Perspective}
+While FPGAs can provide significant advantages over other hardware platforms, as of right now, there is no software framework, like TensorFlow and PyTorch, that natively supports FPGA acceleration. Hence, third party architectures have to be used.
+
 \subsection{Xilinx CHaiDNN}
 \subsection{Xilinx Deep Learning Processor Unit (DPU)}
 
