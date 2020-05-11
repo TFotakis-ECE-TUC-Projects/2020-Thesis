@@ -191,6 +191,32 @@ The DPU IP is implemented in the Programmable Logic (PL) part with direct connec
 	\label{fig:dpu-top-block-diagram}
 \end{figure}
 
+DPU-V1, previously known as xDNN, uses a 96x16 DSP Systolic Array as its main compute unit (Figure \ref{fig:dpu-v1-architecture}). DPU-V2 uses a Hybrid Computing Array (Figure \ref{fig:dpu-v2-architecture}), and DPU-V3E uses multiple instances of Batch Engines in each DPU core (Figure \ref{fig:dpu-v3-architecture}).
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[scale=0.6]{Images/Hardware/dpu-v1-architecture.png}
+	\decoRule
+	\caption[Xilinx DPU-V1 Architecture]{Xilinx DPU-V1 Architecture: \href{https://www.xilinx.com/html_docs/vitis_ai/1_1/zlx1571919192500.html}{URL}}
+	\label{fig:dpu-v1-architecture}
+\end{figure}
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[scale=0.6]{Images/Hardware/dpu-v2-architecture.png}
+	\decoRule
+	\caption[Xilinx DPU-V2 Architecture]{Xilinx DPU-V2 Architecture: \href{https://www.xilinx.com/html_docs/vitis_ai/1_1/vpt1571919210634.html}{URL}}
+	\label{fig:dpu-v2-architecture}
+\end{figure}
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[scale=0.6]{Images/Hardware/dpu-v3-architecture.png}
+	\decoRule
+	\caption[Xilinx DPU-V3 Architecture]{Xilinx DPU-V3 Architecture: \href{https://www.xilinx.com/html_docs/vitis_ai/1_1/xyt1583919665886.html}{URL}}
+	\label{fig:dpu-v3-architecture}
+\end{figure}
+
 In contrast with the CHaiDNN, all layers, including the Fully-Connected and Softmax layers, are hardware accelerated. Currently, implementing up to four DPU cores in a single DPU IP is supported, and there is an option of using Double Data Rate DSPs (Double-Pumped DSPs). Furthermore, there are architectures for various parallelism needs, starting from 512 operations per cycle per core up to 4096 operations per cycle per core.
 
 The Xilinx Vitis AI development environment \cite{Xilinx-Vitis-AI}, released in December 2019, is Xilinx's development platform for AI inference applications using its hardware platforms, which provides optimized IPs, tools, and libraries including the aforementioned Xilinx DPU. The Xilinx Vitis AI stack (Figure \ref{fig:vitis-ai-stack}) has to be used to run a network's inference using the DPU accelerator. The network's program giving instructions and orchestrating the data transfers has to run on top of PetaLinux. This program is generated with substantial instruction optimizations using the Xilinx Vitis AI compiler. This program has to be regenerated with every network or hardware configuration change. The network's quantization is done using the Xilinx Vitis AI Quantizer, generating the appropriate 8-bit integer parameters.
