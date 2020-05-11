@@ -160,24 +160,49 @@ Moreover, FPGAs can come with hard processor cores in the same chip that can be 
 Although FPGAs have Block RAM (BRAM) and some even Ultra RAM (URAM), which is a high-speed type of memory inside the FPGA fabric, they can be bottlenecked due to its limited size. Hence, FPGAs are often provided with big DRAM modules. However, compared to GPUs', which are provided with HBM, FPGAs may still face bandwidth limitations. Such limitations can be overcome the same way ASICs do; by reducing data precision. Reducing data precision is accomplished by converting them from floating-point to lower bitwidth numeric representations, such as half-precision floating point and fixed point. It can also be achieved by data reuse or quantization.
 
 \section{Quantization}
-In order for the FPGAs and TPUs to compete with the GPUs, the parameters' memory footprint has to be reduced. This process is called quantization, and it is comprised of various techniques. Quantization is applied independently of the framework that trains the network and the hardware that runs its inference; however, the techniques to be used are selected explicitly to the network's environment for best performance optimization.
+In order for FPGAs and TPUs to compete with GPUs, the parameters' memory footprint has to be reduced to reduce the needed memory bandwidth and communication. This process is called quantization, and it is comprised of various techniques. Quantization is applied independently of the framework that trains the network and the hardware that runs its inference; however, the techniques to be used are selected explicitly to the network's environment for best performance optimization.
+% Todo: add more details on techniques and reference papers
 
 \section{The FPGA Perspective}
 While FPGAs can provide significant advantages over other hardware platforms, as of right now, there is no software framework, like TensorFlow and PyTorch, that natively supports FPGA acceleration. Hence, third party architectures have to be used.
 
 \subsection{Xilinx CHaiDNN}
-CHaiDNN \cite{CHaiDNN-GitHub} is an open-source Deep Neural Network inference accelerator library developed by Xilinx for its Ultrascale+ MPSoC devices, mainly focusing on Convolutional Neural Networks. It was initially released in February 2018, with its second version been released in June 2018.
+The CHaiDNN \cite{CHaiDNN-GitHub} is an open-source Deep Neural Network inference accelerator library developed by Xilinx for its Ultrascale+ MPSoC devices, mainly focusing on Convolutional Neural Networks. It was initially released in February 2018, with its second version been released in June 2018.
 
-CHaiDNN is designed for maximum compute efficiency at 6-bit fixed-point data type for both parameters and activations, while also supporting 8-bit fixed-point representations. The data precision can vary even throughout the layers, claiming that a well-crafted data precision combination can result in accuracy similar to a floating-point single precision model. To avoid retraining the network with 6-bit or 8-bit fixed-point representations, Xilinx has developed two quantization techniques, the Dynamic fixed-point quantization, and the Xilinx Quantizer, which are both supported by the CHaiDNN.
+The CHaiDNN is designed for maximum compute efficiency at 6-bit fixed-point data type for both parameters and activations, while also supporting 8-bit fixed-point representations. The data precision can vary even throughout the layers, claiming that a well-crafted data precision combination can result in accuracy similar to a floating-point single precision model. To avoid retraining the network with 6-bit or 8-bit fixed-point representations, Xilinx has developed two quantization techniques, the Dynamic fixed-point quantization, and the Xilinx Quantizer, which are both supported by the CHaiDNN.
 
-Moreover, CHaiDNN provides configurations that can utilize from 128 up to 1024 Double-Pumped DSPs, with some designs achieving up to 700MHz. For smaller MPSoCs, there is the DietCHai, a miniature version of CHai. URAM is also supported.
+Moreover, the CHaiDNN provides configurations that can utilize from 128 up to 1024 Double-Pumped DSPs, with some designs achieving up to 700MHz. For smaller MPSoCs, there is the DietCHai, a miniature version of CHai. URAM is also supported.
 
 Even though the most commonly used layers in various image classification and object detection neural networks are supported, unsupported layers can also be added as software layers and run the network's inference. For performance optimization, some layers, such as the Fully-Connected and Softmax, are implemented as software layers. However, software layers can decrease the inference throughput based on their latencies. In order to tackle this problem, hardware and software layers can be run in parallel, hiding each others' latencies.
 
 To run the inference using the accelerator, PetaLinux has to be running on the MPSoC to handle all the layer job scheduling across all CPU cores and hardware IPs. Network configuration and parameters are given using the Caffe framework's standard (.prototxt, .caffemodel, and mean files).
 
 \subsection{Xilinx Deep Learning Processing Unit (DPU)}
-\subsection{Xilinx Vitis AI}
+Xilinx Deep Learning Processing Unit (DPU) \cite{PG338-Zynq-DPU-IP-Product-Guide} is a configurable Convolutional Neural Network 8-bit integer inference accelerator developed by Xilinx for its Zynq-7000 SoCs and Zynq Ultrascale+ MPSoCs. It supports most CNNs and can be configured appropriately according to parallelism needs and resource constraints. It was initially released in February 2019, with its latest version 3.2 been released in March 2020.
+
+The DPU IP is implemented in the Programmable Logic (PL) part with direct connections to the Processing System (PS). Instructions are sent from the program running on the Application Processing Unit (APU) to the corresponding DPU core with memory addresses of input images, temporary, and output data. The system's architecture is shown in Figure \ref{fig:dpu-top-block-diagram} (Left) with the APU, High Speed Data Tube, and DPU part all being in the same MPSoC, and RAM being the external Random Access Memory. A more detailed hardware architecture is shown on Figure \ref{fig:dpu-top-block-diagram} (Right). It is worth noting that the on-chip memory is utilized as a buffer for input, temporary and output data, increasing throughput, and efficiency by reusing as much data as possible and reducing external memory communication. The Hybrid Computing Array (Left) or Computing Engine (Right) is comprised of Processing Elements (PEs), creating a deep pipelined design. A PE is based on the fine-grained building blocks found in Xilinx devices, such as multipliers, adders, and accumulators.
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[scale=0.35]{Images/Hardware/dpu-top-block-diagram.png}
+	\includegraphics[scale=0.6]{Images/Hardware/dpu-hardware-architecture.png}
+	\decoRule
+	\caption[Xilinx DPU Architecture]{Xilinx DPU Architecture: Left top-level block diagram, Right hardware architecture: \href{https://www.xilinx.com/support/documentation/ip_documentation/dpu/v3_2/pg338-dpu.pdf}{URL}}
+	\label{fig:dpu-top-block-diagram}
+\end{figure}
+
+In contrast with the CHaiDNN, all layers, including the Fully-Connected and Softmax layers, are hardware accelerated. Currently, implementing up to four DPU cores in a single DPU IP is supported, and there is an option of using Double Data Rate DSPs (Double-Pumped DSPs). Furthermore, there are architectures for various parallelism needs, starting from 512 operations per cycle per core up to 4096 operations per cycle per core.
+
+The Xilinx Vitis AI development environment \cite{Xilinx-Vitis-AI}, released in December 2019, is Xilinx's development platform for AI inference applications using its hardware platforms, which provides optimized IPs, tools, and libraries including the aforementioned Xilinx DPU. The Xilinx Vitis AI stack (Figure \ref{fig:vitis-ai-stack}) has to be used to run a network's inference using the DPU accelerator. The network's program giving instructions and orchestrating the data transfers has to run on top of PetaLinux. This program is generated with substantial instruction optimizations using the Xilinx Vitis AI compiler. This program has to be regenerated with every network or hardware configuration change. The network's quantization is done using the Xilinx Vitis AI Quantizer, generating the appropriate 8-bit integer parameters.
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[scale=0.6]{Images/Hardware/vitis-ai-stack.png}
+	\decoRule
+	\caption[Xilinx Vitis AI Stack]{Xilinx Vitis AI Stack: \href{https://www.xilinx.com/support/documentation/ip_documentation/dpu/v3_2/pg338-dpu.pdf}{URL}}
+	\label{fig:vitis-ai-stack}
+\end{figure}
+
 \subsection{NVIDIA NVDLA}
 
 \section{Thesis Approach}
