@@ -160,8 +160,11 @@ Moreover, FPGAs can come with hard processor cores in the same chip that can be 
 Although FPGAs have Block RAM (BRAM) and some even Ultra RAM (URAM), which is a high-speed type of memory inside the FPGA fabric, they can be bottlenecked due to its limited size. Hence, FPGAs are often provided with big DRAM modules. However, compared to GPUs', which are provided with HBM, FPGAs may still face bandwidth limitations. Such limitations can be overcome the same way ASICs do; by reducing data precision. Reducing data precision is accomplished by converting them from floating-point to lower bitwidth numeric representations, such as half-precision floating point and fixed point. It can also be achieved by data reuse or quantization.
 
 \section{Quantization}
-In order for FPGAs and TPUs to compete with GPUs, the parameters' memory footprint has to be reduced to reduce the needed memory bandwidth and communication. This process is called quantization, and it is comprised of various techniques. Quantization is applied independently of the framework that trains the network and the hardware that runs its inference; however, the techniques to be used are selected explicitly to the network's environment for best performance optimization.
-% Todo: add more details on techniques and reference papers
+In order to compete with GPUs, FPGAs and TPUs have to minimize their memory bandwidth needs. One of the most effective ways to tackle this problem is by reducing the parameters' memory footprint. This process is called quantization, and it is comprised of various techniques. While, quantization is applied independently of the framework that trains the network and the hardware that runs its inference, the techniques to be used are selected explicitly to the network's environment for best performance optimization.
+
+\textcolor{red}{
+Todo: add more details on techniques and reference papers
+}
 
 \section{The FPGA Perspective}
 While FPGAs can provide significant advantages over other hardware platforms, as of right now, there is no software framework, like TensorFlow and PyTorch, that natively supports FPGA acceleration. Hence, third party architectures have to be used.
@@ -230,5 +233,30 @@ The Xilinx Vitis AI development environment \cite{Xilinx-Vitis-AI}, released in 
 \end{figure}
 
 \subsection{NVIDIA NVDLA}
+NVIDIA's Deep Learning Accelerator (NVDLA) \cite{NVIDIA-NVDLA}, initially released in Q3 2017, is a free and open architecture project seeking to standardize the design of deep learning inference accelerators.
+
+There are two main system implementations; the headless and the headed. The headless implementation expects the main system's processor to manage the accelerator, while the headed implementation expects a companion microcontroller, tightly coupled to the NVDLA sub-system, to do the management.
+
+NVDLA is comprised of five components, Convolution core, Single Data processor, Planar Data processor, Channel Data processor, Dedicated Memory, and Data Reshape Engine, which are separate and independently configurable. Each block's input and output data transfers can be performed either in memory-to-memory using the Independent operation mode, or by passing through some internal results to next blocks using the Fused operation mode (Figure \ref{fig:nvdla-hardware-architecture}). Furthermore, NVDLA supports a wide range of data types, from binary and 4-bit integer up to 64-bit floating-point.
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[scale=0.6]{Images/Hardware/nvdla-hardware-architecture.png}
+	\decoRule
+	\caption[NVIDIA NVDLA Hardware Architecture]{NVIDIA NVDLA Hardware Architecture in Fused operation mode: \href{http://nvdla.org/primer.html}{URL}}
+	\label{fig:nvdla-hardware-architecture}
+\end{figure}
+
+The convolution core supports sparse weight compression to reduce memory bandwidth, as well as Winograd for computing efficiency for specific kernel sizes. Batch convolution is also supported to reduce memory bandwidth. In addition, a convolution buffer is added as internal RAM to avoid communication with external system memory.
+
+The Single Data Point processor implements the various linear and non-linear activation functions used in CNNs. For the non-linear functions, a lookup table is used, while for the linear functions, a simple bias and scale are used.
+
+The Planar Data processor supports minimum, maximum, and average pooling operations, with kernel sizes configurable during runtime.
+
+The Cross-channel Data processor implements the local response normalization.
+
+The Data Reshape engine performs data format transformations for operations such as slice and reshape-transpose.
+
+In general, NVDLA is a highly customizable and modular architecture, with various configurations suitable for both FPGAs and ASICs.
 
 \section{Thesis Approach}
