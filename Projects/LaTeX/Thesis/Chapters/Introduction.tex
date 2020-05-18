@@ -6,7 +6,7 @@ Since the invention of the first computer, humankind is rapidly solving problems
 
 It is estimated that by the year 2025, the total amount of data created worldwide will rise to 163 ZettaBytes, while every minute of the year 2019, Americans used more than 4.4 PetaBytes of data \cite{Forbes-How-Much-Data-Is-Collected-Every-Minute-Of-The-Day}. It is evident that data management systems and knowledge extraction from them, also called Data Analysis, are urgent. Although such problems can be tackled using Artificial Intelligence and Machine Learning, it is extremely computationally intensive, if not even non-feasible, in a reasonable amount of time.
 
-Fortunately, most of the algorithms used to tackle such problems come with high parallelism. Therefore, they can be expanded in the space domain, in other words, they can utilize more hardware resources in order to cut down on needs from the time domain. Of course, there are many different types of hardware resources, each one of them with their advantages and disadvantages, from parallelism capabilities and energy efficiency to cost of production, reconfigurability, and reusability.
+Fortunately, most of the algorithms used to tackle such problems come with high parallelism. Therefore, they can be expanded in the space domain, in other words, they can utilize more hardware resources to cut down on needs from the time domain. Of course, there are many different types of hardware resources, each with their advantages and disadvantages, from parallelism capabilities and energy efficiency to cost of production, reconfigurability, and reusability.
 
 \section{Motivation}
 Nowadays, the computational complexity of the aforementioned algorithms makes hardware acceleration a necessity, since running them on Central Processing Units (CPUs) is, while possible, the least efficient and fast solution. Although writing software for CPUs may be fast and easy, its running speed due to low parallelism and high power consumption, as a general propose piece of hardware, are far from ideal. For reference, at the time of writing, a top-grade server CPU, AMD EPYC 7002 Series (Figure \ref{fig:amd-epyc-7002-chip}), can provide up to 64 cores and 128 threads, at up to 2.25GHz base clock and 3.4GHz boost clock, with a rated Thermal Design Power (TDP) of 225Watts, and a list price of 4,425 USD \cite{AMD-EPYC-7002-Series-Processors}.
@@ -31,7 +31,7 @@ Graphics Processing Units (GPUs), on the other hand, provide much higher paralle
 	\label{fig:nvidia-titan-rtx-explosion-view}
 \end{figure}
 
-Moreover, there are Application Specific Integrated Circuits (ASICs), which for a particular application can provide the best parallelism capabilities and the lowest power consumption. Unfortunately, they are very expensive to develop and produce, and they can only serve a single purpose, a single application. An example of such an ASIC is the Google Cloud Tensor Processing Unit (TPU) (Figure \ref{fig:google-tpu-motherboard}), which, for the third version (v3), in a single chip there are two TPU cores, each of which contains two scalar, vector, and matrix units (MXUs), and 16 GB of High Bandwidth Memory (HBM) \cite{Google-Cloud-TPU}.
+Moreover, there are Application Specific Integrated Circuits (ASICs), which can provide the best parallelism capabilities and the lowest power consumption for a particular application. Unfortunately, they are very expensive to develop and produce, and they can only serve a single purpose, a single application. An example of such an ASIC is the Google Cloud Tensor Processing Unit (TPU) (Figure \ref{fig:google-tpu-motherboard}), which, for the third version (v3), in a single chip there are two TPU cores, each of which contains two scalar, vector, and matrix units (MXUs), and 16 GB of High Bandwidth Memory (HBM) \cite{Google-Cloud-TPU}.
 
 \begin{figure} [H]
 	\centering
@@ -41,7 +41,7 @@ Moreover, there are Application Specific Integrated Circuits (ASICs), which for 
 	\label{fig:google-tpu-motherboard}
 \end{figure}
 
-Field Programmable Gate Arrays (FPGAs), on the contrary, are bridging the gap between the GPUs' flexibility and the ASICs' performance and power consumption. An example FPGA Hardware, targeted for High-Performance Computing (HPC), is the Quad-FPGA Daughter Board (QFDB) (Figure \ref{fig:forth-qfdb-daughterboard}) \cite{Implementation-and-Impact-of-an-Ultra-Compact-Multi-FPGA-Board-for-Large-System-Prototyping}, developed by the Foundation of Research and Technology Hellas (FORTH) \cite{FORTH}. It combines four interconnected Xilinx Zynq Ultrascale+ Multi-Processor Systems on Chip (MPSoCs), with 16GB of DDR4 memory and an M.2 Solid State Drive (SSD).
+On the contrary, Field Programmable Gate Arrays (FPGAs) are bridging the gap between the GPUs' flexibility and the ASICs' performance and power consumption. An example FPGA Hardware targeted for High-Performance Computing (HPC) is the Quad-FPGA Daughter Board (QFDB) (Figure \ref{fig:forth-qfdb-daughterboard}) \cite{Implementation-and-Impact-of-an-Ultra-Compact-Multi-FPGA-Board-for-Large-System-Prototyping}, developed by the Foundation of Research and Technology Hellas (FORTH) \cite{FORTH}, combines four interconnected Xilinx Zynq Ultrascale+ Multi-Processor Systems on Chip (MPSoCs), with 16GB of DDR4 memory and an M.2 Solid State Drive (SSD).
 
 \begin{figure} [H]
 	\centering
@@ -52,7 +52,7 @@ Field Programmable Gate Arrays (FPGAs), on the contrary, are bridging the gap be
 	\label{fig:forth-qfdb-daughterboard}
 \end{figure}
 
-In this work, the FPGAs' benefits are being utilized in order to create a hardware accelerator that can speed up the inference of Convolutional Neural Networks (CNNs), a branch of Deep Neural Networks (DNNs), which is a subfield of Machine Learning.
+In this work, the FPGAs' benefits are being utilized to create a hardware accelerator that can speed up the inference of Convolutional Neural Networks (CNNs), a branch of Deep Neural Networks (DNNs), which is a subfield of Machine Learning.
 
 \section{Scientific Contributions}
 
