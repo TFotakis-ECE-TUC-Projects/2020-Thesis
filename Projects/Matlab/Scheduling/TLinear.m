@@ -30,4 +30,8 @@ ret.s = 0;
 ret.p = 0;
 ret.to = oc;
 ret.name = name;
+
+ret.totalWeights = oc * ic;
+ret.totalMemory = ret.totalWeights * c.dataTypeSize;
+ret.totalOutputMemory = ret.to * c.dataTypeSize;
 end

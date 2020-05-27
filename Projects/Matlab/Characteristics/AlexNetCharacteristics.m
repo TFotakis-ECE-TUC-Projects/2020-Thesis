@@ -4,7 +4,7 @@ clc;
 
 global SAVE_PLOTS USE_SUBPLOTS
 SAVE_PLOTS = true;
-USE_SUBPLOTS = false;
+USE_SUBPLOTS = true;
 
 PlotLayerCharacteristics(224, 55, 3, 96, 11, 4, 2, 'FilterFirst', 'Conv1')
 PlotLayerCharacteristics(55, 27, 96, 96, 3, 2, 0, 'FilterFirst', 'MaxPool1')

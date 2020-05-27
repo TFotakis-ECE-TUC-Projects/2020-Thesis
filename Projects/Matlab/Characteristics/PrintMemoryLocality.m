@@ -13,7 +13,7 @@ for i=1:length(arr)
 end
 
 if USE_SUBPLOTS
-	subplot(2, 2, 1)
+	subplot(1, 3, 1)
 else
 	figureName = strcat(layerName, '-pixel-frequency');
 	figure('Name', figureName)
@@ -31,7 +31,7 @@ if ~USE_SUBPLOTS && SAVE_PLOTS
 end
 
 if USE_SUBPLOTS
-	subplot(2, 2, 2)
+	subplot(1, 3, 2)
 else
 	figureName = strcat(layerName, '-pixel-histogram');
 	figure('Name', figureName)

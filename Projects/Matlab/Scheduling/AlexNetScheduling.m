@@ -11,6 +11,7 @@ c.add = 1;
 c.branch = 1;
 c.memWrite = 1;
 c.useTimings = 0;
+c.dataTypeSize = 4;
 chip_frequency = 100e6;
 logScale = 0;
 printTimings = 1;

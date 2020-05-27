@@ -47,4 +47,8 @@ ret.to = to;
 ret.st = 0;
 ret.en = 0;
 ret.name = name;
+
+ret.totalWeights = oc * ic * k * k;
+ret.totalMemory = ret.totalWeights * c.dataTypeSize;
+ret.totalOutputMemory = to * c.dataTypeSize;
 end

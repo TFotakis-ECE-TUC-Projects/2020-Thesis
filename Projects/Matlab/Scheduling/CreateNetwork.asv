@@ -15,31 +15,26 @@ n.arr = [n.c1 n.m1 n.c2 n.m2 n.c3 n.c4 n.c5 n.m3 n.l1 n.l2 n.l3];
 
 n.totalWeights = 0;
 n.totalMemory = 0;
-n.totalOutputMemory = 3 * 224 * 224; %one byte per color of the input image
-n.totalOutputs = 2 * 224 * 224; % data for every color of the input image
+n.totalOutputMemory = 3 * 224 * 224; %one byte per color for every image
+n.totalOutputs = 2 * 224 * 224; %
 for i = 1:11
 	n.totalWeights = n.totalWeights + n.arr(i).totalWeights;
     n.totalMemory = n.totalMemory + n.arr(i).totalMemory;
     n.totalOutputMemory = n.totalOutputMemory + n.arr(i).totalOutputMemory;
-    n.totalOutputs = n.totalOutputs + n.arr(i).to;
+    n.totalOutputMemory = n.totalOutputs+ n.arr(i).to;
 end
-
-
-fprintf("Image: Outputs %d$ & %d & %0.2f \\\\\n", ...
-        3 * 224 * 224, 3 * 224 * 224, ...
-        3 * 224 * 224 / n.totalOutputMemory * 100);
 
 for i = 1:11
     n.arr(i).totalMemoryPerc = n.arr(i).totalMemory / n.totalMemory * 100;
     n.arr(i).totalOutputMemoryPerc = n.arr(i).totalOutputMemory / n.totalOutputMemory * 100;
-	fprintf("%s: Weights %d$ & %d & %0.2f \\\\, Outputs %d$ & %d & %0.2f \\\\\n", ...
+	fprintf("%s: #Weights %d %d %0.2f, #Outputs %d %d %0.2f\n", ...
         n.arr(i).name, n.arr(i).totalWeights, n.arr(i).totalMemory, ...
         n.arr(i).totalMemoryPerc, ...
         n.arr(i).to, n.arr(i).totalOutputMemory, ...
         n.arr(i).totalOutputMemoryPerc);
 end
 
-fprintf("Totals: Weights %d$ & %d & %0.2f \\\\, Outputs %d$ & %d & %0.2f \\\\\n", ...
+fprintf("Totals: #Weights %d %d %0.2f, #Outputs %d %d %0.2f\n", ...
         n.totalWeights, n.totalMemory, 100, ...
         n.totalOutputs, n.totalOutputMemory, 100);
 

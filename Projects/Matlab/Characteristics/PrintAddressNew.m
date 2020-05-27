@@ -2,7 +2,7 @@ function PrintAddressNew(arr, layerName)
 global SAVE_PLOTS USE_SUBPLOTS
 
 if USE_SUBPLOTS
-	subplot(2, 2, 3)
+	subplot(1, 3, 3)
 else
 	figureName = strcat(layerName, '-output-creation-time');
 	figure('Name', figureName)
