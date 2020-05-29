@@ -52,7 +52,6 @@ class CustomPyTorchAlexNet(nn.Module):
 				"l7.bias": originalStateDict["features.6.bias"],
 				"l9.weight": originalStateDict["features.8.weight"],
 				"l9.bias": originalStateDict["features.8.bias"],
-				"l7.bias": originalStateDict["features.6.bias"],
 				"l11.weight": originalStateDict["features.10.weight"],
 				"l11.bias": originalStateDict["features.10.bias"],
 				"l14.weight": originalStateDict["classifier.1.weight"],
