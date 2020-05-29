@@ -1,4 +1,4 @@
-<project xmlns="com.autoesl.autopilot.project" top="MaxPool_Core" name="Maxpool_core">
+<project xmlns="com.autoesl.autopilot.project" name="Maxpool_core" top="MaxPool_Core">
     <includePaths/>
     <libraryPaths/>
     <Simulation>

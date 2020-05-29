@@ -5,11 +5,15 @@
 ############################################################
 open_project Linear_core
 set_top Linear_Core
-add_files Linear_core/src/linear_core.c
+add_files Linear_core/src/linear_core.cpp
 open_solution "solution1"
 set_part {xczu9eg-ffvb1156-2-e} -tool vivado
-create_clock -period 10 -name default
-#source "./Linear_core/solution1/directives.tcl"
+create_clock -period 1 -name default
+config_sdx -target none
+config_export -format ip_catalog -rtl vhdl -vivado_optimization_level 2 -vivado_phys_opt place -vivado_report_level 0
+config_interface -clock_enable=0 -expose_global=0 -m_axi_addr64 -m_axi_offset off -register_io off -trim_dangling_port=0
+set_clock_uncertainty 12.5%
+source "./Linear_core/solution1/directives.tcl"
 #csim_design
 csynth_design
 #cosim_design

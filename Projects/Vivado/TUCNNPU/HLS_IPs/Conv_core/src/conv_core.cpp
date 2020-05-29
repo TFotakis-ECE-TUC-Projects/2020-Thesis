@@ -5,10 +5,10 @@
 typedef unsigned int u32;
 
 /** Matrix data type for easy switching when needed to other types */
-//typedef float matrix_t;
-#define AP_INT_MAX_W 16
-#include <ap_fixed.h>
-typedef ap_fixed<8,2,AP_RND > matrix_t;
+ typedef float matrix_t;
+//#define AP_INT_MAX_W 16
+//#include <ap_fixed.h>
+//typedef ap_fixed<16, 2, AP_RND> matrix_t;
 
 /**
  * Calculates the index on a 1D buffer representation of a 3D matrix
@@ -72,15 +72,15 @@ int Conv_Core(
 	//	}
 	//	return 0;
 
-	din = 3;
-	hin = 224;
-	win = 224;
-	dout = 64;
-	hout = 55;
-	wout = 55;
-	kernel_size = 11;
-	stride = 4;
-	padding = 2;
+//	din = 3;
+//	hin = 224;
+//	win = 224;
+//	dout = 64;
+//	hout = 55;
+//	wout = 55;
+//	kernel_size = 11;
+//	stride = 4;
+//	padding = 2;
 
 	matrix_t xCache[MAX_X_SIZE];
 	memcpy(xCache, x, din * hin * win * sizeof(matrix_t));

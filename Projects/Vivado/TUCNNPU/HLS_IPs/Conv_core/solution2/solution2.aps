@@ -2,12 +2,16 @@
     <checksum>
         <value string="false"/>
     </checksum>
+    <downStreamTool>
+        <DownStreamTool name=""/>
+    </downStreamTool>
     <config>
         <schedule model="Conv_Core"/>
-        <config_export format="ip_catalog" rtl="vhdl"/>
+        <config_export format="ip_catalog" rtl="vhdl" use_netlist="" vivado_optimization_level="2" vivado_phys_opt="place" vivado_report_level="0"/>
+        <config_sdx optimization_level="none" target="none"/>
     </config>
     <UIConfigurations>
-        <UIAutosynConf boardInfo="Zynq UltraScale+ ZCU102 Evaluation Board (xczu9eg-ffvb1156-2-e) " hideTrivialOp="true" isBasedOnBoard="true" isSolutionDirty="false" isStopAskAgain="false" showDetailDesignViewer="false">
+        <UIAutosynConf boardInfo="Zynq UltraScale+ ZCU102 Evaluation Board (xczu9eg-ffvb1156-2-e) " hideTrivialOp="true" isBasedOnBoard="true" isSolutionDirty="true" isStopAskAgain="false" showDetailDesignViewer="false">
             <Platform>xilinx/zynquplus/zynquplus</Platform>
             <customLibs/>
         </UIAutosynConf>
@@ -52,7 +56,7 @@
         </SimFlow>
     </Simulation>
     <name>
-        <value string="solution1"/>
+        <value string="solution2"/>
     </name>
     <project>
         <value string="Conv_core"/>
@@ -64,11 +68,8 @@
         <library name="DefaultPlatform" value="xilinx/zynquplus/zynquplus"/>
         <library value="xilinx/zynquplus/zynquplus_fpv7" name="DefaultPlatform"/>
     </libraryList>
-    <downStreamTool>
-        <DownStreamTool name="vivado"/>
-    </downStreamTool>
     <clockList>
-        <clock default="false" name="default" period="10"/>
+        <clock default="false" name="default" uncertainty="12.5%" period="1"/>
     </clockList>
 </solution>
 

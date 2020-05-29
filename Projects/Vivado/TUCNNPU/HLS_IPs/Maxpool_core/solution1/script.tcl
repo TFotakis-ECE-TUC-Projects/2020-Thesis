@@ -8,7 +8,9 @@ set_top MaxPool_Core
 add_files Maxpool_core/src/maxpool_core.c
 open_solution "solution1"
 set_part {xczu9eg-ffvb1156-2-e} -tool vivado
-create_clock -period 10 -name default
+create_clock -period 1 -name default
+config_export -format ip_catalog -rtl vhdl -vivado_optimization_level 2 -vivado_phys_opt place -vivado_report_level 0
+config_sdx -optimization_level none -target none
 #source "./Maxpool_core/solution1/directives.tcl"
 #csim_design
 csynth_design

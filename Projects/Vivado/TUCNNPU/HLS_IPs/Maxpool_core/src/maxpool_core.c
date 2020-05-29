@@ -64,6 +64,7 @@ int MaxPool_Core(matrix_t *x, unsigned int d, unsigned int hin, unsigned int win
 				/** For every pool's row */
 				Loop_pool_row:
 				for (int l = 0; l < kernel_size; l++) {
+#pragma HLS PIPELINE
 					/** For every pool row's pixel */
 					Loop_pool_pixel:
 					for (int m = 0; m < kernel_size; m++) {
