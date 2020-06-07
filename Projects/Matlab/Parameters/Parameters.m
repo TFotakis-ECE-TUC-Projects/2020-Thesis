@@ -2,7 +2,7 @@ clear;
 close all;
 clc;
 
-p = ReadParams();
+p = ReadParams("../CNN-Tools/Data/alexnetParams");
 
 figureName = 'All histogram';
 figure('Name', figureName);

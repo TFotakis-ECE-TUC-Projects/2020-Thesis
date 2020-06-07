@@ -1,5 +1,5 @@
-function p = ReadParams()
-f = fopen('/home/tzanis/Workspace/Thesis/Projects/PyCharm/Scripts/AlexNetParametersProcessing/output/binaryParameters.txt', 'r');
+function p = ReadParams(path)
+f = fopen(path, 'r');
 
 paramsNum = fscanf(f, "%d", 1);
 
