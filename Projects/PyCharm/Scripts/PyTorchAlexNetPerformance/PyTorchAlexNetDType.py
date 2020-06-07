@@ -159,9 +159,10 @@ def inference(model):
 		endTime = time.time()
 		totalTime = totalTime + endTime - startTime
 
-		top_class = x.argmax()
-		imageClass[image] = top_class
-		print(image.split('/')[-1] + ': ' + labelNames[top_class])
+		top_class = int(x.argmax())
+		imageName = image.split('/\\')[-1]
+		imageClass[imageName] = top_class
+		print(imageName + ': ' + labelNames[top_class])
 	print('\n---------------- Timings ----------------')
 	print('- Average Latency (ms): ', round(totalTime / len(dataset.imgs) * 1000, 2))
 	print('- Average Throughput (images/sec): ', round(len(dataset.imgs) / totalTime, 2))
@@ -187,6 +188,10 @@ def main():
 	if USE_GPU:
 		model.cuda()
 	baseline = inference(model)
+
+	with open('output/baseline.json', 'w') as f:
+		f.write(json.dumps(baseline))
+		f.close()
 
 	inferences = []
 	for transFunc in TRANS_FUNCS:
