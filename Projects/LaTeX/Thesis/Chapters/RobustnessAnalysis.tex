@@ -256,23 +256,32 @@ Algorithm \ref{alg:SoftMax} performs a SoftMax activation function on vector inp
 \section{Data Types}
 As mentioned in the Related Work section, memory bandwidth needs can become a severe bottleneck to applications like neural networks on FPGAs and ASICs. Consequently, the investigation of the most suitable data type is a necessity. However, decreasing the bit-width does come with its costs, classification accuracy. This creates a tradeoff between network classification accuracy and inference speed. In general, lowering the bit-width increases performance, but decreases accuracy. The cost of each bit-width lowering is different for every application, so a specific investigation has to be done.
 
-Using AlexNet as a reference, three different data types have been used: double, single, and half-precision floating-point (IEEE standard). This experiment's baseline uses a double-precision floating-point, as it has full data precision. After inferencing 2500 images using all three data types, each image classification Top-1 result was compared to the baseline's result. The Top-1 error rate for each data type is presented in table \ref{tab:floats-error-rates}.
+% Todo: Fix text on data types
+Using AlexNet as a reference, two different data types have been used: single, and half-precision floating-point (IEEE standard). This experiment's baseline uses a single-precision floating-point, as it has full data precision given from the pre-trained model. After inferencing 2500 images using both data types, each image classification Top-1 result was compared to the baseline's result. The Top-1 error rate for each data type is presented in table \ref{tab:floats-error-rates}.
 
 % Todo: fill table with correct data
 \begin{table}[H]
 	\caption{Floating-point precision Top-1 error rates}
 	\label{tab:floats-error-rates}
 	\centering
-	\begin{tabular}{l l}
+	\begin{tabular}{l l l}
 		\toprule
-		\textbf{Floating-point precision} & \textbf{Top-1 Error rate(\%)}  \\
+		\textbf{Data type} & \textbf{Top-1 Error rate(\%)} & \textbf{Running time (ms)} \\
 		\midrule
-			Double 	& 0 \\
-			Single 	& 0 \\
-			Half 	& 0 \\
+			Single-precision floating-point	& 0			& 0 \\
+			Half-precision floating-point 	& 0.0036 	& 0 \\
+			8-bit Fixed point & 0 & 0 \\
+			10-bit Fixed point & 0 & 0 \\
+			12-bit Fixed point & 0 & 0 \\
+			16-bit Fixed point & 0 & 0 \\
+			32-bit Fixed point & 0 & 0 \\
+			64-bit Fixed point & 0 & 0 \\
 		\bottomrule\\
 	\end{tabular}
 \end{table}
+
+% Todo: Fix text on data types
+It is worth noting that a MATLAB implementation of the network had to be used in this investigation, due to the fact that, at the time of writing, neither PyTorch nor C/C++ support half-precision floating-point arithmetic. Unfortunately, MATLAB inference was really slow compared to PyTorch, and even slower when using half-precision. The half-precision floating-point slowdown was caused because there is no hardware acceleration on the test CPU (Intel i7 4710MQ) for such data type.
 
 \section{Memory Footprint}
 
@@ -325,3 +334,69 @@ Using AlexNet as a reference, three different data types have been used: double,
 \end{table}
 
 \section{Weight Distribution}
+
+
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[scale=0.9]{Images/Weights/weight-distribution-conv1.png}
+	\decoRule
+	\caption[Weights distribution of 1st Convolution layer]{Weights distribution of 1st Convolution layer}
+	\label{fig:weight-distribution-conv1}
+\end{figure}
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[scale=0.9]{Images/Weights/weight-distribution-conv2.png}
+	\decoRule
+	\caption[Weights distribution of 2nd Convolution layer]{Weights distribution of 2nd Convolution layer}
+	\label{fig:weight-distribution-conv2}
+\end{figure}
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[scale=0.9]{Images/Weights/weight-distribution-conv3.png}
+	\decoRule
+	\caption[Weights distribution of 3rd Convolution layer]{Weights distribution of 3rd Convolution layer}
+	\label{fig:weight-distribution-conv3}
+\end{figure}
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[scale=0.9]{Images/Weights/weight-distribution-conv4.png}
+	\decoRule
+	\caption[Weights distribution of 4th Convolution layer]{Weights distribution of 4th Convolution layer}
+	\label{fig:weight-distribution-conv4}
+\end{figure}
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[scale=0.9]{Images/Weights/weight-distribution-conv5.png}
+	\decoRule
+	\caption[Weights distribution of 5th Convolution layer]{Weights distribution of 5th Convolution layer}
+	\label{fig:weight-distribution-conv5}
+\end{figure}
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[scale=0.9]{Images/Weights/weight-distribution-FC1.png}
+	\decoRule
+	\caption[Weights distribution of 1st FC layer]{Weights distribution of 1st FC layer}
+	\label{fig:weight-distribution-FC1}
+\end{figure}
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[scale=0.9]{Images/Weights/weight-distribution-FC2.png}
+	\decoRule
+	\caption[Weights distribution of 2nd FC layer]{Weights distribution of 2nd FC layer}
+	\label{fig:weight-distribution-FC2}
+\end{figure}
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[scale=0.9]{Images/Weights/weight-distribution-FC3.png}
+	\decoRule
+	\caption[Weights distribution of 3rd FC layer]{Weights distribution of 3rd FC layer}
+	\label{fig:weights-distribution-FC3}
+\end{figure}
