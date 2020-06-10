@@ -4,7 +4,8 @@ global activationsConvertFunc;
 res = x * weights + bias;
 
 if doReLU
-	res = double(res > 0) .* res;
+	res = double(res);
+	res = (res > 0) .* res;
 
 res = activationsConvertFunc(res);
 end

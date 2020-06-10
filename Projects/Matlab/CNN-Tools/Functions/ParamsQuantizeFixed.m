@@ -4,4 +4,3 @@ for p=1:numel(params)
 	params{p} = QuantizeFixed(params{p}, bitWidth);
 end
 end
-

@@ -8,9 +8,11 @@ hOut = floor((hIn + 2 * padding - kernel_size) / stride + 1);
 wOut = floor((wIn + 2 * padding - kernel_size) / stride + 1);
 
 res = zeros(hOut, wOut, out_channels);
+res = activationsConvertFunc(res);
 
 arr = zeros(hIn + 2 * padding, wIn + 2 * padding, in_channels);
 arr(padding + 1: padding + hIn, padding + 1: padding + wIn, :) = x;
+arr = activationsConvertFunc(arr);
 
 % For every output channel
 for out_channel=1:out_channels
@@ -25,17 +27,21 @@ for out_channel=1:out_channels
 			
 			xa = arr(imgStartH: imgStartH + kernel_size - 1, ...
 				imgStartW: imgStartW + kernel_size - 1, :);
-			wa = weights(:, :, :, out_channel);
-			p = xa .* wa;
-			pixel = sum(p, 'all') + bias(out_channel);
+			xa = double(xa);
 			
-			if doReLU && pixel > 0 || ~doReLU
+			wa = weights(:, :, :, out_channel);
+			wa = double(wa);
+			
+			p = xa .* wa;
+			pixel = activationsConvertFunc(sum(p(:))) + bias(out_channel);
+			
+			if doReLU && pixel > activationsConvertFunc(0) || ~doReLU
 				res(oh + 1, ow + 1, out_channel) = pixel;
 			end
 		end
 	end
 end
 
-res = activationsConvertFunc(res);
+% res = activationsConvertFunc(res);
 
 end
