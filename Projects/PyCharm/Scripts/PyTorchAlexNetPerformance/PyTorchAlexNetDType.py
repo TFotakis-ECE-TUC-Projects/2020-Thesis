@@ -18,6 +18,8 @@ PRETRANSFORMED_IMAGES_DIRECTORY = 'Data/pretransformed'
 LABELS_FILE = 'Data/labels.json'
 model_urls = {'alexnet': 'https://download.pytorch.org/models/alexnet-owt-4df8aa71.pth'}
 
+torch.set_default_tensor_type(torch.DoubleTensor)
+
 
 def noTransform(t):
 	return t
@@ -38,7 +40,8 @@ def typeConvert(t):
 	t = t.detach().numpy()
 	t = TRANS_FUNC(t)
 	t = np.array(t, dtype='float32')
-	t = torch.Tensor(t)
+	t = torch.DoubleTensor(t)
+	# t = torch.Tensor(t)
 	# t = torch.HalfTensor(t)
 	return t
 
@@ -105,29 +108,29 @@ class CustomPyTorchAlexNet(nn.Module):
 
 	def forward(self, x):
 		x = typeConvert(x)
-		x = typeConvert(self.l1(x))
-		x = typeConvert(self.l2(x))
-		x = typeConvert(self.l3(x))
-		x = typeConvert(self.l4(x))
-		x = typeConvert(self.l5(x))
-		x = typeConvert(self.l6(x))
-		x = typeConvert(self.l7(x))
-		x = typeConvert(self.l8(x))
-		x = typeConvert(self.l9(x))
-		x = typeConvert(self.l10(x))
-		x = typeConvert(self.l11(x))
-		x = typeConvert(self.l12(x))
-		x = typeConvert(self.l13(x))
-		x = typeConvert(x.view(x.size(0), 256 * 6 * 6))
+		x = self.l1(x)
+		x = self.l2(x)
+		x = self.l3(x)
+		x = self.l4(x)
+		x = self.l5(x)
+		x = self.l6(x)
+		x = self.l7(x)
+		x = self.l8(x)
+		x = self.l9(x)
+		x = self.l10(x)
+		x = self.l11(x)
+		x = self.l12(x)
+		x = self.l13(x)
+		x = x.view(x.size(0), 256 * 6 * 6)
 		if USE_DROPOUT:
-			x = typeConvert(self.dropout1(x))
-		x = typeConvert(self.l14(x))
-		x = typeConvert(self.l15(x))
+			x = self.dropout1(x)
+		x = self.l14(x)
+		x = self.l15(x)
 		if USE_DROPOUT:
-			x = typeConvert(self.dropout2(x))
-		x = typeConvert(self.l16(x))
-		x = typeConvert(self.l17(x))
-		x = typeConvert(self.l18(x))
+			x = self.dropout2(x)
+		x = self.l16(x)
+		x = self.l17(x)
+		x = self.l18(x)
 		return x
 
 
