@@ -254,28 +254,33 @@ Algorithm \ref{alg:SoftMax} performs a SoftMax activation function on vector inp
 \end{algorithm}
 
 \section{Data Types}
-As mentioned in the Related Work section, memory bandwidth needs can become a severe bottleneck to applications like neural networks on FPGAs and ASICs. Consequently, the investigation of the most suitable data type is a necessity. However, decreasing the bit-width does come with its costs, classification accuracy. This creates a tradeoff between network classification accuracy and inference speed. In general, lowering the bit-width increases performance, but decreases accuracy. The cost of each bit-width lowering is different for every application, so a specific investigation has to be done.
+As mentioned in the Related Work section, memory bandwidth needs can become a severe bottleneck to applications like neural networks on FPGAs and ASICs. Consequently, the investigation of the most suitable data type is a necessity. However, decreasing the bit-width does come with its costs, classification accuracy. This creates a tradeoff between network classification accuracy and inference speed. In general, lowering the bit-width increases performance, but decreases accuracy. The cost of each bit-width lowering is different for every application, so an application specific investigation has to be done.
 
 % Todo: Fix text on data types
-Using AlexNet as a reference, two different data types have been used: single, and half-precision floating-point (IEEE standard). This experiment's baseline uses a single-precision floating-point, as it has full data precision given from the pre-trained model. After inferencing 2500 images using both data types, each image classification Top-1 result was compared to the baseline's result. The Top-1 error rate for each data type is presented in table \ref{tab:floats-error-rates}.
+Using AlexNet as a reference, various data types have been tested to achieve the best performance to accuracy ratio.   (IEEE standard). This experiment's baseline uses a single-precision floating-point, as it has full data precision given from the pre-trained model. After inferencing 2500 images using both data types, each image classification Top-1 result was compared to the baseline's result. The Top-1 error rate for each data type is presented in table \ref{tab:floats-error-rates}.
 
 % Todo: fill table with correct data
 \begin{table}[H]
-	\caption{Floating-point precision Top-1 error rates}
+	\caption{Top-1 error rate of every tested data type}
 	\label{tab:floats-error-rates}
 	\centering
-	\begin{tabular}{l l l}
+	\begin{tabular}{l l l l}
 		\toprule
-		\textbf{Data type} & \textbf{Top-1 Error rate(\%)} & \textbf{Running time (ms)} \\
+		\textbf{Tool} & \textbf{Data type} & \textbf{Top-1 Error rate(\%)} & \textbf{Running time (sec)} \\
 		\midrule
-			Single-precision floating-point	& 0			& 0 \\
-			Half-precision floating-point 	& 0.0036 	& 0 \\
-			8-bit Fixed point & 0 & 0 \\
-			10-bit Fixed point & 0 & 0 \\
-			12-bit Fixed point & 0 & 0 \\
-			16-bit Fixed point & 0 & 0 \\
-			32-bit Fixed point & 0 & 0 \\
-			64-bit Fixed point & 0 & 0 \\
+			PyTorch & float64	& 0			& 0.091 \\
+			PyTorch & float32	& 0			& 0.034 \\
+			MATLAB 	& float64	& 0			& 6.624 \\
+			MATLAB 	& float32	& 0			& 8.162 \\
+			MATLAB 	& float16 	& 0.36  	& 147.480 \\
+		\midrule
+			MATLAB 	& fixed64	& 0 		& 7.318 \\
+			MATLAB 	& fixed32	& 0 		& 7.692 \\
+			MATLAB 	& fixed16	& 22 		& 6.650 \\
+			MATLAB 	& fixed14	& 28.44 	& 6.813 \\
+			MATLAB 	& fixed12	& 36.24 	& 6.797 \\
+			MATLAB 	& fixed10	& 77.07		& 6.929 \\
+			MATLAB 	& fixed8	& 100 		& 6.312 \\
 		\bottomrule\\
 	\end{tabular}
 \end{table}
