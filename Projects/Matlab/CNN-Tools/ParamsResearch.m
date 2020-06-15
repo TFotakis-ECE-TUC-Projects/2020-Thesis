@@ -2,43 +2,10 @@ clear;
 close all;
 clc;
 
+addpath("Functions");
+
 p = LoadParams("Data/alexnetParams");
 nBins = 100;
-
-%% ---------------------------------------------------------------
-%{
-subplot(2, 2, 1);
-flat = FlattenParams(p(1:2:end));
-h = histogram(flat, nBins);
-set(gca, "YScale", "log");
-lim = max(abs(h.BinEdges));
-xlim([-lim, lim]);
-title("Weight distribution of all layers");
-xlabel("Weight Value");
-ylabel("Count");
-
-subplot(2, 2, 2);
-threshold = 0.02;
-flatZeroed = flat;
-flatZeroed(flatZeroed > -threshold & flatZeroed < threshold) = [];
-h = histogram(flatZeroed, nBins);
-set(gca, "YScale", "log");
-lim = max(abs(h.BinEdges));
-xlim([-lim, lim]);
-title(strcat("Weight distribution of all layers, pruned with threshold: ", num2str(threshold)));
-xlabel("Weight Value");
-ylabel("Count");
-
-subplot(2, 2, 3);
-flatLinear = FlattenParams(p(11:2:end));
-h = histogram(flatLinear, nBins);
-set(gca, "YScale", "log");
-lim = max(abs(h.BinEdges));
-xlim([-lim, lim]);
-title("Weight distribution of all FC layers");
-xlabel("Weight Value");
-ylabel("Count");
-%}
 
 %% ---------------------------------------------------------------
 titles = [
@@ -98,5 +65,40 @@ for i=1:8
 	xlabel("Weight Value");
 	ylabel("Count");
 	
-	saveas(gca, strcat('Data/figures/', figureNames(i), '.png'))
+	saveas(gca, strcat('Data/figures/weights-distributions/original-vs-fixed8/', figureNames(i), '-MQE.png'))
 end
+
+%% ---------------------------------------------------------------
+%{
+subplot(2, 2, 1);
+flat = FlattenParams(p(1:2:end));
+h = histogram(flat, nBins);
+set(gca, "YScale", "log");
+lim = max(abs(h.BinEdges));
+xlim([-lim, lim]);
+title("Weight distribution of all layers");
+xlabel("Weight Value");
+ylabel("Count");
+
+subplot(2, 2, 2);
+threshold = 0.02;
+flatZeroed = flat;
+flatZeroed(flatZeroed > -threshold & flatZeroed < threshold) = [];
+h = histogram(flatZeroed, nBins);
+set(gca, "YScale", "log");
+lim = max(abs(h.BinEdges));
+xlim([-lim, lim]);
+title(strcat("Weight distribution of all layers, pruned with threshold: ", num2str(threshold)));
+xlabel("Weight Value");
+ylabel("Count");
+
+subplot(2, 2, 3);
+flatLinear = FlattenParams(p(11:2:end));
+h = histogram(flatLinear, nBins);
+set(gca, "YScale", "log");
+lim = max(abs(h.BinEdges));
+xlim([-lim, lim]);
+title("Weight distribution of all FC layers");
+xlabel("Weight Value");
+ylabel("Count");
+%}
