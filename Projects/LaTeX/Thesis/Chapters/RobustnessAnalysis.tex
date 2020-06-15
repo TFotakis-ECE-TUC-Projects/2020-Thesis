@@ -253,42 +253,10 @@ Algorithm \ref{alg:SoftMax} performs a SoftMax activation function on vector inp
 	\end{algorithmic}
 \end{algorithm}
 
-\section{Data Types}
-As mentioned in the Related Work section, memory bandwidth needs can become a severe bottleneck to applications like neural networks on FPGAs and ASICs. Consequently, the investigation of the most suitable data type is a necessity. However, decreasing the bit-width does come with its costs, classification accuracy. This creates a tradeoff between network classification accuracy and inference speed. In general, lowering the bit-width increases performance, but decreases accuracy. The cost of each bit-width lowering is different for every application, so an application specific investigation has to be done.
-
-% Todo: Fix text on data types
-Using AlexNet as a reference, various data types have been tested to achieve the best performance to accuracy ratio.   (IEEE standard). This experiment's baseline uses a single-precision floating-point, as it has full data precision given from the pre-trained model. After inferencing 2500 images using both data types, each image classification Top-1 result was compared to the baseline's result. The Top-1 error rate for each data type is presented in table \ref{tab:floats-error-rates}.
-
-% Todo: fill table with correct data
-\begin{table}[H]
-	\caption{Top-1 error rate of every tested data type}
-	\label{tab:floats-error-rates}
-	\centering
-	\begin{tabular}{l l l l}
-		\toprule
-		\textbf{Tool} & \textbf{Data type} & \textbf{Top-1 Error rate(\%)} & \textbf{Running time (sec)} \\
-		\midrule
-			PyTorch & float64	& 0			& 0.091 \\
-			PyTorch & float32	& 0			& 0.034 \\
-			MATLAB 	& float64	& 0			& 6.624 \\
-			MATLAB 	& float32	& 0			& 8.162 \\
-			MATLAB 	& float16 	& 0.36  	& 147.480 \\
-		\midrule
-			MATLAB 	& fixed64	& 0 		& 7.318 \\
-			MATLAB 	& fixed32	& 0 		& 7.692 \\
-			MATLAB 	& fixed16	& 22 		& 6.650 \\
-			MATLAB 	& fixed14	& 28.44 	& 6.813 \\
-			MATLAB 	& fixed12	& 36.24 	& 6.797 \\
-			MATLAB 	& fixed10	& 77.07		& 6.929 \\
-			MATLAB 	& fixed8	& 100 		& 6.312 \\
-		\bottomrule\\
-	\end{tabular}
-\end{table}
-
-% Todo: Fix text on data types
-It is worth noting that a MATLAB implementation of the network had to be used in this investigation, due to the fact that, at the time of writing, neither PyTorch nor C/C++ support half-precision floating-point arithmetic. Unfortunately, MATLAB inference was really slow compared to PyTorch, and even slower when using half-precision. The half-precision floating-point slowdown was caused because there is no hardware acceleration on the test CPU (Intel i7 4710MQ) for such data type.
-
 \section{Memory Footprint}
+Memory footprint plays a considerable role in neural network applications based on FPGA or ASIC systems. While neural networks are compute-bound on classic hardware architectures, on FPGAs' and ASICs', they can become memory bound due to their high parallelism capabilities but low memory bandwidth. In general, an application can fully benefit from an FPGA when its memory requirements fit into the FPGA's internal BRAM. Otherwise, modern FPGAs support external DRAM modules that can be utilized to fulfill the application's memory requirements. However, this introduces latency and memory I/O stalls to the system.
+
+Consequently, it is of high importance to minimize the network's memory footprint in order to make it fit into the internal BRAM, or at least, minimize the memory bandwidth requirements. It is firstly needed to explore how the network's memory requirements are distributed throughout its stages. Using AlexNet as a reference network, tables \ref{tab:AlexNet-Parameters-Memory-Footprint} and \ref{tab:AlexNet-Data-Stages-Memory-Footprint} show AlexNet's parameters memory requirements per layer and each layer's output memory requirements respectively, using single-precision floating-point numbers.
 
 \begin{table}[H]
 	\caption{AlexNet Parameters Memory Footprint}
@@ -311,6 +279,10 @@ It is worth noting that a MATLAB implementation of the network had to be used in
 		\bottomrule\\
 	\end{tabular}
 \end{table}
+
+This work focuses on the Xilinx ZCU102 \cite{ZCU102-User-Guide} and the QFDB \cite{Implementation-and-Impact-of-an-Ultra-Compact-Multi-FPGA-Board-for-Large-System-Prototyping} target boards, which both integrate the same Zynq UltraScale+ MPSoC (XCZU9EG-2FFVB1156). Unfortunately, this MPSoC provides only 2MBs of BRAM, which, according to tables \ref{tab:AlexNet-Parameters-Memory-Footprint} and \ref{tab:AlexNet-Data-Stages-Memory-Footprint}, creates some serious memory constraints.
+
+In respect to table \ref{tab:AlexNet-Parameters-Memory-Footprint}, only the first and the second convolutional layers' parameters can fit both simultaneously in the MPSoC's BRAM. Moreover, not only do all other layers not fit, but they also need up to 75 times more memory each (see first Fully-Connected layer).
 
 \begin{table}[H]
 	\caption{AlexNet Data Stages Memory Footprint}
@@ -338,13 +310,178 @@ It is worth noting that a MATLAB implementation of the network had to be used in
 	\end{tabular}
 \end{table}
 
-\section{Weight Distribution}
+In respect to table \ref{tab:AlexNet-Data-Stages-Memory-Footprint}, all layers' outputs can fit individually into the MPSoC's BRAM; however, they cannot fit all together combined.
 
+Under those circumstances, the exploration of various techniques for memory footprint reduction, memory footprint partitioning, and caching is an essential requirement.
 
+\section{Data Types}
+As mentioned in the Related Work section, memory bandwidth needs can become a severe bottleneck to applications like neural networks on FPGAs and ASICs. Consequently, the investigation of the most suitable data type for parameters and activations is a necessity. However, decreasing the bit-width does come with its costs, classification accuracy. This creates a tradeoff between network classification accuracy and inference speed. In general, lowering the bit-width increases performance due to both decreasing memory bandwidth and computation time, but decreases accuracy. The cost of each bit-width lowering is different for every application, so an application-specific investigation has to be conducted.
+
+Using AlexNet as a reference, various data types have been tested to achieve the best performance to accuracy ratio. From double, single, and half-precision floating-point (IEEE standard) representations, to fixed-point from 64 down to 8-bit representations have been tested. This experiment's baseline uses a single-precision floating-point, as it is the pre-trained model's data type. After inferencing 2500 images using every data type, each image classification Top-1 result was compared to the baseline's result. The Top-1 error rate for each data type is presented in table \ref{tab:floats-error-rates}.
+
+\begin{table}[H]
+	\caption{Top-1 error rate of every tested data type}
+	\label{tab:floats-fixed-error-rates}
+	\centering
+	% \begin{tabular}{*{4}{p{3cm}}}
+	\begin{tabular}{p{2cm} p{2cm} p{3cm} p{3cm}}
+		\toprule
+		\textbf{Tool} & \textbf{Data type} & \textbf{Top-1 Error rate (\%)} & \textbf{Avg. inference time (sec)} \\
+		\midrule
+			PyTorch & float64	& 0			& 0.091 \\
+			PyTorch & float32	& 0			& 0.034 \\
+			MATLAB 	& float64	& 0			& 6.624 \\
+			MATLAB 	& float32	& 0			& 8.162 \\
+			MATLAB 	& float16 	& 0.36  	& 147.480 \\
+		\midrule
+			MATLAB 	& fixed64	& 0 		& 7.318 \\
+			MATLAB 	& fixed32	& 0 		& 7.692 \\
+			MATLAB 	& fixed16	& 22 		& 6.650 \\
+			MATLAB 	& fixed14	& 28.44 	& 6.813 \\
+			MATLAB 	& fixed12	& 36.24 	& 6.797 \\
+			MATLAB 	& fixed10	& 77.07		& 6.929 \\
+			MATLAB 	& fixed8	& 100 		& 6.312 \\
+		\bottomrule\\
+	\end{tabular}
+\end{table}
+
+It is worth noting that a MATLAB implementation of the network had to be used in this investigation, due to the fact that, at the time of writing, neither PyTorch nor C/C++ support half-precision floating-point arithmetic. Unfortunately, MATLAB inference was really slow compared to PyTorch, and even slower when using half-precision (see table \ref{tab:floats-fixed-error-rates} Avg. inference time column). The half-precision floating-point slowdown was caused because there is no hardware acceleration on the test CPU (Intel i7 4710MQ) for such data type, forcing the mathematical operations to get calculated by software emulation.
+
+Before every test, the network's parameters were converted from the given single-precision floating-point pre-trained model to the corresponding data type. Also, the same data type was used for the layers' activations during inference. While converting single-precision to double-precision does not result in higher arithmetic accuracy, experiments with doubles were conducted for completeness.
+
+In respect to the floating-point data types, the Top-1 error-rate for both double and single-precision is zero, while for the half-precision, there is a minor error rate that can be ignored. As a result, the half-precision is the leading one in the floating-point space due to its excellent performance to accuracy ratio.
+
+The usage of fixed-point data types can benefit the application with its lower memory bandwidth and its more straightforward hardware requirements and faster arithmetic operations compared to the floating-point data types. In contrast to the floating-point data types conversion, when converting to fixed-point data types, it is vital to select the position of the radix point that most accurately represents the given numbers. In this experiment, the uniform conversion technique was used in which given a set of numbers \emph{S} and the wanted representation bit width, \emph{W}, the radix point is selected as shown on equation \ref{eqn:select-radix-point-position} by minimizing the overall error between the given number set \emph{S} and the converted to fixed-point number set.
+\begin{equation}
+	\label{eqn:select-radix-point-position}
+	Position = argmin_{i=0}^{W}[\frac{\sum_{j=1}^{size(S)} |S_j - FixPtConvert(S_j, W, i)| }{size(S)}]
+\end{equation}
+In this experiment, a different radix point position was calculated for every layer's parameters and every bit width with respect to each layer parameter's characteristics. It should be mentioned that MATLAB's conversion of floating-point to any bit-width fixed-point data types results in a set of double-precision floating-point numbers to enable mathematical operations without needing fixed-point hardware acceleration or software emulation. Consequently, each layer's activations had to get converted to fixed-point so that the system's modeling is as accurate as possible.
+
+Unfortunately, only the 64 and 32-bit tests resulted in no Top-1 error-rate. Even the 16-bit test resulted in a very high error-rate, rendering this data type unusable for this application. However, the high error-rate can be explained after visualizing the weights' distributions before and after the conversion, with its three side effects. The following figures were selected because of their dramatic transformation caused by this conversion to demonstrate its side effects.
+
+First of all, figure \ref{fig:weight-distribution-comparison-conv2} depicts the second convolution layer's weights distributions of both their original single-precision floating-point and their 8-bit fixed-point converted representations. It is evident that the right histogram's limits have been significantly altered, with the weights $W \epsilon (-\infinity, -0.5) \cup (0.5, \infinity)$ been suppressed to the $(-0.5, 0.5)$ range.
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[scale=0.9]{Images/Weights/weight-distribution-conv1.png}
+	\includegraphics[scale=0.9]{Images/Weights-distributions/original-vs-fixed8/weight-distribution-conv2.png}
+	\decoRule
+	\caption[Second Convolution layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations]{Second Convolution layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations: right histogram's limits are significantly altered}
+	\label{fig:weight-distribution-comparison-conv2}
+\end{figure}
+
+This suppression is caused because of the nature of the 8-bit fixed-point data type, which only allows 256 different values to be represented. Equation's \ref{eqn:select-radix-point-position} result is position 8, which means that the representation's step is $1/2^8 = 0.00390625$, hence its limits are $-2^7/2^8 = -0.5$ and $2^7/2^8 = 0.5$ (the most significant bit is used for the sign). Although there are some weights in the range of $(-2, -0.5) \cup (0.5, 2)$, their summed conversion accuracy error is less than the sum of accuracy errors of the smaller numbers, which are orders of magnitude more in count, when another radix-point position is selected. In other words, the sum of a lot of small errors is greater than the sum of a few big errors, causing the big errors the be ignored.
+
+Second of all, figure \ref{fig:weight-distribution-comparison-conv5} depicts the fifth convolution layer's weights distributions of both their original single-precision floating-point and their 8-bit fixed-point converted representations. While this layer's weights distribution limits are not altered, various spikes on the right histogram can be observed.
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[scale=0.9]{Images/Weights-distributions/original-vs-fixed8/weight-distribution-conv5.png}
+	\decoRule
+	\caption[Fifth Convolution layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations]{Fifth Convolution layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations: various spikes can be observed on the right histogram}
+	\label{fig:weight-distribution-comparison-conv5}
+\end{figure}
+
+Those spikes are caused because of the fixed-point's inability to represent all real numbers. It is the same reason the floating-point data type exists. The fifth convolution layer's radix-point is positioned on the 8th bit, which results in a representation step of $1/2^8 = 0.00390625$. This means that any weight with value ($i/8, (i + 1)/8)$, with $i=-2^7, -2^7 + 1, ..., 2^7$, is rounded to the nearest fixed-point number available. Therefore, many weights are rounded to their nearest fixed-point representation, creating those spikes, which is expected.
+
+Last but not least, figure \ref{fig:weight-distribution-comparison-FC1} depicts the first Fully-Connected layer's weights distributions of both their original single-precision floating-point and their 8-bit fixed-point converted representations. In this figure's right histogram, a high amount of subsampling can be observed compared to the left one.
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[scale=0.9]{Images/Weights-distributions/original-vs-fixed8/weight-distribution-FC1.png}
+	\decoRule
+	\caption[First Fully-Connected layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations]{First Fully-Connected layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations: significant subsampling on the right histogram}
+	\label{fig:weight-distribution-comparison-FC1}
+\end{figure}
+
+This subsampling can be explained, again, by the fixed-point's inability to represent all weights accurately, resulting in jumps. In this layer, equation \ref{eqn:select-radix-point-position} positioned the radix-point on the 8th bit, which, again, means a step of $1/2^8 = 0.00390625$.
+
+To tackle with the suppression and subsampling side effects, an enhanced version of this technique was used. More specifically, instead of merely measuring the representation error of each weight and the summing it up with all other errors, as equation \ref{eqn:select-radix-point-position} does, it is essential to further amplify significant errors in order for them to stand out compared to the big count of small errors. This amplification can be done by adding non-linearity to the error's computation. The Mean Squared Error (MSE) can be used for this purpose, as shown in equation \ref{eqn:select-radix-point-position-Mean-Squared-Error}.
+
+After observing the weights' distributions, it is clear that some distributions need a more accurate representation step. This is given by the radix point's position. So, instead of searching for a position on the given bit width, the radix-point should be allowed to exceed the number's bit-width. Therefore, the maximum radix-point was selected greedily to be 32.
+
+\begin{equation}
+	\label{eqn:select-radix-point-position-Mean-Squared-Error}
+	Position = argmin_{i=0}^{32}[\frac{\sum_{j=1}^{size(S)} |S_j - FixPtConvert(S_j, W, i)|^2 }{size(S)}]
+\end{equation}
+
+Although equation \ref{eqn:select-radix-point-position-Mean-Squared-Error} resulted in better inference accuracy, after some experimentation, more amplification was needed to achieve the best accuracy possible with this technique. For AlexNet, the Mean Quarted Error (MQE), shown on equation \ref{eqn:select-radix-point-position-Mean-Quarted-Error}, yields the best results, and no further amplification is needed.
+
+\begin{equation}
+	\label{eqn:select-radix-point-position-Mean-Quarted-Error}
+	Position = argmin_{i=0}^{32}[\frac{\sum_{j=1}^{size(S)} |S_j - FixPtConvert(S_j, W, i)|^4 }{size(S)}]
+\end{equation}
+
+As shown on figures \ref{fig:weight-distribution-comparison-conv2-MQE}, \ref{fig:weight-distribution-comparison-conv5-MQE} and \ref{fig:weight-distribution-comparison-FC1-MQE}, the suppression and the subsampling side effects are eliminated. There is still some spiking; however, it is an expected behavior due to the lack of representation accuracy with fixed-point data types.
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[scale=0.9]{Images/Weights-distributions/original-vs-fixed8/weight-distribution-conv2-MQE.png}
+	\decoRule
+	\caption[Second Convolution layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations using MQE]{Second Convolution layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations using MQE: right histogram's limits are identical}
+	\label{fig:weight-distribution-comparison-conv2-MQE}
+\end{figure}
+
+Using MQE, equation \ref{eqn:select-radix-point-position-Mean-Quarted-Error} resulted in the 5th radix-point position for the second convolution layer's weights. This results in a representation step of $1/2^5 = 0.03125$, hence its limits are $-2^7/2^5 = -4$ and $2^7/2^5 = 4$. Consequently, the whole weights range can be represented, removing the suppression problem.
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[scale=0.9]{Images/Weights-distributions/original-vs-fixed8/weight-distribution-conv5-MQE.png}
+	\decoRule
+	\caption[Fifth Convolution layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations using MQE]{Fifth Convolution layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations using MQE: various spikes can still be observed on the right histogram}
+	\label{fig:weight-distribution-comparison-conv5-MQE}
+\end{figure}
+
+Using MQE, equation \ref{eqn:select-radix-point-position-Mean-Quarted-Error} resulted in the 9th radix-point position for the fifth convolution layer's weights. This results in a representation step of $1/2^9 = 0.001953125$, hence its limits are $-2^7/2^9 = -0.25$ and $2^7/2^9 = 0.25$. Although, the spikes are not removed, there is a slight improvement in the weights representation accuracy.
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[scale=0.9]{Images/Weights-distributions/original-vs-fixed8/weight-distribution-FC1-MQE.png}
+	\decoRule
+	\caption[First Fully-Connected layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations using MQE]{First Fully-Connected layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations using MQE: no subsampling on the right histogram}
+	\label{fig:weight-distribution-comparison-FC1-MQE}
+\end{figure}
+
+Using MQE, equation \ref{eqn:select-radix-point-position-Mean-Quarted-Error} resulted in the 10th radix-point position for the first Fully-Connected layer's weights. This results in a representation step of $1/2^10 = 0.0009765625$, hence its limits are $-2^7/2^10 = -0.125$ and $2^7/2^10 = 0.125$. The added representation accuracy fully eliminates the subsampling problem, though some spiking is introduced as expected.
+
+Table \ref{tab:fixed-MQE-error-rates} shows the Top-1 error-rate of fixed-point data types using the Mean Quarted Error equation \ref{eqn:select-radix-point-position-Mean-Quarted-Error}. While 8, 10, and 12 bit width fixed-point data types are still unusable, the 14 and 16 bit width representations have improved significantly.
+
+\begin{table}[H]
+	\caption{Top-1 error rate of fixed-point data types using Mean Quarted Error equation \ref{eqn:select-radix-point-position-Mean-Quarted-Error}}
+	\label{tab:fixed-MQE-error-rates}
+	\centering
+	\begin{tabular}{lll}
+		\toprule
+		\textbf{Tool} & \textbf{Data type} & \textbf{Top-1 Error rate (\%)}\\
+		\midrule
+			MATLAB 	& fixed64	& 0 	\\
+			MATLAB 	& fixed32	& 0 	\\
+			MATLAB 	& fixed16	& 4.42 	\\
+			MATLAB 	& fixed14	& 17.59 \\
+			MATLAB 	& fixed12	& 48.11 \\
+			MATLAB 	& fixed10	& 86.91	\\
+			MATLAB 	& fixed8	& 99.3 	\\
+		\bottomrule\\
+	\end{tabular}
+\end{table}
+
+For better clarity on the results, figure \ref{fig:data-types-accuracy-chart} depicts all tested data types and their Top-1 accuracy.
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[width=\textwidth]{Images/Weights-distributions/data-types-accuracy-chart.png}
+	\decoRule
+	\caption[All data types tested accuracy]{All data types tested accuracy}
+	\label{fig:data-types-accuracy-chart}
+\end{figure}
+
+After some experimentation, dynamically assigning different bit-widths on each layer, according to its accuracy needs, rather than a single bit-width for the whole network, can yield even better results. However, further investigation has to be conducted.
+
+\section{Weight Pruning}
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[scale=0.9]{Images/Weights-distributions/original/weight-distribution-conv1.png}
 	\decoRule
 	\caption[Weights distribution of 1st Convolution layer]{Weights distribution of 1st Convolution layer}
 	\label{fig:weight-distribution-conv1}
@@ -352,7 +489,7 @@ It is worth noting that a MATLAB implementation of the network had to be used in
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[scale=0.9]{Images/Weights/weight-distribution-conv2.png}
+	\includegraphics[scale=0.9]{Images/Weights-distributions/original/weight-distribution-conv2.png}
 	\decoRule
 	\caption[Weights distribution of 2nd Convolution layer]{Weights distribution of 2nd Convolution layer}
 	\label{fig:weight-distribution-conv2}
@@ -360,7 +497,7 @@ It is worth noting that a MATLAB implementation of the network had to be used in
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[scale=0.9]{Images/Weights/weight-distribution-conv3.png}
+	\includegraphics[scale=0.9]{Images/Weights-distributions/original/weight-distribution-conv3.png}
 	\decoRule
 	\caption[Weights distribution of 3rd Convolution layer]{Weights distribution of 3rd Convolution layer}
 	\label{fig:weight-distribution-conv3}
@@ -368,7 +505,7 @@ It is worth noting that a MATLAB implementation of the network had to be used in
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[scale=0.9]{Images/Weights/weight-distribution-conv4.png}
+	\includegraphics[scale=0.9]{Images/Weights-distributions/original/weight-distribution-conv4.png}
 	\decoRule
 	\caption[Weights distribution of 4th Convolution layer]{Weights distribution of 4th Convolution layer}
 	\label{fig:weight-distribution-conv4}
@@ -376,7 +513,7 @@ It is worth noting that a MATLAB implementation of the network had to be used in
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[scale=0.9]{Images/Weights/weight-distribution-conv5.png}
+	\includegraphics[scale=0.9]{Images/Weights-distributions/original/weight-distribution-conv5.png}
 	\decoRule
 	\caption[Weights distribution of 5th Convolution layer]{Weights distribution of 5th Convolution layer}
 	\label{fig:weight-distribution-conv5}
@@ -384,7 +521,7 @@ It is worth noting that a MATLAB implementation of the network had to be used in
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[scale=0.9]{Images/Weights/weight-distribution-FC1.png}
+	\includegraphics[scale=0.9]{Images/Weights-distributions/original/weight-distribution-FC1.png}
 	\decoRule
 	\caption[Weights distribution of 1st FC layer]{Weights distribution of 1st FC layer}
 	\label{fig:weight-distribution-FC1}
@@ -392,7 +529,7 @@ It is worth noting that a MATLAB implementation of the network had to be used in
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[scale=0.9]{Images/Weights/weight-distribution-FC2.png}
+	\includegraphics[scale=0.9]{Images/Weights-distributions/original/weight-distribution-FC2.png}
 	\decoRule
 	\caption[Weights distribution of 2nd FC layer]{Weights distribution of 2nd FC layer}
 	\label{fig:weight-distribution-FC2}
@@ -400,7 +537,7 @@ It is worth noting that a MATLAB implementation of the network had to be used in
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[scale=0.9]{Images/Weights/weight-distribution-FC3.png}
+	\includegraphics[scale=0.9]{Images/Weights-distributions/original/weight-distribution-FC3.png}
 	\decoRule
 	\caption[Weights distribution of 3rd FC layer]{Weights distribution of 3rd FC layer}
 	\label{fig:weights-distribution-FC3}
