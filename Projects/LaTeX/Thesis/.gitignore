@@ -8,8 +8,7 @@
 !Chapters/*.tex
 
 !Images
-!Images/*
-!Images/*/*
+!Images/**
 
 
 !*.tex
