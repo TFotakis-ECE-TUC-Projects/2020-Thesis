@@ -320,13 +320,18 @@ Under those circumstances, the exploration of various techniques for memory foot
 \section{Data Types}
 As mentioned in the Related Work section, memory bandwidth needs can become a severe bottleneck to applications like neural networks on FPGAs and ASICs. Consequently, the investigation of the most suitable data type for parameters and activations is a necessity. However, decreasing the bit-width does come with its costs, classification accuracy. This creates a tradeoff between network classification accuracy and inference speed. In general, lowering the bit-width increases performance due to both decreasing memory bandwidth and computation time, but decreases accuracy. The cost of each bit-width lowering is different for every application, so an application-specific investigation has to be conducted.
 
-Using AlexNet as a reference, various data types have been tested to achieve the best performance to accuracy ratio. From double, single, and half-precision floating-point (IEEE standard) representations, to fixed-point from 64 down to 8-bit representations have been tested. This experiment's baseline uses a single-precision floating-point, as it is the pre-trained model's data type. After inferencing 2500 images using every data type, each image classification Top-1 result was compared to the baseline's result. The Top-1 error rate for each data type is presented in table \ref{tab:floats-error-rates}.
+\subsection{Evaluation}
+Using AlexNet as a reference, various data types have been tested to achieve the best performance to accuracy ratio. From double, single, and half-precision floating-point (IEEE standard) representations, to fixed-point from 64 down to 8-bit representations have been tested. This experiment's baseline uses a single-precision floating-point, as it is the pre-trained model's data type. After inferencing 2500 images using every data type, each image classification Top-1 result was compared to the baseline's result. The Top-1 error rates for each data type are presented in tables \ref{tab:floats-error-rates} and \ref{tab:fixed-error-rates}.
+
+\subsection{Floating Point}
+It is worth noting that a MATLAB implementation of the network had to be used in this investigation, due to the fact that, at the time of writing, neither PyTorch nor C/C++ support half-precision floating-point arithmetic. Unfortunately, MATLAB inference was really slow compared to PyTorch, and even slower when using half-precision (see table \ref{tab:floats-error-rates} Avg. inference time column). The half-precision floating-point slowdown was caused because there is no hardware acceleration on the test CPU (Intel i7 4710MQ) for such data type, forcing the mathematical operations to get calculated by software emulation.
+
+Before every test, the network's parameters were converted from the given single-precision floating-point pre-trained model to the corresponding data type. Also, the same data type was used for the layers' activations during inference. While converting single-precision to double-precision does not result in higher arithmetic accuracy, experiments with doubles were conducted for completeness, as shown  on table \ref{tab:floats-error-rates}.
 
 \begin{table}[H]
-	\caption{Top-1 error rate of every tested data type}
-	\label{tab:floats-fixed-error-rates}
+	\caption{Top-1 error rate of every floating-point tested data type}
+	\label{tab:floats-error-rates}
 	\centering
-	% \begin{tabular}{*{4}{p{3cm}}}
 	\begin{tabular}{p{2cm} p{2cm} p{3cm} p{3cm}}
 		\toprule
 		\textbf{Tool} & \textbf{Data type} & \textbf{Top-1 Error rate (\%)} & \textbf{Avg. inference time (sec)} \\
@@ -336,7 +341,31 @@ Using AlexNet as a reference, various data types have been tested to achieve the
 			MATLAB 	& float64	& 0			& 6.624 \\
 			MATLAB 	& float32	& 0			& 8.162 \\
 			MATLAB 	& float16 	& 0.36  	& 147.480 \\
-		\midrule
+		\bottomrule\\
+	\end{tabular}
+\end{table}
+
+In respect to the floating-point data types, the Top-1 error-rate for both double and single-precision is zero, while for the half-precision, there is a minor error rate that can be ignored. As a result, the half-precision is the leading one in the floating-point space due to its excellent performance to accuracy ratio.
+
+\subsection{Fixed Point}
+The usage of fixed-point data types can benefit the application with its lower memory bandwidth and its more straightforward hardware requirements and faster arithmetic operations compared to the floating-point data types. In contrast to the floating-point data types conversion, when converting to fixed-point data types, it is vital to select the position of the radix point that most accurately represents the given numbers. In this experiment, the uniform conversion technique was used in which given a set of numbers \emph{S} and the wanted representation bit width, \emph{W}, the radix point is selected as shown on equation \ref{eqn:select-radix-point-position} by minimizing the overall error between the given number set \emph{S} and the converted to fixed-point number set.
+\begin{equation}
+	\label{eqn:select-radix-point-position}
+	Position = argmin_{i=0}^{W}[\frac{\sum_{j=1}^{size(S)} |S_j - FixPtConvert(S_j, W, i)| }{size(S)}]
+\end{equation}
+In this experiment, a different radix point position was calculated for every layer's parameters and every bit width with respect to each layer parameter's characteristics. This technique was first introduced by Williamson in 1991 \cite{Dynamically-scaled-fixed-point-arithmetic}, and is called Dynamic Fixed Point arithmetic. Instead of using a global scaling factor for all layers (typical fixed point arithmetic), dynamic fixed point arithmetic uses a different scaling factor for every layer. On low bit-widths, using dynamic fixed point because it can maintain most of the weights representation accuracy.
+
+It should be mentioned that MATLAB's conversion of floating-point to any bit-width fixed-point data types results in a set of double-precision floating-point numbers to enable mathematical operations without needing fixed-point hardware acceleration or software emulation. Consequently, each layer's activations had to get converted to fixed-point so that the system's modeling is as accurate as possible.
+
+Unfortunately, only the 64 and 32-bit tests resulted in no Top-1 error-rate as shown in table \ref{tab:fixed-error-rates}. Even the 16-bit test resulted in a very high error-rate, rendering this data type unusable for this application. However, the high error-rate can be explained after visualizing the weights' distributions before and after the conversion, with its three side effects. The following figures were selected because of their dramatic transformation caused by this conversion to demonstrate its side effects.
+
+\begin{table}[H]
+	\caption{Top-1 error rate of every fixed-point tested data type}
+	\label{tab:fixed-error-rates}
+	\centering
+	\begin{tabular}{p{2cm} p{2cm} p{3cm} p{3cm}}
+		\toprule
+		\textbf{Tool} & \textbf{Data type} & \textbf{Top-1 Error rate (\%)} & \textbf{Avg. inference time (sec)} \\
 			MATLAB 	& fixed64	& 0 		& 7.318 \\
 			MATLAB 	& fixed32	& 0 		& 7.692 \\
 			MATLAB 	& fixed16	& 22 		& 6.650 \\
@@ -347,21 +376,6 @@ Using AlexNet as a reference, various data types have been tested to achieve the
 		\bottomrule\\
 	\end{tabular}
 \end{table}
-
-It is worth noting that a MATLAB implementation of the network had to be used in this investigation, due to the fact that, at the time of writing, neither PyTorch nor C/C++ support half-precision floating-point arithmetic. Unfortunately, MATLAB inference was really slow compared to PyTorch, and even slower when using half-precision (see table \ref{tab:floats-fixed-error-rates} Avg. inference time column). The half-precision floating-point slowdown was caused because there is no hardware acceleration on the test CPU (Intel i7 4710MQ) for such data type, forcing the mathematical operations to get calculated by software emulation.
-
-Before every test, the network's parameters were converted from the given single-precision floating-point pre-trained model to the corresponding data type. Also, the same data type was used for the layers' activations during inference. While converting single-precision to double-precision does not result in higher arithmetic accuracy, experiments with doubles were conducted for completeness.
-
-In respect to the floating-point data types, the Top-1 error-rate for both double and single-precision is zero, while for the half-precision, there is a minor error rate that can be ignored. As a result, the half-precision is the leading one in the floating-point space due to its excellent performance to accuracy ratio.
-
-The usage of fixed-point data types can benefit the application with its lower memory bandwidth and its more straightforward hardware requirements and faster arithmetic operations compared to the floating-point data types. In contrast to the floating-point data types conversion, when converting to fixed-point data types, it is vital to select the position of the radix point that most accurately represents the given numbers. In this experiment, the uniform conversion technique was used in which given a set of numbers \emph{S} and the wanted representation bit width, \emph{W}, the radix point is selected as shown on equation \ref{eqn:select-radix-point-position} by minimizing the overall error between the given number set \emph{S} and the converted to fixed-point number set.
-\begin{equation}
-	\label{eqn:select-radix-point-position}
-	Position = argmin_{i=0}^{W}[\frac{\sum_{j=1}^{size(S)} |S_j - FixPtConvert(S_j, W, i)| }{size(S)}]
-\end{equation}
-In this experiment, a different radix point position was calculated for every layer's parameters and every bit width with respect to each layer parameter's characteristics. It should be mentioned that MATLAB's conversion of floating-point to any bit-width fixed-point data types results in a set of double-precision floating-point numbers to enable mathematical operations without needing fixed-point hardware acceleration or software emulation. Consequently, each layer's activations had to get converted to fixed-point so that the system's modeling is as accurate as possible.
-
-Unfortunately, only the 64 and 32-bit tests resulted in no Top-1 error-rate. Even the 16-bit test resulted in a very high error-rate, rendering this data type unusable for this application. However, the high error-rate can be explained after visualizing the weights' distributions before and after the conversion, with its three side effects. The following figures were selected because of their dramatic transformation caused by this conversion to demonstrate its side effects.
 
 First of all, figure \ref{fig:weight-distribution-comparison-conv2} depicts the second convolution layer's weights distributions of both their original single-precision floating-point and their 8-bit fixed-point converted representations. It is evident that the right histogram's limits have been significantly altered, with the weights $W \epsilon (-\infinity, -0.5) \cup (0.5, \infinity)$ been suppressed to the $(-0.5, 0.5)$ range.
 
