@@ -7,16 +7,15 @@ addpath("Functions");
 p = LoadParams("Data/alexnetParams");
 nBins = 100;
 
-%% ---------------------------------------------------------------
 titles = [
-	"Weight distribution of 1st Convolution layer"
-	"Weight distribution of 2nd Convolution layer"
-	"Weight distribution of 3rd Convolution layer"
-	"Weight distribution of 4th Convolution layer"
-	"Weight distribution of 5th Convolution layer"
-	"Weight distribution of 1st FC layer"
-	"Weight distribution of 2nd FC layer"
-	"Weight distribution of 3rd FC layer"
+	"1st Convolution layer"
+	"2nd Convolution layer"
+	"3rd Convolution layer"
+	"4th Convolution layer"
+	"5th Convolution layer"
+	"1st FC layer"
+	"2nd FC layer"
+	"3rd FC layer"
 	];
 
 figureNames = [
@@ -30,8 +29,30 @@ figureNames = [
 	"weight-distribution-FC3"
 	];
 
+%% ---------------------------------------------------------------
+figure("Name", "All layer distributions");
+for i=1:8
+	subplot(4, 2, i);
+	h = histogram(p{i * 2 - 1}, nBins);
+	set(gca, "YScale", "log");
+	lim = 1.1 * max(abs(h.BinEdges));
+	xlim([-lim, lim]);
+	
+	lim = max(h.Values);
+	ylim([0.1, lim * 10])
+	
+	title(titles(i));
+	xlabel("Weight Value");
+	ylabel("Count");
+end
+
+%% ---------------------------------------------------------------
 bitWidth = 8;
 
+% paramsConvertFunc = @(p) ParamsQuantizeFixed(p, bitWidth);
+paramsConvertFunc = @(p) p;
+% pTransformed = p;
+pTransformed = PruneParams(p);
 for i=1:8
 	figure("Name", figureNames(i));
 	
@@ -45,13 +66,14 @@ for i=1:8
 	ylim([0.1, lim * 10])
 	
 % 	title(titles(i));
-	title("Single-precision floating-point");
+% 	title("Single-precision floating-point");
+	title("Original");
 	xlabel("Weight Value");
 	ylabel("Count");
 	
 	
 	subplot(1, 2, 2);
-	x = QuantizeFixed(p{i * 2 - 1}, bitWidth);
+	x = paramsConvertFunc(pTransformed{i * 2 - 1});
 	h = histogram(x, nBins);
 	set(gca, "YScale", "log");
 	lim = 1.1 * max(abs(h.BinEdges));
@@ -61,11 +83,12 @@ for i=1:8
 	ylim([0.1, lim * 10])
 	
 % 	title(titles(i));
-	title("8-bit fixed-point");
+% 	title("8-bit fixed-point");
+	title("Pruned");
 	xlabel("Weight Value");
 	ylabel("Count");
 	
-	saveas(gca, strcat('Data/figures/weights-distributions/original-vs-fixed8/', figureNames(i), '-MQE.png'))
+	saveas(gca, strcat('Data/figures/weights-distributions/original-vs-pruned/', figureNames(i), '.png'))
 end
 
 %% ---------------------------------------------------------------
@@ -76,7 +99,7 @@ h = histogram(flat, nBins);
 set(gca, "YScale", "log");
 lim = max(abs(h.BinEdges));
 xlim([-lim, lim]);
-title("Weight distribution of all layers");
+title("all layers");
 xlabel("Weight Value");
 ylabel("Count");
 
@@ -88,7 +111,7 @@ h = histogram(flatZeroed, nBins);
 set(gca, "YScale", "log");
 lim = max(abs(h.BinEdges));
 xlim([-lim, lim]);
-title(strcat("Weight distribution of all layers, pruned with threshold: ", num2str(threshold)));
+title(strcat("all layers, pruned with threshold: ", num2str(threshold)));
 xlabel("Weight Value");
 ylabel("Count");
 
@@ -98,7 +121,7 @@ h = histogram(flatLinear, nBins);
 set(gca, "YScale", "log");
 lim = max(abs(h.BinEdges));
 xlim([-lim, lim]);
-title("Weight distribution of all FC layers");
+title("all FC layers");
 xlabel("Weight Value");
 ylabel("Count");
 %}

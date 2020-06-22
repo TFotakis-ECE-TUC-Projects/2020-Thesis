@@ -4,7 +4,7 @@ clc;
 
 global imgConvertFunc paramsConvertFunc activationsConvertFunc
 
-compDTypeFile = "Data/results/fixed16MQE.txt";
+compDTypeFile = "Data/results/float32Pruned41.22.txt";
 
 imgConvertFunc = @(x) x;
 % imgConvertFunc = @double;
@@ -16,8 +16,8 @@ imgConvertFunc = @(x) x;
 % paramsConvertFunc = @(p) cellfun(@(x) double(x), p, 'UniformOutput', false);
 % paramsConvertFunc = @(p) cellfun(@(x) single(x), p, 'UniformOutput', false);
 % paramsConvertFunc = @(p) cellfun(@(x) half(x), p, 'UniformOutput', false);
-paramsConvertFunc = @(p) ParamsQuantizeFixed(p, 16);
-% paramsConvertFunc = @(p) PruneParams(p);
+% paramsConvertFunc = @(p) ParamsQuantizeFixed(p, 16);
+paramsConvertFunc = @(p) PruneParams(p);
 
 activationsConvertFunc = @(x) x;
 % activationsConvertFunc = @double;
@@ -76,7 +76,7 @@ for i=1:numel(imgs)
 	eval = baseline(imgs(i).name) == x;
 	correct = correct + eval * 1;
 	if eval, fprintf("+ "), else, fprintf("x "), end
-	fprintf("Class %u, Error Rate %f, Avg Time (sec) %f\n", x, ErrorRate(correct, i), t / i);
+	fprintf("Class %u, Error Rate %0.2f%%, Avg Time (sec) %f\n", x, round(ErrorRate(correct, i) * 100, 2), t / i);
 	fprintf(f, "%s: %u\n", imgs(i).name, x);
 
 	drawnow;
