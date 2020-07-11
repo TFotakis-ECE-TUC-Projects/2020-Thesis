@@ -11,7 +11,7 @@ Such algorithm types, at the time of writing, include, but are not limited to:
 \begin{itemize}
 	\item \textbf{Supervised Learning:} Algorithms that learn by using "labeled" sample data, " containing both the inputs and their desired outputs for classification and regression.
 	\item \textbf{Unsupervised Learning:} In contrast with the Supervised Learning, unlabeled sample data are used to discover structures that could group or cluster them.
-	\item \textbf{Reinforcement Learning:} Algorithms responsible for taking actions in an environment, often also described as software agents, to maximize a specific metric, many of which use dynamic programming techniques.
+	\item \textbf{Reinforcement Learning:} Algorithms responsible for taking actions in an environment, often also described as software agents, maximize a specific metric, many of which use dynamic programming techniques.
 	\item \textbf{Feature Learning:} Algorithms that by combining or even discarding features from the input samples, try to create a new, more useful set of features. One of the most popular algorithms of this category is Principal Components Analysis (PCA).
 	\item \textbf{Anomaly Detection:} Algorithms that try to identify outlier samples, which are characterized by their significant difference compared to the majority of the data used. Such algorithms are often used in noise reduction, data mining, and even security and defense systems.
 	\item \textbf{Association Rule Learning:} Algorithms that aim to discover strong relationships between features.
@@ -101,7 +101,7 @@ The activation function receives the propagation function's result and applies a
 		      \sum_{j=1}^{J}e^{x_j}
 		      }
 		  $, for i = 1, ..., J\\
-		  Commonly used as a final output activation function for multiclass classification. It normalizes the output to [0, 1], and makes its sum equal to 1. After this transformation, the i-th output's value designates the probability of the input to be the class i.
+		  Commonly used as a final output activation function for multiclass classification. It normalizes the output to [0, 1], and makes its sum equal to 1. After this transformation, the i-th output's value designates the input's probability to be the class i.
 \end{itemize}
 
 \begin{figure} [H]
