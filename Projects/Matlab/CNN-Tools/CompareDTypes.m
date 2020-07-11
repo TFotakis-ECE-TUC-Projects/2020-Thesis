@@ -4,7 +4,7 @@ clc;
 
 global imgConvertFunc paramsConvertFunc activationsConvertFunc
 
-compDTypeFile = "Data/results/float32Pruned41.22.txt";
+compDTypeFile = "Data/results/fixedAll.txt";
 
 imgConvertFunc = @(x) x;
 % imgConvertFunc = @double;
@@ -16,8 +16,8 @@ imgConvertFunc = @(x) x;
 % paramsConvertFunc = @(p) cellfun(@(x) double(x), p, 'UniformOutput', false);
 % paramsConvertFunc = @(p) cellfun(@(x) single(x), p, 'UniformOutput', false);
 % paramsConvertFunc = @(p) cellfun(@(x) half(x), p, 'UniformOutput', false);
-% paramsConvertFunc = @(p) ParamsQuantizeFixed(p, 16);
-paramsConvertFunc = @(p) PruneParams(p);
+paramsConvertFunc = @(p) ParamsQuantizeFixed(p, 8);
+% paramsConvertFunc = @(p) PruneParams(p);
 
 activationsConvertFunc = @(x) x;
 % activationsConvertFunc = @double;
@@ -32,7 +32,8 @@ hWaitbar = waitbar(0, 'Loading Params', 'Name', ...
 	'Compare Data types for network inferencing', 'CreateCancelBtn', ...
 	'delete(gcbf)');
 p = LoadParams("Data/alexnetParams");
-p = paramsConvertFunc(p);
+% p = paramsConvertFunc(p);
+[p, rep] = paramsConvertFunc(p);
 
 waitbar(1/5, hWaitbar, 'Loading Labels');
 labels = LoadLabels("Data/alexnet.labels");
@@ -59,6 +60,8 @@ count = 0;
 correct = 0;
 t = 0;
 f = fopen(compDTypeFile, "at");
+xr = -inf * ones(9, 1);
+xb = -inf * ones(9, 1);
 for i=1:numel(imgs)
 	waitbar(i/numel(imgs), hWaitbar, ['Image ' num2str(i) '/' num2str(numel(imgs))]);
 
@@ -68,7 +71,8 @@ for i=1:numel(imgs)
 	x = imgConvertFunc(x);
 
 	tic
-	x = AlexNet(x, p);
+% 	x = AlexNet(x, p);
+	[x, xrep, xr, xb] = AlexNetFixed(x, p, rep, xr, xb);
 	t = t + toc;
 
 	[~, x] = max(double(x));
@@ -78,6 +82,8 @@ for i=1:numel(imgs)
 	if eval, fprintf("+ "), else, fprintf("x "), end
 	fprintf("Class %u, Error Rate %0.2f%%, Avg Time (sec) %f\n", x, round(ErrorRate(correct, i) * 100, 2), t / i);
 	fprintf(f, "%s: %u\n", imgs(i).name, x);
+	
+	[xr, xb]
 
 	drawnow;
 	if ~ishandle(hWaitbar), break, end

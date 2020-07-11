@@ -1,4 +1,4 @@
-function x = QuantizeFixed(x, bitWidth)
+function [x, rep] = QuantizeFixed(x, bitWidth)
 x = double(x);
 
 % s = zeros(1, bitWidth);
@@ -15,5 +15,5 @@ rep = int32(rep);
 m=0;
 
 x = num2fixpt(x, fixdt(1, bitWidth, rep));
-fprintf("Fixed %u.%u, Error rate: %f\n", bitWidth, rep, m);
+% fprintf("Fixed %u.%u, Error rate: %f\n", bitWidth, rep, m);
 end
