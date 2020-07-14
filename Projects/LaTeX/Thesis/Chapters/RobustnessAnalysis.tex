@@ -283,7 +283,7 @@ Consequently, it is of high importance to minimize the network's memory footprin
 	\end{tabular}
 \end{table}
 
-This work focuses on the Xilinx ZCU102 \cite{ZCU102-User-Guide} and the QFDB \cite{Implementation-and-Impact-of-an-Ultra-Compact-Multi-FPGA-Board-for-Large-System-Prototyping} target boards, which both integrate the same Zynq UltraScale+ MPSoC (XCZU9EG-2FFVB1156). Unfortunately, this MPSoC provides only 2MBs of BRAM, which, according to tables \ref{tab:AlexNet-Parameters-Memory-Footprint} and \ref{tab:AlexNet-Data-Stages-Memory-Footprint}, creates some serious memory constraints.
+This work focuses on the Xilinx ZCU102 \cite{ZCU102-User-Guide} \cite{ZCU102-Product-Overview} and the QFDB \cite{Implementation-and-Impact-of-an-Ultra-Compact-Multi-FPGA-Board-for-Large-System-Prototyping} target boards, which both integrate the same Zynq UltraScale+ MPSoC XCZU9EG-2FFVB1156E (for more information see section \ref{sec:FPGA-Platforms}). Unfortunately, this MPSoC provides only 2MBs of BRAM, which, according to tables \ref{tab:AlexNet-Parameters-Memory-Footprint} and \ref{tab:AlexNet-Data-Stages-Memory-Footprint}, creates some serious memory constraints.
 
 In respect to table \ref{tab:AlexNet-Parameters-Memory-Footprint}, only the first and the second convolutional layers' parameters can fit both simultaneously in the MPSoC's BRAM. Moreover, not only do all other layers not fit, but they also need up to 75 times more memory each (see first Fully-Connected layer).
 

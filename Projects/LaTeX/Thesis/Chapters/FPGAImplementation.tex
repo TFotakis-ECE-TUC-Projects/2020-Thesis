@@ -54,7 +54,7 @@ As mentioned above, HLS provides a set of directives for design optimization in 
 \end{itemize}
 
 \subsection{Xilinx SDK}
-Xilinx Software Development Kit (SDK) \cite{Xilinx-SDK}, currently unified with SDSoC and SDAccel into Vitis Unified Software Platform, is an IDE for embedded-software development Xilinx's microprocessors. Based on the Eclipse IDE \cite{Eclipse-IDE}, it includes a C/C++ editor, a compilation toolchain for ARM microprocessors with automatic Makefile generation, and several debug and profiling tools. It is used to create applications that run on the ARM cores either external to the FPGA die or internal like on the MPSoCs. Often those applications play the role of the coordinator/master that organizes, schedules, and configures the FPGA hardware. They often handle the external I/O, like data transfers to and from storage devices (SD cards, Hard Drives, Flash Memories, etc.) or Ethernet, to and from volatile memory (RAM, BRAM, etc.). They can also handle the data pre-processing needed to feed the FPGA hardware. Furthermore, multi-core processors can be utilized simultaneously using bare-metal applications. If multi-processing is required with a sophisticated scheduler, Linux applications can be built and run on Linux operating systems like PetaLinux \cite{PetaLinux} and FreeRTOS \cite{FreeRTOS}.
+Xilinx Software Development Kit (SDK) \cite{Xilinx-SDK}, currently unified with SDSoC and SDAccel into Vitis Unified Software Platform, is an IDE for embedded-software development Xilinx's microprocessors. Based on the Eclipse IDE \cite{Eclipse-IDE}, it includes a C/C++ editor, a compilation toolchain for ARM microprocessors with automatic Makefile generation, system performance analysis and optimization tools, and several debug and profiling tools. It is used to create applications that run on the ARM cores either external to the FPGA die or internal like on the MPSoCs. Often those applications play the role of the coordinator/master that organizes, schedules, and configures the FPGA hardware. They often handle the external I/O, like data transfers to and from storage devices (SD cards, Hard Drives, Flash Memories, etc.) or Ethernet, to and from volatile memory (RAM, BRAM, etc.). They can also handle the data pre-processing needed to feed the FPGA hardware. Furthermore, multi-core processors can be utilized simultaneously using bare-metal applications. If multi-processing is required with a sophisticated scheduler, Linux applications can be built and run on Linux operating systems like PetaLinux \cite{PetaLinux} and FreeRTOS \cite{FreeRTOS}.
 
 Xilinx SDK is strongly coupled with the Xilinx Design Suite and its hardware designs and bitstreams. After the successful implementation and bitstream generation of the hardware design from Vivado IDE, Xilinx SDK imports the project's hardware wrapper to generate the Board Support Package (BSP) and various C/C++ libraries useful for communication with and configuration of the FPGA hardware.
 
@@ -69,6 +69,41 @@ A console window is used for input and output functionality using the UART port 
 Debugging applications is as simple as regular locally running applications using the built-in System Debugger or other debugging tools like GDB \cite{GDB}. In addition, Vivado IDE's Hardware Manager can be used in combination with SDK's System Debugger to debug hardware designs and their driver applications. Vivado IDE's Hardware Manager connects to the hardware's ILA IPs, enabling the monitoring in real-time of the hardware's state concerning the driver application's state.
 
 \section{FPGA Platforms}
+\label{sec:FPGA-Platforms}
+This work focuses on the two FPGA platforms available in the lab, the Xilinx ZCU102 Evaluation Kit, and the FORTH QFDB. Conveniently, both platforms integrate the same Zynq UltraScale+ MPSoC XCZU9EG-2FFVB1156E.
+
+\subsection{Xilinx Zynq UltraScale+ MPSoC XCZU9EG-2FFVB1156E}
+The Xilinx Zynq UltraScale+ Multi-Processor System-on-Chip (MPSoC) \cite{DS891-Zynq-UltraScale-MPSoC-DataSheet-Overview} family of products integrates multiple ARM Cortex-A53 and Cortex-R5 cores processing system (PS) and a Xilinx UltraScale programmable logic (PL) architecture in a single chip with on-chip memory, multiport external memory interfaces and several peripheral connectivity interfaces.
+
+Some key features of XCZU9EG-2FFVB1156E are:
+\begin{itemize}
+	\item Quad-core 64bit Arm v8-A Cortex-A53 with L1/L2 cache.
+	\item Dual-core 32bit Arm v7-R Cortex-R5 with L1 cache.
+	\item Arm Mali-400 MP2 graphic processing unit.
+	\item 256KB on-chip ECC memory.
+	\item Xilinx 16nm FinFet+ programmable logic fabric.
+	\item 600k system logic cells.
+	\item 548k CLB Flip-Flops.
+	\item 274k CLB LUTs.
+	\item 32.1Mb Block RAM.
+	\item 2520 DSPs.
+\end{itemize}
+
+\subsection{Xilinx ZCU102 Evaluation Kit}
+The Xilinx ZCU102 Evaluation Kit \cite{ZCU102-User-Guide} \cite{ZCU102-Product-Overview} (Figure \ref{fig:ZCU102-board-overview}) is a general-purpose development board for rapid prototyping based on the aforementioned UltraScale+ MPSoC. It provides a complete platform with an SD card as a primary storage device, 4GB 64bit ECC DDR4 SODIMM RAM, 512MB DDR4 component memory for PL, and a power delivery system. It also provides various configuration switches and jumpers, and all major peripherals and interfaces such as PCIe Gen 2x4 slot, SATA, Ethernet, HDMI input and output, DisplayPort, USB, JTAG, and UART.
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[width=\textwidth]{Images/Hardware/ZCU102-board-overview.jpg}
+	\decoRule
+	\caption[Xilinx ZCU102 Evaluation Board overview]{Xilinx ZCU102 Evaluation Board overview: \href{https://www.xilinx.com/products/boards-and-kits/ek-u1-zcu102-g.html}{URL}}
+	\label{fig:ZCU102-board-overview}
+\end{figure}
+
+\subsection{FORTH QFDB}
+The Quad-FPGA Daughter Board (QFDB) (Figure \ref{fig:forth-qfdb-daughterboard}) \cite{Implementation-and-Impact-of-an-Ultra-Compact-Multi-FPGA-Board-for-Large-System-Prototyping}, developed by the Foundation of Research and Technology Hellas (FORTH) \cite{FORTH}, combines four of the aforementioned MPSoCs, interconnected with each other. It is a complete platform as well, which provides 16GB of DDR4 memory and an M.2 Solid State Drive (SSD), and some peripherals and interfaces such as Ethernet, JTAG, and UART.
+
+It is designed to be used in servers, with other QFDBs running in parallel, creating a network of FPGAs. The QFDB enables massive hardware designs to be split and deployed into multiple FPGA devices or even multiple QFDB boards. It also enables the deployment of hardware designs into a high number of FPGAs for increased parallelism.
 
 \section{Characteristics}
 
