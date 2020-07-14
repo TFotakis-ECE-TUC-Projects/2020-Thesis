@@ -1,4 +1,4 @@
-function PrintSchedule(arr, figureName)
+function PrintSchedule(arr, figureName, useTitles)
 global chip_frequency logScale printTimings USE_SUBPLOTS SAVE_PLOTS
 %cla;
 lineWidth = 15;
@@ -15,7 +15,9 @@ end
 plotFunc(a, b, 'LineWidth', lineWidth);
 text(s, length(arr):-1:1, {arr(:).name})
 
-title(figureName);
+if useTitles
+	title(figureName);
+end
 xlabel('Clock cycles');
 set(gca, 'ytick', []);
 ylim([0 12]);
