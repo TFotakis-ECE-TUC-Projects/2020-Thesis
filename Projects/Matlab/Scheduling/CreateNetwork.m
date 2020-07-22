@@ -1,5 +1,5 @@
 function n = CreateNetwork()
-global p;
+global p printTimings;
 n.c1 = TConv2DReLU(224, 224, 3, 64, 11, 4, 2, p.conv1, 'Conv1');
 n.m1 = TMaxPool(64, 55, 55, 3, 2, p.maxpool1, 'MaxPool1');
 n.c2 = TConv2DReLU(27, 27, 64, 192, 5, 1, 2, p.conv2, 'Conv2');
@@ -24,23 +24,28 @@ for i = 1:11
     n.totalOutputs = n.totalOutputs + n.arr(i).to;
 end
 
-
+if printTimings
 fprintf("Image: Outputs %d$ & %d & %0.2f \\\\\n", ...
         3 * 224 * 224, 3 * 224 * 224, ...
         3 * 224 * 224 / n.totalOutputMemory * 100);
+end
 
 for i = 1:11
     n.arr(i).totalMemoryPerc = n.arr(i).totalMemory / n.totalMemory * 100;
     n.arr(i).totalOutputMemoryPerc = n.arr(i).totalOutputMemory / n.totalOutputMemory * 100;
+	
+	if printTimings
 	fprintf("%s: Weights %d$ & %d & %0.2f \\\\, Outputs %d$ & %d & %0.2f \\\\\n", ...
         n.arr(i).name, n.arr(i).totalWeights, n.arr(i).totalMemory, ...
         n.arr(i).totalMemoryPerc, ...
         n.arr(i).to, n.arr(i).totalOutputMemory, ...
         n.arr(i).totalOutputMemoryPerc);
+	end
 end
 
+if printTimings
 fprintf("Totals: Weights %d$ & %d & %0.2f \\\\, Outputs %d$ & %d & %0.2f \\\\\n", ...
         n.totalWeights, n.totalMemory, 100, ...
         n.totalOutputs, n.totalOutputMemory, 100);
-
+end
 end

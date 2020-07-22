@@ -32,6 +32,7 @@ if printTimings
 end
 
 if ~USE_SUBPLOTS && SAVE_PLOTS
-	saveas(gca, strcat('output/noSubplots/', regexprep(figureName, ' +', '-'), '.png'))
+	figurePath = strcat('output/noSubplots/', regexprep(figureName, ' +', '-'), '.png');
+	saveas(gca, figurePath);
 end
 end

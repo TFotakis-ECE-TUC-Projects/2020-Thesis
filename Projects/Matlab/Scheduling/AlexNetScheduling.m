@@ -13,8 +13,8 @@ c.memWrite = 1;
 c.useTimings = 0;
 c.dataTypeSize = 4;
 chip_frequency = 100e6;
-logScale = 0;
-printTimings = 1;
+logScale = false;
+printTimings = false;
 USE_SUBPLOTS = false;
 USE_TITLES = false;
 SAVE_PLOTS = true;
@@ -43,6 +43,7 @@ end
 n1 = CreateNetwork();
 n1 = ScheduleSerial(n1);
 PrintSchedule(n1.arr, figureName, USE_TITLES);
+LayerTypeTimings(n1);
 
 figureName = 'Pipelined 1x';
 if USE_SUBPLOTS
