@@ -105,8 +105,53 @@ The Quad-FPGA Daughter Board (QFDB) (Figure \ref{fig:forth-qfdb-daughterboard}) 
 
 It is designed to be used in servers, with other QFDBs running in parallel, creating a network of FPGAs. The QFDB enables massive hardware designs to be split and deployed into multiple FPGA devices or even multiple QFDB boards. It also enables the deployment of hardware designs into a high number of FPGAs for increased parallelism.
 
-\section{Characteristics}
+\section{The platform}
+For this work, a platform was created capable of CNN inference on FPGA devices. This platform had to be created with flexibility and versatility in mind to be able to be transferred to other FPGA devices while being based on the Xilinx ZCU102, which was available in the lab. It should also be scalable to enable multi-FPGA implementations, and it should be extendable to enable for easy adding of new layer types and new layer accelerators. Furthermore, it should be able to run various CNN models' inference, but most importantly, it should provide easy experimentation and development of accelerator architectures.
 
+The basic building blocks of this platform consists of its volatile and non-volatile memory, and its compute engine. Figure \ref{fig:platform-block-diagram} depicts the platform's block diagram, whose functionality is explained below. It should be noted that everything described below is implemented on the aforementioned Xilinx ZCU102 Evaluation Kit.
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[width=\textwidth]{Images/Platform/platform.png}
+	\decoRule
+	\caption[The platform's block diagram]{The platform's block diagram.}
+	\label{fig:platform-block-diagram}
+\end{figure}
+
+\subsection{Non-Volatile Memory}
+This platform's non-volatile memory serves as a storage medium for all the data that networks require for their inference, which include the initialization data (network model configurations, parameters (weights and biases), class labels), and the input data (e.g., images). An SD-card is used as the non-volatile memory for this platform (also depicted as an SD-card in Figure \ref{fig:platform-block-diagram}). However, with some software extensions, other storage devices can also be used, such as SATA hard drives or even M.2 SSDs (on other FPGA platforms, e.g., QFDB). Moreover, external storage devices can also be utilized, via the Ethernet port through local-network/Internet, or via the JTAG port to avoid copying files over and over again on the platform's primary storage device but also to enable the single-source access for multiple FPGA devices.
+
+While SD-cards have little bandwidth than other storage devices like SATA drives and M.2 SSDs, the non-volatile memory's purpose is to initialize the platform, which is a one time cost, and feed it with input data. When the platform is on its initialization phase, the initialization data from its non-volatile memory are transferred to its volatile memory to get later used from the compute engine. Because most, if not all, networks' initialization data fit in the volatile memory, leaving a lot of empty memory space, input data are also transferred, filling as much space as possible to utilize the volatile memory's high bandwidth for input data consumption. Consequently, the SD-card's low bandwidth can be safely ignored.
+
+If the input data are large enough to not completely fit in the volatile memory and their consumption is faster than their feed through the SD-card, a faster storage device should be used. However, in this work's experiments, this has never been the case.
+
+\subsection{Volatile Memory}
+The platform's volatile memory consists of two types of memory devices, the DDR4 modules found on the ZCU102 and the on-chip BRAM. The ZCU102 also provides a separate DDR4 component accessible from the FPGA's PL part, however for simplicity and generality (it is not provided on all FPGA platforms) purposes, and because it provides lower bandwidth compared to the DDR4 modules, it is not utilized on this platform.
+
+The platform's primary memory medium is the DDR4 memory modules connected to both the PS and PL parts of the device. As mentioned before, it stores and serves all the required data for the platform to run. Those data are read from various files found on the non-volatile memory, in this case, the SD-card, using the Arm cores found on the PS part, and are then stored onto the DDR.
+
+The DDR has to feed the PL part with data in chunks because, as explained in section \ref{sec:Memory-Footprint}, the integrated BRAM cannot store the whole network's parameters and activations. Consequently, every network's layer has to know where to find and how to access every piece of data it requires, which is found on the platform's software structures.
+
+On this platform, there is no central BRAM component that every accelerator accesses. Instead, every accelerator should implement its own BRAM, without permitting access to others. It should be the only one to know how to manage its storage. Of course, to fulfill the accelerator's needs in bandwidth, read and write ports, and latency, it can implement its BRAM as it requires, and utilize individual registers.
+
+\subsection{Compute Engine}
+The compute engine consists of both the PS and PL part of the FPGA device, which includes the Arm cores and the FPGA accelerators, respectively. While the bulk of the computation is handled by the PL part, the PS part handles the more sophisticated computations, such as the input data pre-processing and the accelerator configuration and scheduling.
+
+In this platform, a network can be run only if its layers are supported by either software or hardware implementations. Software implementations are running on the Arm cores, and hardware implementations are the FPGA accelerators. By allowing both types of implementations, this platform expands its flexibility. This can not only help the development stage of FPGA accelerators by comparing their outputs with the ones generated by the software implementation, but it can also help to fully utilize the device's resources by running parts of even whole layers on the Arm cores in parallel to the hardware accelerators. Furthermore, layers that have not yet been implemented in hardware can easily be implemented in software for experimentation purposes, such as the Depth Concat layer found on the GoogLeNet (Figure \ref{fig:GoogLeNet}).
+
+As shown in Figure \ref{fig:platform-block-diagram}, in this work, three layer types have been implemented in hardware; the Convolutional (Conv) layer, the Max-Pooling (MaxPool) layer and the Fully-Connected (Linear) layer. In addition, multiple instances of the same layer type can also be added in the platform to enable for either parallel execution of different inferences with different inputs or even different network models, or better pipelining in a single inference. This is discussed in detail in section \ref{sec:CNN-Scheduling}.
+
+\subsection{I/O}
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[width=\textwidth]{Images/Platform/PlatformFlowchart.png}
+	\decoRule
+	\caption[The platform's flowchart]{The platform's flowchart.}
+	\label{fig:platform-flowchart}
+\end{figure}
+
+\subsection{AlexNet Characteristics}
 \begin{table}[H]
 	\caption{Scale and bit-width of input and activations}
 	\label{tab:scale-and-bit-width-of-input-and-activations}
@@ -128,8 +173,8 @@ It is designed to be used in servers, with other QFDBs running in parallel, crea
 	\end{tabular}
 \end{table}
 
-\section{Scheduling}
-
+\subsection{CNN Scheduling}
+\label{sec:CNN-Scheduling}
 \begin{figure} [H]
 	\centering
 	\includegraphics[width=\textwidth]{Images/Scheduling/Serial.png}

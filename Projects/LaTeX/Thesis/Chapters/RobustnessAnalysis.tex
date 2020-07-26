@@ -257,6 +257,7 @@ Algorithm \ref{alg:SoftMax} performs a SoftMax activation function on vector inp
 \end{algorithm}
 
 \section{Memory Footprint}
+\label{sec:Memory-Footprint}
 Memory footprint plays a considerable role in neural network applications based on FPGA or ASIC systems. While neural networks are compute-bound on classic hardware architectures, on FPGAs' and ASICs', they can become memory bound due to their high parallelism capabilities but low memory bandwidth. In general, an application can fully benefit from an FPGA when its memory requirements fit into the FPGA's internal BRAM. Otherwise, modern FPGAs support external DRAM modules that can be utilized to fulfill the application's memory requirements. However, this introduces latency and memory I/O stalls to the system.
 
 Consequently, it is of high importance to minimize the network's memory footprint in order to make it fit into the internal BRAM, or at least, minimize the memory bandwidth requirements. It is firstly needed to explore how the network's memory requirements are distributed throughout its stages. Using AlexNet as a reference network, tables \ref{tab:AlexNet-Parameters-Memory-Footprint} and \ref{tab:AlexNet-Data-Stages-Memory-Footprint} show AlexNet's parameters memory requirements per layer and each layer's output memory requirements respectively, using single-precision floating-point numbers.
@@ -288,7 +289,7 @@ This work focuses on the Xilinx ZCU102 \cite{ZCU102-User-Guide} \cite{ZCU102-Pro
 In respect to table \ref{tab:AlexNet-Parameters-Memory-Footprint}, only the first and the second convolutional layers' parameters can fit both simultaneously in the MPSoC's BRAM. Moreover, not only do all other layers not fit, but they also need up to 75 times more memory each (see first Fully-Connected layer).
 
 \begin{table}[H]
-	\caption{AlexNet Data Stages Memory Footprint}
+	\caption{AlexNet Data Stages Memory Footprint.}
 	\label{tab:AlexNet-Data-Stages-Memory-Footprint}
 	\centering
 	\begin{tabular}{llll}
@@ -329,7 +330,7 @@ It is worth noting that a MATLAB implementation of the network had to be used in
 Before every test, the network's parameters were converted from the given single-precision floating-point pre-trained model to the corresponding data type. Also, the same data type was used for the layers' activations during inference. While converting single-precision to double-precision does not result in higher arithmetic accuracy, experiments with doubles were conducted for completeness, as shown in table \ref{tab:floats-error-rates}.
 
 \begin{table}[H]
-	\caption{Top-1 error rate of every floating-point tested data type}
+	\caption{Top-1 error rate of every floating-point tested data type.}
 	\label{tab:floats-error-rates}
 	\centering
 	\begin{tabular}{p{2cm} p{2cm} p{3cm} p{3cm}}
@@ -360,7 +361,7 @@ It should be mentioned that MATLAB's conversion of floating-point to any bit-wid
 Unfortunately, only the 64 and 32-bit tests resulted in no Top-1 error-rate, as shown in table \ref{tab:fixed-error-rates}. Even the 16-bit test resulted in a very high error-rate, rendering this data type unusable for this application. However, the high error-rate can be explained after visualizing the weights' distributions before and after the conversion, with its three side effects. The following figures were selected because of their dramatic transformation caused by this conversion to demonstrate its side effects.
 
 \begin{table}[H]
-	\caption{Top-1 error rate of every fixed-point tested data type}
+	\caption{Top-1 error rate of every fixed-point tested data type.}
 	\label{tab:fixed-error-rates}
 	\centering
 	\begin{tabular}{p{2cm} p{2cm} p{3cm} p{3cm}}
@@ -383,7 +384,7 @@ First of all, figure \ref{fig:weight-distribution-comparison-conv2} depicts the 
 	\centering
 	\includegraphics[scale=0.9]{Images/Weights-distributions/original-vs-fixed8/weight-distribution-conv2.png}
 	\decoRule
-	\caption[Second Convolution layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations]{Second Convolution layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations: right histogram's limits are significantly altered}
+	\caption[Second Convolution layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations]{Second Convolution layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations: right histogram's limits are significantly altered.}
 	\label{fig:weight-distribution-comparison-conv2}
 \end{figure}
 
@@ -395,7 +396,7 @@ Second of all, figure \ref{fig:weight-distribution-comparison-conv5} depicts the
 	\centering
 	\includegraphics[scale=0.9]{Images/Weights-distributions/original-vs-fixed8/weight-distribution-conv5.png}
 	\decoRule
-	\caption[Fifth Convolution layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations]{Fifth Convolution layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations: various spikes can be observed on the right histogram}
+	\caption[Fifth Convolution layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations]{Fifth Convolution layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations: various spikes can be observed on the right histogram.}
 	\label{fig:weight-distribution-comparison-conv5}
 \end{figure}
 
@@ -407,7 +408,7 @@ Last but not least, figure \ref{fig:weight-distribution-comparison-FC1} depicts 
 	\centering
 	\includegraphics[scale=0.9]{Images/Weights-distributions/original-vs-fixed8/weight-distribution-FC1.png}
 	\decoRule
-	\caption[First Fully-Connected layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations]{First Fully-Connected layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations: significant subsampling on the right histogram}
+	\caption[First Fully-Connected layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations]{First Fully-Connected layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations: significant subsampling on the right histogram.}
 	\label{fig:weight-distribution-comparison-FC1}
 \end{figure}
 
@@ -435,7 +436,7 @@ As shown on figures \ref{fig:weight-distribution-comparison-conv2-MQE}, \ref{fig
 	\centering
 	\includegraphics[scale=0.9]{Images/Weights-distributions/original-vs-fixed8/weight-distribution-conv2-MQE.png}
 	\decoRule
-	\caption[Second Convolution layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations using MQE]{Second Convolution layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations using MQE: right histogram's limits are identical}
+	\caption[Second Convolution layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations using MQE]{Second Convolution layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations using MQE: right histogram's limits are identical.}
 	\label{fig:weight-distribution-comparison-conv2-MQE}
 \end{figure}
 
@@ -445,7 +446,7 @@ Using MQE, equation \ref{eqn:select-radix-point-position-Mean-Quarted-Error} res
 	\centering
 	\includegraphics[scale=0.9]{Images/Weights-distributions/original-vs-fixed8/weight-distribution-conv5-MQE.png}
 	\decoRule
-	\caption[Fifth Convolution layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations using MQE]{Fifth Convolution layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations using MQE: various spikes can still be observed on the right histogram}
+	\caption[Fifth Convolution layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations using MQE]{Fifth Convolution layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations using MQE: various spikes can still be observed on the right histogram.}
 	\label{fig:weight-distribution-comparison-conv5-MQE}
 \end{figure}
 
@@ -455,7 +456,7 @@ Using MQE, equation \ref{eqn:select-radix-point-position-Mean-Quarted-Error} res
 	\centering
 	\includegraphics[scale=0.9]{Images/Weights-distributions/original-vs-fixed8/weight-distribution-FC1-MQE.png}
 	\decoRule
-	\caption[First Fully-Connected layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations using MQE]{First Fully-Connected layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations using MQE: no subsampling on the right histogram}
+	\caption[First Fully-Connected layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations using MQE]{First Fully-Connected layer's weights distribution comparison between single-precision floating-point and 8-bit fixed-point representations using MQE: no subsampling on the right histogram.}
 	\label{fig:weight-distribution-comparison-FC1-MQE}
 \end{figure}
 
@@ -464,7 +465,7 @@ Using MQE, equation \ref{eqn:select-radix-point-position-Mean-Quarted-Error} res
 Table \ref{tab:fixed-MQE-error-rates} shows the Top-1 error-rate of fixed-point data types using the Mean Quarted Error equation \ref{eqn:select-radix-point-position-Mean-Quarted-Error}. While 8, 10, and 12 bit width fixed-point data types are still unusable, the 14 and 16 bit width representations have improved significantly.
 
 \begin{table}[H]
-	\caption{Top-1 error rate of fixed-point data types using Mean Quarted Error equation \ref{eqn:select-radix-point-position-Mean-Quarted-Error}}
+	\caption{Top-1 error rate of fixed-point data types using Mean Quarted Error equation \ref{eqn:select-radix-point-position-Mean-Quarted-Error}.}
 	\label{tab:fixed-MQE-error-rates}
 	\centering
 	\begin{tabular}{lll}
@@ -488,7 +489,7 @@ For better clarity on the results, figure \ref{fig:data-types-accuracy-chart} de
 	\centering
 	\includegraphics[width=\textwidth]{Images/Weights-distributions/data-types-accuracy-chart.png}
 	\decoRule
-	\caption[All data types tested accuracy]{All data types tested accuracy}
+	\caption[All data types tested accuracy]{All data types tested accuracy.}
 	\label{fig:data-types-accuracy-chart}
 \end{figure}
 
@@ -511,7 +512,7 @@ A more suitable strategy would be to investigate a pruning factor for each layer
 	\centering
 	\includegraphics[width=\textwidth]{Images/Weights-distributions/all-layer-original-weights-distributions.png}
 	\decoRule
-	\caption[All layer weights distributions]{All layer weights distributions}
+	\caption[All layer weights distributions]{All layer weights distributions.}
 	\label{fig:all-layer-original-weights-distributions}
 \end{figure}
 
@@ -529,7 +530,7 @@ Tests explanation:
 \end{itemize}
 
 \begin{table}[H]
-	\caption{All pruning amount configurations tested and their accuracy}
+	\caption{All pruning amount configurations tested and their accuracy.}
 	\label{tab:pruning-amount-vs-accuracy}
 	\centering
 	\begin{tabular}{llll llll}
@@ -562,7 +563,7 @@ Figure \ref{fig:pruning-amount-vs-accuracy} shows the two test groups' classific
 	\centering
 	\includegraphics[width=\textwidth]{Images/Weights-distributions/pruned/pruning-amount-vs-accuracy-chart.png}
 	\decoRule
-	\caption[Accuracy per pruning amount]{Accuracy per pruning amount}
+	\caption[Accuracy per pruning amount]{Accuracy per pruning amount.}
 	\label{fig:pruning-amount-vs-accuracy}
 \end{figure}
 
@@ -574,7 +575,7 @@ The effect of weight pruning can be clearly observed in figure \ref{fig:weight-d
 	\centering
 	\includegraphics[width=\textwidth]{Images/Weights-distributions/pruned/41.22/weight-distribution-conv1.png}
 	\decoRule
-	\caption[Weight distribution comparison of the original and the pruned weights of the first convolution layer of test 3]{Weight distribution comparison of the original and the pruned weights of the first convolution layer  of test 3: A high concentration of zero valued weights can be observed on the pruned weights histogram (right), with a severe absence of near-to-zero valued weights}
+	\caption[Weight distribution comparison of the original and the pruned weights of the first convolution layer of test 3]{Weight distribution comparison of the original and the pruned weights of the first convolution layer  of test 3: A high concentration of zero valued weights can be observed on the pruned weights histogram (right), with a severe absence of near-to-zero valued weights.}
 	\label{fig:weight-distribution-comparison-pruned-conv1-test3}
 \end{figure}
 
@@ -588,7 +589,7 @@ Figure \ref{fig:weight-distribution-comparison-pruned-conv1-test1} shows the wei
 	\centering
 	\includegraphics[width=\textwidth]{Images/Weights-distributions/pruned/37.97/weight-distribution-conv1.png}
 	\decoRule
-	\caption[Weight distribution comparison of the original and the pruned weights of the first convolution layer of test 1]{Weight distribution comparison of the original and the pruned weights of the first convolution layer of test 1: Similar concentration of zero valued weights can be observed on the pruned histogram (right), with almost no absence of near-to-zero valued weights}
+	\caption[Weight distribution comparison of the original and the pruned weights of the first convolution layer of test 1]{Weight distribution comparison of the original and the pruned weights of the first convolution layer of test 1: Similar concentration of zero valued weights can be observed on the pruned histogram (right), with almost no absence of near-to-zero valued weights.}
 	\label{fig:weight-distribution-comparison-pruned-conv1-test1}
 \end{figure}
 
@@ -598,6 +599,6 @@ Figure \ref{fig:weight-distribution-comparison-pruned-FC1-test1} shows the weigh
 	\centering
 	\includegraphics[width=\textwidth]{Images/Weights-distributions/pruned/37.97/weight-distribution-FC1.png}
 	\decoRule
-	\caption[Weight distribution comparison of the original and the pruned weights of the first Fully-Connected layer of test 1]{Weight distribution comparison of the original and the pruned weights of the first Fully-Connected layer of test 1: A high concentration of zero valued weights can be observed on the pruned weights histogram (right), with a slight absence of near-to-zero valued weights}
+	\caption[Weight distribution comparison of the original and the pruned weights of the first Fully-Connected layer of test 1]{Weight distribution comparison of the original and the pruned weights of the first Fully-Connected layer of test 1: A high concentration of zero valued weights can be observed on the pruned weights histogram (right), with a slight absence of near-to-zero valued weights.}
 	\label{fig:weight-distribution-comparison-pruned-FC1-test1}
 \end{figure}
