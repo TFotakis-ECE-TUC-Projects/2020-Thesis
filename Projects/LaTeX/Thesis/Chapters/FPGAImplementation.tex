@@ -77,9 +77,9 @@ The Xilinx Zynq UltraScale+ Multi-Processor System-on-Chip (MPSoC) \cite{DS891-Z
 
 Some key features of XCZU9EG-2FFVB1156E are:
 \begin{itemize}
-	\item Quad-core 64bit Arm v8-A Cortex-A53 with L1/L2 cache.
-	\item Dual-core 32bit Arm v7-R Cortex-R5 with L1 cache.
-	\item Arm Mali-400 MP2 graphic processing unit.
+	\item Quad-core 64bit ARM v8-A Cortex-A53 with L1/L2 cache.
+	\item Dual-core 32bit ARM v7-R Cortex-R5 with L1 cache.
+	\item ARM Mali-400 MP2 graphic processing unit.
 	\item 256KB on-chip ECC memory.
 	\item Xilinx 16nm FinFet+ programmable logic fabric.
 	\item 600k system logic cells.
@@ -105,8 +105,8 @@ The Quad-FPGA Daughter Board (QFDB) (Figure \ref{fig:forth-qfdb-daughterboard}) 
 
 It is designed to be used in servers, with other QFDBs running in parallel, creating a network of FPGAs. The QFDB enables massive hardware designs to be split and deployed into multiple FPGA devices or even multiple QFDB boards. It also enables the deployment of hardware designs into a high number of FPGAs for increased parallelism.
 
-\section{The platform}
-For this work, a platform was created capable of CNN inference on FPGA devices. This platform had to be created with flexibility and versatility in mind to be able to be transferred to other FPGA devices while being based on the Xilinx ZCU102, which was available in the lab. It should also be scalable to enable multi-FPGA implementations, and it should be extendable to enable for easy adding of new layer types and new layer accelerators. Furthermore, it should be able to run various CNN models' inference, but most importantly, it should provide easy experimentation and development of accelerator architectures.
+\section{The Platform}
+For this work, a platform was created capable of CNN inference on FPGA devices. This platform had to be created with flexibility and versatility in mind to be able to be transferred to other FPGA devices while being based on the Xilinx ZCU102, which was available in the lab. It should also be scalable to enable multi-FPGA implementations, and it should be extendable to enable for easy adding of new layer types and new layer accelerators. Furthermore, it should be able to run various CNN models' inference, but most importantly, it should provide easy experimentation and development of hardware accelerator architectures.
 
 The basic building blocks of this platform consists of its volatile and non-volatile memory, and its compute engine. Figure \ref{fig:platform-block-diagram} depicts the platform's block diagram, whose functionality is explained below. It should be noted that everything described below is implemented on the aforementioned Xilinx ZCU102 Evaluation Kit.
 
@@ -128,20 +128,76 @@ If the input data are large enough to not completely fit in the volatile memory 
 \subsection{Volatile Memory}
 The platform's volatile memory consists of two types of memory devices, the DDR4 modules found on the ZCU102 and the on-chip BRAM. The ZCU102 also provides a separate DDR4 component accessible from the FPGA's PL part, however for simplicity and generality (it is not provided on all FPGA platforms) purposes, and because it provides lower bandwidth compared to the DDR4 modules, it is not utilized on this platform.
 
-The platform's primary memory medium is the DDR4 memory modules connected to both the PS and PL parts of the device. As mentioned before, it stores and serves all the required data for the platform to run. Those data are read from various files found on the non-volatile memory, in this case, the SD-card, using the Arm cores found on the PS part, and are then stored onto the DDR.
+The platform's primary memory medium is the DDR4 memory modules  (also depicted as a DDR4 module in Figure \ref{fig:platform-block-diagram}) connected to both the PS and PL parts of the device. As mentioned before, it stores and serves all the required data for the platform to run. Those data are read from various files found on the non-volatile memory, in this case, the SD-card, using the ARM cores found on the PS part, and are then stored onto the DDR.
 
-The DDR has to feed the PL part with data in chunks because, as explained in section \ref{sec:Memory-Footprint}, the integrated BRAM cannot store the whole network's parameters and activations. Consequently, every network's layer has to know where to find and how to access every piece of data it requires, which is found on the platform's software structures.
+The DDR has to feed the PL part with data in chunks because, as explained in section \ref{sec:Memory-Footprint}, the integrated BRAM cannot store the whole network's parameters and activations. Consequently, every network's layer has to know where to find and how to access every piece of data it requires, information that is found on the platform's software structures and passed to the layers using the ARM cores during the setup phase.
 
 On this platform, there is no central BRAM component that every accelerator accesses. Instead, every accelerator should implement its own BRAM, without permitting access to others. It should be the only one to know how to manage its storage. Of course, to fulfill the accelerator's needs in bandwidth, read and write ports, and latency, it can implement its BRAM as it requires, and utilize individual registers.
 
 \subsection{Compute Engine}
-The compute engine consists of both the PS and PL part of the FPGA device, which includes the Arm cores and the FPGA accelerators, respectively. While the bulk of the computation is handled by the PL part, the PS part handles the more sophisticated computations, such as the input data pre-processing and the accelerator configuration and scheduling.
+The compute engine consists of both the PS and PL part of the FPGA device, which includes the ARM cores and the FPGA accelerators, respectively. While the bulk of the computation is handled by the PL part, the PS part handles the more sophisticated computations, such as the input data pre-processing and the accelerator configuration and scheduling.
 
-In this platform, a network can be run only if its layers are supported by either software or hardware implementations. Software implementations are running on the Arm cores, and hardware implementations are the FPGA accelerators. By allowing both types of implementations, this platform expands its flexibility. This can not only help the development stage of FPGA accelerators by comparing their outputs with the ones generated by the software implementation, but it can also help to fully utilize the device's resources by running parts of even whole layers on the Arm cores in parallel to the hardware accelerators. Furthermore, layers that have not yet been implemented in hardware can easily be implemented in software for experimentation purposes, such as the Depth Concat layer found on the GoogLeNet (Figure \ref{fig:GoogLeNet}).
+In this platform, a network can be run only if its layers are supported by either software or hardware implementations. Software implementations are running on the ARM cores, and hardware implementations are the FPGA accelerators. By allowing both types of implementations, this platform expands its flexibility. This can not only help the development stage of FPGA accelerators by comparing their outputs with the ones generated by the software implementation, but it can also help to fully utilize the device's resources by running parts of even whole layers on the ARM cores in parallel to the hardware accelerators. Furthermore, layers that have not yet been implemented in hardware can easily be implemented in software for experimentation purposes, such as the Depth Concat layer found on the GoogLeNet (Figure \ref{fig:GoogLeNet}).
 
 As shown in Figure \ref{fig:platform-block-diagram}, in this work, three layer types have been implemented in hardware; the Convolutional (Conv) layer, the Max-Pooling (MaxPool) layer and the Fully-Connected (Linear) layer. In addition, multiple instances of the same layer type can also be added in the platform to enable for either parallel execution of different inferences with different inputs or even different network models, or better pipelining in a single inference. This is discussed in detail in section \ref{sec:CNN-Scheduling}.
 
+In this work, every accelerator implements a layer type, and, therefore, the platform assumes that every accelerator can handle and compute a whole layer type's computation. Every accelerator comes with its driver, which is integrated into the platform's software. The driver is responsible for setting up its accelerator, which includes setting the layer's hyperparameters and passing the information of where to find its parameters (weights and biases), its input data, and where to send its output data. Also, the driver handles the accelerator's interrupts, which,  in this work, only includes the accelerator completion interrupt.
+
+The assumption that every accelerator implements a whole layer type simplifies the accelerator's driver. As a result, the driver does not have to know its accelerator's inner workings and architecture, except for its aforementioned settings, treating it as a black box with inputs and outputs. However, those settings are the same for every implementation of the same layer type; hence, experimenting with different architectures is made easy without developing a different driver for every single architecture. The driver can be reused on the same layer type accelerators, letting the engineer focus their efforts on the accelerator's architecture. Of course, every different layer type needs different settings; therefore, different drivers.
+
+It is worth mentioning that every accelerator has an AXI4-Lite \cite{UG1037-Vivado-Design-Suite-AXI-Reference-Guide} slave port through which it can get configured. All accelerators' AXI4-Lite slave ports are connected to a Xilinx AXI SmartConnect IP \cite{PG247-SmartConnect-Product-Guide}, onto its master ports. The AXI SmartConnect, a replacement of the AXI Interconnect IP, acts as a router, providing a single slave port that is finally connected to the Zynq's (ARM cores) master port. AXI SmartConnect automatically detects the port's protocol, in this case, AXI4-Lite, and adjusts its ports accordingly. This creates a hardware connection so that the software can access and configure the platform's accelerators. Details on the AXI protocol are given in section \ref{sec:AMBA-AXI4-Interface-Protocol}.
+
 \subsection{I/O}
+\label{sec:IO}
+As explained in previous sections, the I/O bandwidth provided to any hardware platform plays an essential role in its performance due to the CNNs' high bandwidth requirements. Hence, the platform should implement a network for its accelerators to enable the communication between them, the PS part, the DDR, and each other. There are three ways for high bandwidth communication, which are discussed below.
+\begin{itemize}
+	\item \textbf{Memory-Mapped I/O (MMIO):} In this method, the PS communicates with its PL part's accelerators using a global address space for both its main memory (DDR) and the accelerators' I/O extensions, mapping every memory component, such as the DDR, BRAM, and registers, onto its own address range. While it is straightforward to implement, it can create a bottleneck on random memory accesses onto the DDR, with each request costing up to 50 clock cycles for the DDR's initialization. Fortunately, this is not the case with burst accesses, which request only once a range of addresses so that there is only one initialization cost for a big transfer of data.
+	\item \textbf{Streaming (AXI4-Stream):} Using streaming interfaces, such as the AXI4-Stream, continuous communication can be established between components in a FIFO manner. Every streaming connection creates a channel between the two components with a predefined FIFO size, with a producer-consumer behavior. Communication between hardware accelerators and the DDR can be established using the Xilinx AXI DMA IP \cite{PG021-AXI-DMA-Product-Guide}, which hides the DDR's initialization costs. However, AXI DMA requires knowledge of the data flow, and its function is instructed by the PS part for every transfer, increasing the system's complexity.
+	\item \textbf{BRAM:} This method is an MMIO variation, which uses BRAM IPs to store the required data on-chip, taking advantage of the BRAM's high bandwidth. Data are transferred from the DDR to the BRAM in bursts using a Xilinx CDMA IP \cite{PG034-AXI-Central-Direct-Memory-Access-Product-Guide} connected to a Xilinx BRAM Controller IP \cite{PG078-AXI-BRAM-Controller-Product-Guide} and its Xilinx Block Memory Generator IP \cite{PG058-Block-Memory-Generator-Product-Guide}. Though, a major constraint is that the data have to be small enough to fit into the chip's BRAM, which is in the order of a few MBs in size.
+\end{itemize}
+
+As explained in section \ref{sec:Memory-Footprint}, the integrated BRAM cannot store the parameters for most layers. There is the case that parameters can be transferred in chunks to the central Block Memory IP; however, this creates further complexity and bandwidth bottleneck due to the low number of read and write ports. Therefore, the BRAM method described above cannot be used in this platform.
+
+Hence, the question that arises is which method is more suitable for this platform, the MMIO or the Streaming one. To answer it, a test system was created, integrating a simple IP, created using Vivado HLS, that adds a specific value to its input data, and then returns its output data. The input data are generated on the PS part and are stored on the system's DDR. The IP's output is returned to the PS part and stored on its DDR. Then the PS validates the outputs to ensure their correctness. The IP's input and output ports are implemented both as streams and as MMIO.
+
+The test measures the average number of clock cycles it takes for both implementations to process 40MB of data in chunks of 40kB. The chunk's size was selected greedily, because most, if not all, accelerators' requests need to be at least 40kB. The time measurement includes the input data transfer from the DDR to the IP's BRAM, the input data processing, and the output data transfer from the IP's BRAM to the system's DDR. Both implementations were tested with 32 and 128 input and output ports bit-width. The test's results are shown on table \ref{tab:MMIO-vs-Stream}.
+
+\begin{table}[H]
+	\caption[MMIO vs Stream]{MMIO vs Stream: Processing 40MB data of 40KB bursts, showing a slight advantage over the MMIO method.}
+	\label{tab:MMIO-vs-Stream}
+	\centering
+	\begin{tabular}{lll}
+		\toprule
+		\textbf{Port bit-width} & \textbf{MMIO avg. cycles} & \textbf{Streaming avg. cycles}\\
+		\midrule
+			32-bit 	& 62700922 & 65611580\\
+			128-bit & 15761270 & 16201797\\
+		\bottomrule\\
+	\end{tabular}
+\end{table}
+
+Both implementations for both port bit-widths show similar results, with a slight advantage over the MMIO implementation. Selecting MMIO for the primary method of data feeding the accelerators benefits the platform not only in terms of bandwidth, according to the slight advantage depicted on table \ref{tab:MMIO-vs-Stream}, but also in terms of simplicity of both software and hardware implementation and efficiency of hardware resources.
+
+Consequently, the connection between the accelerators and the PS part and its DDR is established using the MMIO method, as shown on the platform's block diagram (Figure \ref{fig:platform-block-diagram}). Every accelerator has an AXI4-Full \cite{UG1037-Vivado-Design-Suite-AXI-Reference-Guide} master port, which is connected to a Xilinx AXI SmartConnect IP, onto its slave ports. The SmartConnect's master port then gets connected onto the Zynq's slave port. Communication to the DDR is established via the Zynq's slave port, and an integrated DMA found on the PS part.
+
+However, the streaming method cannot be dismissed entirely, as it is perfect for communication between accelerators. Passing a layer's activations to its next layer, in terms of hardware means passing the accelerator's output data to the next accelerator as input data. Implementing this data transfer in a streaming manner avoids transferring data from the FPGA to the DDR and then transferring them back to the FPGA using the MMIO method, which can be a significant bottleneck. As a result, every accelerator can optionally have additional input stream and output stream ports. The accelerators driver configures it to either use the MMIO or the streaming method.
+
+It is vital that every accelerator implements at least the MMIO method, to avoid running into deadlocks. For example, let there be a system with one instance of a layer type's accelerator, and the accelerator's output stream needs to get connected back to the same accelerator's input stream. A deadlock occurs when the output stream is full while the accelerator has not finished its execution. In this case, the accelerator hangs, waiting for the stream to accept more data, while the stream hangs, waiting for its data to get consumed. This problem can easily be tackled by simply sending the accelerator's outputs to the DDR using the MMIO method, and when its execution is complete, it can then read them back again from the DDR.
+
+A Xilinx AXI4-Stream Switch IP \cite{PG085-AXI4-Stream-Infrastructure-IP-Suite-Product-Guide} is used to create a star topology \cite{Network-Topology-Wikipedia} stream network, connecting every accelerator's stream ports, as shown on the platform's block diagram (Figure \ref{fig:platform-block-diagram}). Every connection is assigned an address in the AXI4-Stream Switch IP before synthesis so that the TDEST signal of the AXI4-Stream protocol can be set accordingly by the sender accelerator. The AXI4-Stream Switch IP was preferred to the AXI4-Stream Interconnect IP because the latter is the same as the Switch, but it also allows connections of streams with different characteristics in the cost of some hardware resources. However, all accelerators are implemented with the same stream characteristics, so the Interconnect's use is redundant.
+
+\subsection{AMBA AXI4 Interface Protocol}
+\label{sec:AMBA-AXI4-Interface-Protocol}
+The AMBA AXI4 (Advanced eXtensible Interface 4) \cite{UG1037-Vivado-Design-Suite-AXI-Reference-Guide} is the AMBA interface specification from ARM, which is integrated into the Xilinx Design Suite tools to offer a single standard interface and simplify the IP integration. All Xilinx IPs that require any configuration or large amounts of data implement at least one of the AXI4's variation. The AXI4 protocol has three variations for different use cases.
+\begin{itemize}
+	\item \textbf{AXI4-Full:} Used for high-performance memory-mapped applications, supporting bursts of up to 256 beats.
+	\item \textbf{AXI4-Lite:} The simplest of all three variations, with the least hardware resources requirements. It is used for low-throughput memory-mapped applications, usually for accessing control registers, with every transaction having a burst length of one
+	\item \textbf{AXI4-Stream:} Used for high-speed streaming unidirectional data transfers from master to slave, supporting multiple data streams using the same set of shared wires, and multiple data widths withing the same interconnect.
+\end{itemize}
+
+This platform makes usage of all three variations for different purposes, as shown on its block diagram (Figure \ref{fig:platform-block-diagram}). The AXI4-Lite is used for configuring the accelerators; the AXI4-Full is used to implement the accelerators' MMIO, as described in section \ref{sec:IO}, and the AXI4-Stream is used to create the star topology network between the accelerators.
+
+\subsection{Software}
 
 \begin{figure} [H]
 	\centering
