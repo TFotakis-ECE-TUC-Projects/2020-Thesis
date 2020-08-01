@@ -238,6 +238,25 @@ A baseline schedule was created using a serial execution strategy, as shown in f
 
 It can be observed that using the serial execution strategy, around 90\% of the total clock cycles is consumed from the convolutional layers, and almost 0\% is consumed from the max-pooling layers. Hence, according to Amdahl's law, see section \ref{sec:Amdahls-Law}, the convolutional layers should get the most hardware resources for their accelerators to create as much parallelism as possible, while fully-connected layers come next, and max-pooling layers come last.
 
+Another scheduling strategy is applying pipelining within the layers. In this strategy, a layer is fed with input data as soon as the previous layer generates a single output. This hides the next layer's latency as much as possible by computing outputs in parallel with the computation of its next-to-be-processed inputs. A schedule using the layer-pipelined strategy is shown in figure \ref{fig:layer-pipelined-execution}. To produce such a schedule using this strategy, it is considered to exist as many accelerators per layer type as needed. In this schedule, there are needed five instances of a convolutional accelerator,  three instances of a max-pooling accelerator, and three instances of a fully-connected accelerator.
+
+% Todo: Pipeline linear layers too.
+\begin{figure} [H]
+	\centering
+	\includegraphics[width=\textwidth]{Images/Scheduling/Pipelined-1x.png}
+	\decoRule
+	\caption[AlexNet layer-pipelined execution]{AlexNet layer-pipelined execution: Convolution layers consume 90\% of total clock cycles needed for a full inference.}
+	\label{fig:layer-pipelined-execution}
+\end{figure}
+
+The first four layers, Conv1, MaxPool1, Conv2, and MaxPool2 seem to start their execution immediately; however, this is not the case. In fact, they all start on different timestamps, each later from its previous one, but it just cannot be shown in figure \ref{fig:layer-pipelined-execution} due to the x-axis' scale. Conv1, MaxPool1, and Conv2 generate their first outputs in a few clock cycles compared to the x-axis scale.
+
+From figure \ref{fig:layer-pipelined-execution}, it can be seen that the whole execution has significantly been reduced compared to the serial strategy shown in figure \ref{fig:serial-execution}, speeding it up almost three times.
+
+However, to use the layer-pipelined strategy, the accelerators have to support it. This means that they need to process their inputs as soon as possible to generate their outputs. Because convolutional and max-pooling layers process their inputs in the 3D and 2D space, they have different implementation requirements to support layer-pipelining, compared to the fully-connected layers that compute their inputs in the 1D space.
+
+Convolutional and max-pooling layers need to process their inputs in a way that they can generate outputs in a specific order. The optimal output order is the one that the next layer wants its inputs to be in, to also produce useful outputs for its next layer.
+
 \subsection{Amdahl's Law}
 \label{sec:Amdahls-Law}
 Amdahl's law \cite{Improvements-in-Multiprocessor-System-Design} is a formula that calculates the theoretical speedup in latency of the execution of a fixed workload task, when the system's resources are improved or increased. While speedup was firstly used on parallel processing, it can also be used after any resource enhancement.
@@ -266,11 +285,21 @@ Throughput is the maximum processing rate of a specific task and is defined as:
 The speedup is defined for both latency and throughput, as shown in the equations below:
 \begin{equation}
 	\label{eqn:latency-speedup}
-		S_Latency = \frac{L_1}{L_2} = \frac{T_1 * W_2}{T_2 * W_1},\\
+	\begin{split}
+		S_{Latency} = \frac{L_1}{L_2} = \frac{T_1 * W_2}{T_2 * W_1} = \frac{1}{(1 - p) + \frac{p}{s}},\\
+		\mbox{p: the task's portion that benefits from the resource enhancements},\\
+		\mbox{s: the speedup of the task's portion that benefits from the resource enhancements}\\
+	\end{split}
 \end{equation}
 \begin{equation}
 	\label{eqn:throughput-speedup}
-		S_Throughput = \frac{Throughput_2}{Throughput_1}\\
+	S_{Throughput} = \frac{Throughput_2}{Throughput_1}\\
+\end{equation}
+
+The maximum theoretical speedup can also be defined as:
+\begin{equation}
+	\label{eqn:max-speedup}
+	MaxSpeedup = \lim_{s \to \infinity} S_{Latency} = \frac{1}{1 - p}\\
 \end{equation}
 
 \subsection{AlexNet Characteristics}
