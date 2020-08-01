@@ -202,10 +202,13 @@ The platform's software was developed using the Xilinx Vitis IDE, previously kno
 
 The drivers are responsible for the communication between the software and hardware of this platform. They are used to handle the initialization, configuration, and use of each hardware component. They also handle the accelerators' various interrupt events, affecting the software's execution. Every accelerator's driver has to implement several functions with specific functionality and naming scheme, creating an abstraction layer between the drivers and the rest of the software. This makes integrating a new accelerator into the platform easier because the other software parts "know" how to use the new driver, expanding the platform's modularity. Moreover, it is essential that the interrupt service routines are kept as small as possible to avoid missing any other interrupt events while executing them.
 
+The application logic is responsible for configuring the platform depending on the user's input. It handles the parsing of the network model configuration files, the loading of the network's initialization data (parameters and labels), the input data preprocessing, and the accelerator execution according to the scheduler's instructions. It is designed with data arbitration in mind, in order to easily experiment with different data types used in the network's parameters and activations. The application logic's data type is the same with the one used in the accelerators' architecture, and when set, it propagates to the whole software.
 
+For the sake of simplicity, a command-line interface implements the user interface. Most FPGA platforms have a UART port that can be used to print messages, accept user input, and debugging. Therefore, this platform utilizes the UART port for its user input requirements. From the application's menus, the user can select several functions, among which there is a self-test routine that tests the platform's integrity, a network model selection with its corresponding parameters, an image count selection, and an option to run both software and hardware implementations of every layer for output data checking. While not implemented, the user interface can be expanded to a graphical user interface using a standalone program or server, running on a host PC that reads and writes the aforementioned UART port.
 
-% reason why scheduler is a module
-% data type agnostic
+The scheduler is the last but not least, part of the platform's software. It is responsible for scheduling all the necessary tasks for the network's inference to execute. A task can be executing a layer or a group of layers either in software or using the hardware accelerators. The scheduler is also responsible for scheduling the input and output methods of each accelerator (MMIO and Streaming), the input source and output destination. Per platform implementation, there might be needed a different scheduler strategy. For example, there is a different strategy for a platform with only one instance per accelerator type, and a different one when there are multiple, or when the accelerators' execution can be pipelined. For more information on the platform's scheduler strategies see section \ref{sec:Scheduler-Strategies}
+
+A simplified flowchart of the platform's software execution can be seen in figure \ref{fig:platform-flowchart}. On system boot-up, the drivers are discovering and initializing all peripheral devices, such as the SD-card and the UART ports. Afterward, they discover and initialize every accelerator existing in the FPGA's PL part. During this step, the interrupt handlers are also getting set. Next, the user interface asks the user for which network from the available it should run its inference and all the aforementioned running options. Given the user's input, the application logic reads the network model file, parses it, and loads it to the platform's memory. It also loads the network's parameters, labels, and input data. Then, for each input data, the scheduler adds the tasks into a list to be run whenever possible. Then, for every task, the corresponding accelerator is set up and triggered to run using its drivers. The platform finishes when there are no more tasks to be run and input data to get processed.
 
 \begin{figure} [H]
 	\centering
@@ -214,6 +217,61 @@ The drivers are responsible for the communication between the software and hardw
 	\caption[The platform's flowchart]{The platform's flowchart.}
 	\label{fig:platform-flowchart}
 \end{figure}
+
+\subsection{Scheduler Strategies}
+\label{sec:Scheduler-Strategies}
+Scheduling can play a significant role in the platform's performance. As mentioned in the previous section, the scheduling strategy is dependent on the platform's implementation and goals. The number of same-type accelerator instances and whether the platform is throughput or latency optimized, all affect the strategy selection. To study and demonstrate the various strategies, a MATLAB model of a CNN network's inference execution was created that can compute the execution characteristics of any CNN network model. This work's main CNN network is AlexNet, on which all experiments below are based.
+
+The MATLAB model creates a timed schedule of a CNN inference depending on its hyperparameters. It computes the number of clock cycles a layer requires for its full execution, and depending on the strategy selected, it places the layer's execution start and finish timestamps. The clock cycles required for every full execution is equal to the sum of the clock cycles needed per assembly instruction to be executed. The number of clock cycles required for every assembly instruction can be set on the MATLAB model's parameters. However, for simplicity, all instructions are considered to run in a single clock cycle.
+
+The following figures show the starting clock cycle, the ending clock cycle, and the duration of every layer, wherever there are colored boxes. Every colored box has its label, defining the layer that it represents. The label is coded as the layer's type and its serial number; Conv for convolutional layers, MaxPool for max-pooling layers, and Linear for fully-connected layers. It should be noted that the ReLU activation function is embedded into the convolutional and fully-connected layers, as shown on algorithms \ref{alg:Convolution-Layer-with-ReLU} and \ref{alg:Fully-Connected-Layer-with-ReLU}.
+
+A baseline schedule was created using a serial execution strategy, as shown in figure \ref{fig:serial-execution}. In this strategy, every layer starts when the previous layer has finished generating all its outputs. This strategy can be used when there is only one accelerator instance per layer type, and the accelerators do not support layer pipelining. It is also an excellent strategy for debugging and validating the platform and its accelerators because of its simplicity.
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[width=\textwidth]{Images/Scheduling/Serial.png}
+	\decoRule
+	\caption[AlexNet serial execution]{AlexNet serial execution: Convolution layers consume 90\% of total clock cycles needed for a full inference.}
+	\label{fig:serial-execution}
+\end{figure}
+
+It can be observed that using the serial execution strategy, around 90\% of the total clock cycles is consumed from the convolutional layers, and almost 0\% is consumed from the max-pooling layers. Hence, according to Amdahl's law, see section \ref{sec:Amdahls-Law}, the convolutional layers should get the most hardware resources for their accelerators to create as much parallelism as possible, while fully-connected layers come next, and max-pooling layers come last.
+
+\subsection{Amdahl's Law}
+\label{sec:Amdahls-Law}
+Amdahl's law \cite{Improvements-in-Multiprocessor-System-Design} is a formula that calculates the theoretical speedup in latency of the execution of a fixed workload task, when the system's resources are improved or increased. While speedup was firstly used on parallel processing, it can also be used after any resource enhancement.
+
+Latency is the time required for a system to compute a single task and is defines as:
+\begin{equation}
+	\label{eqn:latency}
+	\begin{split}
+		Latency = \frac{1}{v} = \frac{T}{W},\\
+		\mbox{v: the task's execution speed},\\
+		\mbox{T: the task's execution time},\\
+		\mbox{W: the task's execution workload}\\
+	\end{split}
+\end{equation}
+
+Throughput is the maximum processing rate of a specific task and is defined as:
+\begin{equation}
+	\label{eqn:throughput}
+	\begin{split}
+		Throughput = r * v * A = \frac{r * A * W}{T} = \frac{r * A}{L},\\
+		\mbox{r: the execution density},\\
+		\mbox{A: the execution capacity}\\
+	\end{split}
+\end{equation}
+
+The speedup is defined for both latency and throughput, as shown in the equations below:
+\begin{equation}
+	\label{eqn:latency-speedup}
+		S_Latency = \frac{L_1}{L_2} = \frac{T_1 * W_2}{T_2 * W_1},\\
+\end{equation}
+\begin{equation}
+	\label{eqn:throughput-speedup}
+		S_Throughput = \frac{Throughput_2}{Throughput_1}\\
+\end{equation}
 
 \subsection{AlexNet Characteristics}
 \begin{table}[H]
@@ -236,13 +294,3 @@ The drivers are responsible for the communication between the software and hardw
 		\bottomrule\\
 	\end{tabular}
 \end{table}
-
-\subsection{CNN Scheduling}
-\label{sec:CNN-Scheduling}
-\begin{figure} [H]
-	\centering
-	\includegraphics[width=\textwidth]{Images/Scheduling/Serial.png}
-	\decoRule
-	\caption[AlexNet serial execution]{AlexNet serial execution: Convolution layers consume 90\% of total clock cycles needed for a full inference.}
-	\label{fig:ZCU102-board-overview}
-\end{figure}
