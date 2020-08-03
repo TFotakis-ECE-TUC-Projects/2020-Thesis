@@ -298,7 +298,7 @@ When multiple accelerators per layer type can be placed into the FPGA device's P
 \subsubsection{Image-Pipelining Strategy}
 Similar to the multi-inference strategy, when there are multiple accelerators per layer type, multiple images can be fed into the network in a pipelined manner. Every accelerator instance represents a single layer of the network. Hence, the first image can be fed into the first layer. Afterward, when the first layer has generated its outputs, they are fed to the second layer, and the first layer is fed with the second image. This continues for all images to be inferenced. Therefore, when the pipeline is full, all accelerators process different input images from each other. This strategy can decrease the platform's inference latency, and, potentially, the platform's throughput.
 
-\subsection{Amdahl's Law}
+\section{Amdahl's Law}
 \label{sec:Amdahls-Law}
 Amdahl's law \cite{Improvements-in-Multiprocessor-System-Design} is a formula that calculates the theoretical speedup in latency of the execution of a fixed workload task, when the system's resources are improved or increased. While speedup was firstly used on parallel processing, it can also be used after any resource enhancement.
 
@@ -343,7 +343,27 @@ The maximum theoretical speedup can also be defined as:
 	MaxSpeedup = \lim_{s \to \infinity} S_{Latency} = \frac{1}{1 - p}\\
 \end{equation}
 
-\subsection{AlexNet Characteristics}
+\section{Convolutional Accelerator}
+\section{Max-Pooling Accelerator}
+
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[width=\textwidth]{Images/Platform/MaxPool_core_serial.png}
+	\decoRule
+	\caption[Max-Pooling layer serial accelerator]{Max-Pooling layer serial accelerator.}
+	\label{fig:max-pool-core-serial}
+\end{figure}
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[width=\textwidth]{Images/Platform/MaxPool_core_kernel_parallel.png}
+	\decoRule
+	\caption[Max-Pooling layer kernel-parallel accelerator]{Max-Pooling layer kernel-parallel accelerator.}
+	\label{fig:max-pool-core-kernel-parallel}
+\end{figure}
+
+\section{AlexNet Characteristics}
 \begin{table}[H]
 	\caption{Scale and bit-width of input and activations}
 	\label{tab:scale-and-bit-width-of-input-and-activations}
