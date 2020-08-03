@@ -344,6 +344,39 @@ The maximum theoretical speedup can also be defined as:
 \end{equation}
 
 \section{Convolutional Accelerator}
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[scale=0.4]{Images/Platform/ReLU_component.png}
+	\decoRule
+	\caption[ReLU component]{ReLU component.}
+	\label{fig:relu-component}
+\end{figure}
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[scale=0.4]{Images/Platform/Accumulator_component.png}
+	\decoRule
+	\caption[Accumulator component]{Accumulator component.}
+	\label{fig:accumulator-component}
+\end{figure}
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[width=\textwidth]{Images/Platform/Conv_core_serial.png}
+	\decoRule
+	\caption[Convolutional layer serial accelerator]{Convolutional layer serial accelerator.}
+	\label{fig:conv-core-serial}
+\end{figure}
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[width=\textwidth]{Images/Platform/Conv_core_row_parallel.png}
+	\decoRule
+	\caption[Convolutional layer serial accelerator]{Convolutional layer serial accelerator.}
+	\label{fig:conv-core-row-parallel}
+\end{figure}
+
 \section{Max-Pooling Accelerator}
 
 
@@ -378,6 +411,25 @@ The maximum theoretical speedup can also be defined as:
 	\caption[Max-Pooling layer kernel-parallel accelerator]{Max-Pooling layer kernel-parallel accelerator.}
 	\label{fig:max-pool-core-kernel-parallel}
 \end{figure}
+
+\section{Fully-Connected Accelerator}
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[width=\textwidth]{Images/Platform/Linear_core_serial.png}
+	\decoRule
+	\caption[Convolutional layer serial accelerator]{Convolutional layer serial accelerator.}
+	\label{fig:linear-core-serial}
+\end{figure}
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[width=\textwidth]{Images/Platform/Linear_core_partial_outputs.png}
+	\decoRule
+	\caption[Convolutional layer serial accelerator]{Convolutional layer serial accelerator.}
+	\label{fig:linear-core-partial-outputs}
+\end{figure}
+
 
 \section{AlexNet Characteristics}
 \begin{table}[H]
