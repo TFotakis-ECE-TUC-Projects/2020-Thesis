@@ -343,23 +343,11 @@ The maximum theoretical speedup can also be defined as:
 	MaxSpeedup = \lim_{s \to \infinity} S_{Latency} = \frac{1}{1 - p}\\
 \end{equation}
 
-\section{Convolutional Accelerator}
+\section{Platform Accelerator Architectures}
+In this work, three different accelerators have been developed, one per layer type used in most CNNs. Those are the convolution, the max-pooling, and the fully-connected accelerators. Every accelerator has two variations; a simple one that only processes a single input similar to serial execution for testing purposes, and a performance-oriented one for production/system deployment. Some of the accelerators' components are being described separately to increase the readability of their architecture diagrams.
 
-\begin{figure} [H]
-	\centering
-	\includegraphics[scale=0.4]{Images/Platform/ReLU_component.png}
-	\decoRule
-	\caption[ReLU component]{ReLU component.}
-	\label{fig:relu-component}
-\end{figure}
-
-\begin{figure} [H]
-	\centering
-	\includegraphics[scale=0.4]{Images/Platform/Accumulator_component.png}
-	\decoRule
-	\caption[Accumulator component]{Accumulator component.}
-	\label{fig:accumulator-component}
-\end{figure}
+\subsection{Convolution Accelerator}
+The convolution accelerator is the most complex, requiring lots of BRAM slices and clock cycles to complete. Figure \ref{fig:conv-core-serial} depicts the simple version of the convolution accelerator's architecture. While it is not meant to be used in production, it is great for testing purposes and validating the platform's and accelerator's subsystems.
 
 \begin{figure} [H]
 	\centering
@@ -369,6 +357,32 @@ The maximum theoretical speedup can also be defined as:
 	\label{fig:conv-core-serial}
 \end{figure}
 
+The convolution accelerator reaches the platform's DDR memory for its parameters through an AXI4-Full port, while its input data are given either through the same AXI4-Full port or through a dedicated AXI4-Stream port. The input data source is selected using a \emph{MMIO / Stream} component, as instructed by the accelerator's \emph{controller} component, and the data are then stored into a BRAM instance for later use. The layer's weights are stored kernel by kernel onto another BRAM instance. This way, the BRAM requirements are kept low, compared to storing the whole layer's weights, which might also be impossible, due to the BRAM's limited size. Because every kernel is convoluted with the entire input, every weight in that kernel and every input pixel is accessed multiple times. Hence, the inputs and weights BRAM instances are used as caches. It is also worth noting that each BRAM instance implements only one read and one write port because only one input and one weight is accessed every clock cycle.
+
+The computation starts when the input data and weights are stored in their corresponding BRAM instances. Firstly, the \emph{accumulator} component, whose architecture is described below, is initialized by the kernel's bias. Afterward, the controller asks every BRAM instance for specific data to be sent to the \emph{multiplier} component, whose results are then sent to the \emph{accumulator}. This operation continues with the controller selecting the appropriate data for a correct convolution until a single output is ready. Then, it is sent from the \emph{accumulator} to the \emph{ReLU} component, whose architecture is described below. The \emph{controller} then instructs the \emph{ReLU} component to either apply its activation function or pass it through. Lastly, the \emph{ReLU} component sends its output to another \emph{MMIO / Stream} component, which either sends it back to the platform's DDR or a dedicated AXI4-Stream port, also instructed by the \emph{controller}. This procedure continues until the full convolution operation is completed, processing the entire input. The \emph{controller's} configuration is handled by an AXI4-Lite port, accessed by the PS part.
+
+The \emph{accumulator} component, shown in figure \ref{fig:accumulator-component}, is a simple accumulator, which has an input port that gets added with the register's output, used to store the partial result. The adder's output is connected back to the register's input port and the \emph{accumulator} component's output port.
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[scale=0.4]{Images/Platform/Accumulator_component.png}
+	\decoRule
+	\caption[Accumulator component]{Accumulator component.}
+	\label{fig:accumulator-component}
+\end{figure}
+
+The \emph{ReLU} component, shown in figure \ref{fig:relu-component}, applies the ReLU activation function (see section \ref{sec:Activation-Function}) to the component's input, when the enable port is set, otherwise it passes through the input to the output port. It consists of a simple comparator and two multiplexers.
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[scale=0.4]{Images/Platform/ReLU_component.png}
+	\decoRule
+	\caption[ReLU component]{ReLU component.}
+	\label{fig:relu-component}
+\end{figure}
+
+
+
 \begin{figure} [H]
 	\centering
 	\includegraphics[width=\textwidth]{Images/Platform/Conv_core_row_parallel.png}
@@ -377,7 +391,7 @@ The maximum theoretical speedup can also be defined as:
 	\label{fig:conv-core-row-parallel}
 \end{figure}
 
-\section{Max-Pooling Accelerator}
+\subsection{Max-Pooling Accelerator}
 
 
 \begin{figure} [H]
@@ -412,7 +426,7 @@ The maximum theoretical speedup can also be defined as:
 	\label{fig:max-pool-core-kernel-parallel}
 \end{figure}
 
-\section{Fully-Connected Accelerator}
+\subsection{Fully-Connected Accelerator}
 
 \begin{figure} [H]
 	\centering
