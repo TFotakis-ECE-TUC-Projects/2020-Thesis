@@ -381,34 +381,20 @@ The \emph{ReLU} component, shown in figure \ref{fig:relu-component}, applies the
 	\label{fig:relu-component}
 \end{figure}
 
-
+Figure \ref{fig:conv-core-row-parallel} depicts the high performance version of the convolution accelerator's architecture. It is very similar to the simple version, with the main difference being the number of inputs that can be processed in parallel. This version uses a \emph{multiplier} array, an adder tree, and multiple read and write ports on the input and weights BRAM instances. In this version, the multiplier array is fed with data using all BRAM read ports to feed all of its \emph{multiplier} components in parallel, and then it passes its results to the adder tree in order to create a single partial output. The data fed to the multiplier array consist of a single kernel row of weights and inputs. Then, the partial output is fed to the \emph{accumulator}, and a new row of data is given to the multiplier array. The rows come in the order of top to bottom row of a single channel, and then the next channel follows. This process continues until every row, and channel of a specific kernel is convoluted with the corresponding input area. Afterward, the \emph{accumulator} passes its output to the \emph{ReLU} component, and the process continues similar to the accelerator's simple version.
 
 \begin{figure} [H]
 	\centering
 	\includegraphics[width=\textwidth]{Images/Platform/Conv_core_row_parallel.png}
 	\decoRule
-	\caption[Convolutional layer serial accelerator]{Convolutional layer serial accelerator.}
+	\caption[Convolutional layer kernel-row-parallel accelerator]{Convolutional layer kernel-row-parallel accelerator.}
 	\label{fig:conv-core-row-parallel}
 \end{figure}
 
+The number of \emph{multiplier} components is set to be at least the maximum kernel size of every convolutional layer found in the network to be able to process its whole row at once. Granted that the convolution core also has to support the smaller kernel sizes found on the network's convolutional layers, there are structures that feed the excess \emph{multiplier} components with zeros to not affect the computation's result.
+
 \subsection{Max-Pooling Accelerator}
-
-
-\begin{figure} [H]
-	\centering
-	\includegraphics[scale=0.4]{Images/Platform/Max_component.png}
-	\decoRule
-	\caption[Max component]{Max component.}
-	\label{fig:max-component}
-\end{figure}
-
-\begin{figure} [H]
-	\centering
-	\includegraphics[width=\textwidth]{Images/Platform/MaxArray_component.png}
-	\decoRule
-	\caption[MaxArray component]{MaxArray component.}
-	\label{fig:max-array-component}
-\end{figure}
+The max-pooling accelerator is the lightest, requiring little BRAM and external I/O. Figure \ref{fig:max-pool-core-serial} depicts the simple version of the accelerator's architecture. Similar to the convolution accelerator, it is not targeted for testing and validation purposes. However, it might also be suitable for production to save resources due to its simplicity. Besides, as shown in the serial scheduling (Figure \ref{fig:serial-execution}), max-pooling layers contribute almost nothing to the overall time required for a complete inference, allowing for slower architectures, saving resources.
 
 \begin{figure} [H]
 	\centering
@@ -418,6 +404,20 @@ The \emph{ReLU} component, shown in figure \ref{fig:relu-component}, applies the
 	\label{fig:max-pool-core-serial}
 \end{figure}
 
+The max-pooling accelerator's I/O is handled by two \emph{MMIO / Stream} components, similar to the convolutional accelerator. The BRAM instance, using a single read and a single write port, loads a single channel from the whole input. It then feeds the \emph{max} component, whose architecture is described below, as instructed by the accelerator's \emph{controller}. The \emph{max} component's output is fed to the \emph{register}, which feeds it back to the \emph{max} component to process the next input. In other words, this structure finds the maximum value in a given array of input data. This process continues until a whole kernel of input data is processed, generating a single output, which is then sent to the output \emph{MMIO / Stream} component. Afterward, the next part of the input is processed, and when the whole channel is completed, the next one gets loaded to the BRAM instance. The accelerator finishes when all of the input channels are processed.
+
+The \emph{max} component, shown in figure \ref{fig:max-component}, outputs the maximum input of the two it is given. It comprises only two components, a comparator, and a multiplexer.
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[scale=0.4]{Images/Platform/Max_component.png}
+	\decoRule
+	\caption[Max component]{Max component.}
+	\label{fig:max-component}
+\end{figure}
+
+The max-pooling accelerator's high performance version architecture is depicted in figure \ref{fig:max-pool-core-kernel-parallel}. The difference between the simple architecture lies upon the BRAM instance's read ports number and the \emph{max tree} component, whose architecture is described below. Using multiple read ports, multiple inputs can be inserted to the \emph{max tree} component in a single clock cycle, which in turn it outputs the max value of its given input. This architecture processes the whole kernel, generating a single output in every iteration. On every iteration, the kernel moves onto the given input, until the channel is fully processed. Then the next channel gets loaded onto the BRAM instance, and the process continues.
+
 \begin{figure} [H]
 	\centering
 	\includegraphics[width=\textwidth]{Images/Platform/MaxPool_core_kernel_parallel.png}
@@ -426,24 +426,44 @@ The \emph{ReLU} component, shown in figure \ref{fig:relu-component}, applies the
 	\label{fig:max-pool-core-kernel-parallel}
 \end{figure}
 
+Like the convolution accelerator, the max-pooling accelerator must support all kernel sizes found in the network's max-pooling layer. Hence, the BRAM read ports number and the \emph{max tree} component's input ports number are set to be the network's maximum max-pooling kernel size. When a layer with a smaller kernel size is processed, the \emph{max tree} component's excess inputs are fed with the minimum possible value not to affect the computation.
+
+The \emph{max tree} component, shown in figure \ref{fig:max-tree-component}, is a tree of \emph{max} components, capable of finding the max value from the given input. The kernel's 2D matrix is flattened into a 1D array fed into the \emph{max tree} component to find the input area's maximum value.
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[width=\textwidth]{Images/Platform/MaxTree_component.png}
+	\decoRule
+	\caption[MaxTree component]{MaxTree component.}
+	\label{fig:max-tree-component}
+\end{figure}
+
 \subsection{Fully-Connected Accelerator}
+Unfortunately, the fully-connected accelerator is the most limited in terms of parallelism capabilities since the fully-connected layer's weights are used only once, and therefore, they cannot be cached into an in-accelerator memory instance (BRAM or registers). Only the input data are used multiple times, so storing them into a BRAM instance can help avoid I/O with the platform's DDR.
+
+Figure \ref{fig:linear-core-serial} shows the simple version of the fully-connected accelerator's architecture. Like the other accelerators, the input and output data are handled, as instructed by the accelerator's \emph{controller}, using two \emph{MMIO / Stream} components, connected to their dedicated input and output AXI4-Stream ports and the AXI4-Full port. Firstly, the input data are loaded onto the BRAM instance, through the input \emph{MMIO / Stream} component. Afterward, the \emph{accumulator} component is initialized with the appropriate bias, read directly from the platform's DDR through the accelerator's AXI4-Full port. Then, the \emph{controller} instructs the BRAM instance to sequentially fed the \emph{multiplier} with a single input datum on every iteration. It also instructs the DDR to feed the \emph{multiplier}, through the AXI4-Full port, with the corresponding weight on every iteration. The \emph{multiplier} component's output is then forwarded to the \emph{accumulator}. When all weights and inputs are multiplied and accumulated, a single output is generated. It is then sent from the \emph{accumulator} directly to the \emph{ReLU} component, which applies its ReLU activation function if instructed so by the \emph{controller}. Lastly, the \emph{ReLU} component's result is sent to the output \emph{MMIO / Stream} component to write it back to the DDR or to send it to the next accelerator using its dedicated output stream port. The accelerator finishes when all inputs and all weights have been processed, generating the total output.
 
 \begin{figure} [H]
 	\centering
 	\includegraphics[width=\textwidth]{Images/Platform/Linear_core_serial.png}
 	\decoRule
-	\caption[Convolutional layer serial accelerator]{Convolutional layer serial accelerator.}
+	\caption[Fully-Connected layer serial accelerator]{Fully-Connected layer serial accelerator.}
 	\label{fig:linear-core-serial}
 \end{figure}
+
+Although this version is relatively simple, it uses a lot of BRAM only to access a single input, sequentially. Hence, the BRAM instance might be overkill for this use, wasting resources. Although, it should be noted that this simple version of the accelerator's architecture is only targeted for testing and validation purposes.
+
+A more optimized architecture can be seen in figure \ref{fig:linear-core-partial-outputs}, where a multiplier array and an adder tree are utilized, the input BRAM instance is replaced with simple registers, and the weights are given by splitting the 128-bit wide AXI4-Full port. In a sense, the accelerator processes its input data in parts creating partial outputs on each iteration.
 
 \begin{figure} [H]
 	\centering
 	\includegraphics[width=\textwidth]{Images/Platform/Linear_core_partial_outputs.png}
 	\decoRule
-	\caption[Convolutional layer serial accelerator]{Convolutional layer serial accelerator.}
+	\caption[Fully-Connected layer accelerator with partial outputs]{Fully-Connected layer accelerator with partial outputs.}
 	\label{fig:linear-core-partial-outputs}
 \end{figure}
 
+Like the simple version, the input data are handled by the input \emph{MMIO / Stream} component; however, they are then written in parts onto the \emph{input registers}. Every register has its own read and write ports so that multiple inputs can be sent to the multiplier array in parallel. Furthermore, the weights are still read from the DDR through the accelerator's AXI4-Full port, taking advantage of the port's width. For example, if a single weight is a 32-bit float and the port is 128-bit wide, every 128-bit word can include four weights. Hence, the size of the multiplier array depends on the weight's data type. Also, there is no need for more input registers than the number of weights that can fit into a single 128-bit word, so the input data are saved and processed in parts throughout the whole output. The process starts by initializing the output BRAM instance with the biases. The output BRAM instance is used to store the partial outputs; therefore, every cell is initialized with a single bias, corresponding to the output it represents. Starting the computation, the first input part is multiplied with its corresponding weights, and then the multiplication's results are sent to the added tree, generating a partial output stored into its BRAM cell. Afterward, the same input part is multiplied with the next set of weights, and a new partial output is generated and stored. When the first input part has been processed throughout all the partial outputs, the second part takes its place, and the process continues, adding the newly created partial outputs to the already existing ones in the BRAM's cells. The process continues until the whole input has been processed, and the full outputs are generated. Lastly, the full outputs pass through the \emph{ReLU} component and are then sent to the \emph{MMIO / Stream} component.
 
 \section{AlexNet Characteristics}
 \begin{table}[H]
