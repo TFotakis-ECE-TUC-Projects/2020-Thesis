@@ -1,15 +1,54 @@
 \chapter{Results}
+This work's implementation of the proposed platform is described in section \ref{sec:proposed-platform-implementation}. Its performance metrics, such as its latency, throughput, power, and energy consumption, are compared to the available alternative technologies and FPGA architectures.
 
-\label{Chapter-Results}
+\section{Specifications of the Compared Platforms}
+The proposed platform is compared with an Intel i7 4710MQ CPU, an NVIDIA RTX 2060 Super 8GB GPU, a Xilinx CHaiDNN implementation, and a Xilinx DPU implementation both on the Xilinx ZCU102 Evaluation board.
 
-\section{Specification of Compared Platforms}
 \subsection{Intel i7 4710MQ}
-\subsection{NVIDIA Quadro K2200}
+The Intel i7 4710MQ CPU \cite{Intel-i7-4710MQ-Processor}, released in 2014, is a mobile processor targeted for high-performance laptops. Its specifications are presented in table \ref{tab:Intel-i7-4710MQ-specs}.
+
+\begin{table}[H]
+	\caption{Intel i7 4710MQ processor specifications}
+	\label{tab:Intel-i7-4710MQ-specs}
+	\centering
+	\begin{tabular}{p{2cm} p{3cm} p{1cm} p{3cm} p{3cm}}
+		\toprule
+		\textbf{Cores / Threads} & \textbf{Max Turbo Frequency} & \textbf{TDP} & \textbf{Max Memory Bandwidth} & \textbf{Lithography}\\
+		\midrule
+			4/8 & 3.5GHz & 47W & 25.6GB/s & 22nm\\
+		\bottomrule\\
+	\end{tabular}
+\end{table}
+
+\subsection{NVIDIA RTX 2060 Super 8GB}
+The NVIDIA RTX 2060 Super \cite{NVIDIA-RTX-2060-Super}, released in 2019, is a desktop GPU, and while targeted for raytraced gaming, it is also suitable for CNN inferencing due to its large and high-bandwidth memory. Its specifications are presented in table \ref{tab:NVIDIA-RTX-2060-Super-specs}.
+
+\begin{table}[H]
+	\caption{NVIDIA RTX 2060 Super specifications}
+	\label{tab:NVIDIA-RTX-2060-Super-specs}
+	\centering
+	\begin{tabular}{p{1cm} p{2cm} p{1cm} p{2cm} p{2.5cm} p{2.5cm}}
+		\toprule
+		\textbf{CUDA Cores} & \textbf{GPU Memory} & \textbf{Boost Clock} & \textbf{Memory Interface} & \textbf{Memory Bandwidth} & \textbf{Power Consumption}\\
+		\midrule
+			2176 & 8GB GDDR6 & 1650 MHz & 256-bit & 448GB/s & 175W\\
+		\bottomrule\\
+	\end{tabular}
+\end{table}
+
+\section{Proposed Platform}
+\label{sec:proposed-platform-implementation}
+
 
 \section{Power Consumption}
+Power consumption is defined as the energy consumed per unit time for accomplishing a specific task, from a chemical reaction and lifting materials using a crane, to emitting light through a light bulb and inferencing CNNs on electronic hardware. Average power consumption is always preferred to be as low as possible to increase the system's energy efficiency, minimizing energy losses. In addition, low power consumption leads to simpler system designs and lower building costs. It is usually measured in Watts (w) or kiloWatts (kW).
 
 \section{Energy Consumption}
+Energy consumption is defined as the energy required for accomplishing a specific task in a specific time amount. It can be calculated as $Energy = Power * Time$, where $Power$ is the required power, and $Time$ is the required time for accomplishing the task. Energy consumption is also preferred to be as low as possible while accomplishing the given task within the time constraints, to minimize the operational costs. It is usually measured in Joule (J) or kiloJoule (kJ).
 
-\section{Throughput and Latency Speedup}
+\section{Throughput and Latency}
+Throughput, defined in equation \ref{eqn:throughput}, is the number of tasks that can be accomplished in a unit time. It is preferred to be as high as possible to generate as much work as possible in the unit time.
+
+Latency, defined in equation \ref{eqn:latency}, is the time required for accomplishing a single task. It is preferred to be as low as possible to finish tasks as quickly as possible from the time they are issued.
 
 \section{Final Performance}
