@@ -2,7 +2,6 @@
 \label{Chapter-FPGA-Implementation}
 
 \section{Tools Used}
-% Todo: Review Vivado edition
 This work's CNN inference accelerator was implemented and optimized for FPGA platforms using the Xilinx Vivado Design Suite - HL System Edition 2019.2 \cite{Vivado-Design-Suite}. Vivado Design Suite is a software suite developed by Xilinx for its FPGA devices for analysis and synthesis of Hardware Description Language (HDL) designs, written in VHDL or Verilog. It is superseding Xilinx ISE \cite{Xilinx-ISE}, as a complete rewrite, with additional features for System-on-Chip (SoC) design and High-Level Synthesis (HLS). The tools used in this work are Xilinx Vivado HLS, Xilinx Vivado IDE, and Xilinx SDK.
 
 \subsection{Vivado IDE}
@@ -464,25 +463,3 @@ A more optimized architecture can be seen in figure \ref{fig:linear-core-partial
 \end{figure}
 
 Like the simple version, the input data are handled by the input \emph{MMIO / Stream} component; however, they are then written in parts onto the \emph{input registers}. Every register has its own read and write ports so that multiple inputs can be sent to the multiplier array in parallel. Furthermore, the weights are still read from the DDR through the accelerator's AXI4-Full port, taking advantage of the port's width. For example, if a single weight is a 32-bit float and the port is 128-bit wide, every 128-bit word can include four weights. Hence, the size of the multiplier array depends on the weight's data type. Also, there is no need for more input registers than the number of weights that can fit into a single 128-bit word, so the input data are saved and processed in parts throughout the whole output. The process starts by initializing the output BRAM instance with the biases. The output BRAM instance is used to store the partial outputs; therefore, every cell is initialized with a single bias, corresponding to the output it represents. Starting the computation, the first input part is multiplied with its corresponding weights, and then the multiplication's results are sent to the added tree, generating a partial output stored into its BRAM cell. Afterward, the same input part is multiplied with the next set of weights, and a new partial output is generated and stored. When the first input part has been processed throughout all the partial outputs, the second part takes its place, and the process continues, adding the newly created partial outputs to the already existing ones in the BRAM's cells. The process continues until the whole input has been processed, and the full outputs are generated. Lastly, the full outputs pass through the \emph{ReLU} component and are then sent to the \emph{MMIO / Stream} component.
-
-\section{AlexNet Characteristics}
-\begin{table}[H]
-	\caption{Scale and bit-width of input and activations}
-	\label{tab:scale-and-bit-width-of-input-and-activations}
-	\centering
-	\begin{tabular}{llll}
-		\toprule
-		\textbf{Layer} & \textbf{Scale} & \textbf{Theoretical bit-width} & \textbf{Practical bit-width}\\
-		\midrule
-			Input & 7 & 8 & 8\\
-			Conv1 & 5 & $16 + \lceil \log_2 3 * 11 * 11 \rceil = 25 $ & 17\\
-			Conv2 & 5 & $16 + \lceil \log_2 64 * 5 * 5 \rceil = 27$ & 14\\
-			Conv3 & 5 & $16 + \lceil \log_2 192 * 3 * 3 \rceil = 27$ & 15\\
-			Conv4 & 6 & $16 + \lceil \log_2 384 * 3 * 3 \rceil = 28$ & 15\\
-			Conv5 & 5 & $16 + \lceil \log_2 256 * 3 * 3 \rceil = 28$ & 17\\
-			FC1 & 5 & $16 + \lceil \log_2 9216 \rceil = 30$ & 17\\
-			FC2 & 6 & $16 + \lceil \log_2 4096 \rceil = 28$ & 17\\
-			FC3 & 6 & $16 + \lceil \log_2 4096 \rceil = 28$ & 17\\
-		\bottomrule\\
-	\end{tabular}
-\end{table}

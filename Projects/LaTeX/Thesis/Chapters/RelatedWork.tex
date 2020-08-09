@@ -162,12 +162,9 @@ Moreover, FPGAs can come with hard processor cores in the same chip that can be 
 Although FPGAs have Block RAM (BRAM) and some even Ultra RAM (URAM), a high-speed type of memory inside the FPGA fabric, they can be bottlenecked due to its limited size. Hence, FPGAs are often provided with big DRAM modules. However, compared to GPUs', which are provided with HBM, FPGAs may still face bandwidth limitations. Such limitations can be overcome the same way ASICs do; by reducing data precision. Reducing data precision is accomplished by converting them from floating-point to lower bitwidth numeric representations, such as half-precision floating point and fixed point. It can also be achieved by data reuse or quantization.
 
 \section{Quantization}
-In order to compete with GPUs, FPGAs and TPUs have to minimize their memory bandwidth needs. One of the most effective ways to tackle this problem is by reducing the parameters' memory footprint. This process is called quantization, and it is consisted of various techniques. While, quantization is applied independently of the framework that trains the network and the hardware that runs its inference, the techniques to be used are selected explicitly to the network's environment for best performance optimization.
+In order to compete with GPUs, FPGAs and TPUs have to minimize their memory bandwidth needs. One of the most effective ways to tackle this problem is by reducing the parameters' memory footprint. This process is called quantization, and it consists of various techniques. While, quantization is applied independently of the framework that trains the network and the hardware that runs its inference, the techniques to be used are selected explicitly to the network's environment for best performance optimization.
 
 % Todo: add more details on techniques and reference papers
-\textcolor{red}{
-Todo: add more details on techniques and reference papers
-}
 
 \section{The FPGA Perspective}
 While FPGAs can provide significant advantages over other hardware platforms, as of right now, there is no software framework, like TensorFlow and PyTorch, that natively supports FPGA acceleration. Hence, third party architectures have to be used.
@@ -263,3 +260,4 @@ The Data Reshape engine performs data format transformations for operations such
 In general, NVDLA is a highly customizable and modular architecture, with various configurations suitable for both FPGAs and ASICs.
 
 \section{Thesis Approach}
+% Todo: Fill thesis Approach

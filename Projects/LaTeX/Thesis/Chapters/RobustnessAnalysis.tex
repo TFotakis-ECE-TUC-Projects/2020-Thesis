@@ -4,7 +4,6 @@
 
 In this chapter, AlexNet's \cite{ImageNet-classification-with-deep-convolutional-neural-networks} structure is analyzed and modeled using MATLAB \cite{MATLAB-Official-site} and C/C++, evaluating the results using PyTorch \cite{PyTorch-Official-site}. As a starting point, the prebuilt and pre-trained AlexNet model provided by PyTorch was used. For a better understanding of the underlining algorithms, a C/C++ library was created to replicate PyTorch's functionality, from image and parameter importing and formatting, to every CNN layer type needed for the network's inference.
 
-% Todo: review claims below - might be better on other chapter
 Moreover, a Sensitivity Analysis was performed to explore hardware implementation opportunities. Furthermore, various quantization techniques and algorithmic optimizations have been studied and tested to reduce memory footprint and better utilize hardware resources. Lastly, several implementation techniques and tools on the same functionality have been studied to minimize hardware resources and latency.
 
 \section{PyTorch and C/C++ implementations}
@@ -494,6 +493,30 @@ For better clarity on the results, figure \ref{fig:data-types-accuracy-chart} de
 \end{figure}
 
 After some experimentation, dynamically assigning different bit-widths on each layer, according to its accuracy needs, rather than a single bit-width for the whole network, can yield even better results. However, further investigation has to be conducted.
+
+\subsection{Fixed Point Activations}
+
+
+\begin{table}[H]
+	\caption{Scale and bit-width of input and activations}
+	\label{tab:scale-and-bit-width-of-input-and-activations}
+	\centering
+	\begin{tabular}{llll}
+		\toprule
+		\textbf{Layer} & \textbf{Scale} & \textbf{Theoretical bit-width} & \textbf{Practical bit-width}\\
+		\midrule
+			Input & 7 & 8 & 8\\
+			Conv1 & 5 & $16 + \lceil \log_2 3 * 11 * 11 \rceil = 25 $ & 17\\
+			Conv2 & 5 & $16 + \lceil \log_2 64 * 5 * 5 \rceil = 27$ & 14\\
+			Conv3 & 5 & $16 + \lceil \log_2 192 * 3 * 3 \rceil = 27$ & 15\\
+			Conv4 & 6 & $16 + \lceil \log_2 384 * 3 * 3 \rceil = 28$ & 15\\
+			Conv5 & 5 & $16 + \lceil \log_2 256 * 3 * 3 \rceil = 28$ & 17\\
+			FC1 & 5 & $16 + \lceil \log_2 9216 \rceil = 30$ & 17\\
+			FC2 & 6 & $16 + \lceil \log_2 4096 \rceil = 28$ & 17\\
+			FC3 & 6 & $16 + \lceil \log_2 4096 \rceil = 28$ & 17\\
+		\bottomrule\\
+	\end{tabular}
+\end{table}
 
 \section{Weight Pruning}
 Synaptic pruning is the biological brain's phase \cite{Synaptic-Pruning-Wikipedia}, during which both axons and dendrites of mammals brains decay and die off, typically occurring from the time of birth until the mid-20s on humans. Inspired by the Synaptic Pruning, Weight Pruning is a technique for artificial neural network compression, leading to smaller in size networks, higher memory and power efficiency, and faster inference times.

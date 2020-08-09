@@ -195,7 +195,6 @@ The mathematical expression of the convolution operation is defined bellow (Equa
 
 Let \emph{I} be the input with \emph{C} channels, \emph{H} height and \emph{W} width, and let \emph{K} be the kernels with \emph{N} number of kernels, \emph{C} channels, \emph{KH} height and \emph{KW} width. Also, let \emph{B} be the bias with K values, and let \emph{S} be the stride size and \emph{P} be the padding size. So the convolution operation's output, \emph{Out}, is defined as:
 \begin{equation}
-	% Todo: fix overfull hbox
 	I_{padded}(c, i, j) = \begin{cases}
 		0,                  & i \in [1, P], j \in [1, P]                         \\
 		I(c, i - P, j - P), & i \in [P + 1, P + 1 + H], j \in [P + 1, P + 1 + W] \\
@@ -213,7 +212,6 @@ Let \emph{I} be the input with \emph{C} channels, \emph{H} height and \emph{W} w
 
 \begin{equation}
 	\label{eqn:convolution}
-	% Todo: fix overfull hbox
 	\begin{split}
 		Out(k, i, j) = B(k) +
 		\sum_{c = 1}^{C} \sum_{kh = 1}^{KH} \sum_{kw = 1}^{KW}
