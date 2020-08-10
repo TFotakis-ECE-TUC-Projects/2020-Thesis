@@ -348,6 +348,7 @@ Before every test, the network's parameters were converted from the given single
 In respect to the floating-point data types, the Top-1 error-rate for both double and single-precision is zero, while for the half-precision, there is a minor error rate that can be ignored. As a result, the half-precision is the leading one in the floating-point space due to its excellent performance to accuracy ratio.
 
 \subsection{Fixed Point}
+\label{sec:fixed-point}
 The usage of fixed-point data types can benefit the application with its lower memory bandwidth and its more straightforward hardware requirements and faster arithmetic operations compared to the floating-point data types. In contrast to the floating-point data types conversion, when converting to fixed-point data types, it is vital to select the position of the radix point that most accurately represents the given numbers. In this experiment, the uniform conversion technique was used in which given a set of numbers \emph{S} and the wanted representation bit width, \emph{W}, the radix point is selected as shown on equation \ref{eqn:select-radix-point-position} by minimizing the overall error between the given number set \emph{S} and the converted to fixed-point number set.
 \begin{equation}
 	\label{eqn:select-radix-point-position}
@@ -495,25 +496,69 @@ For better clarity on the results, figure \ref{fig:data-types-accuracy-chart} de
 After some experimentation, dynamically assigning different bit-widths on each layer, according to its accuracy needs, rather than a single bit-width for the whole network, can yield even better results. However, further investigation has to be conducted.
 
 \subsection{Fixed Point Activations}
+Since floating-point arithmetic handles scaling automatically, the network does not face any overflow defects on its activations. However, when using fixed-point arithmetic, activations overflow is a severe problem. For instance, when multiplying 8-bit fixed point activations and weights, a new activation is generated with at most 16-bit width. Furthermore, adding two 16-bit activations can generate a new activation of 17-bit width. Therefore, if activations are not quantized between each layer, there will be a very wide output at the end of the network, wasting resources and performance when implemented in FPGAs.
 
+Hence, between every layer, the activations should be quantized from their high-detail, large bit-width representations, back to some low bit wide representation. A question arises on how to quantize them in order to keep the most detail available. This work tries to keep the upper n bits from the first one. For example, let an activation implementation be 32-bit wide, its most significant one be on the 17th bit, and the new, low-detail representation be 8-bit wide. Then, if the upper 8 bits are kept, from the 31st bit down to the 24th bit, they will all be zeros, and as a result, its value will be lost. However, if the 8 bits from the first upper one are kept, from the 17th bit down to the 10th bit, the most significant detail is retained.
+
+On the contrary, finding the most significant one on every activation in a single layer is not only computationally intensive but also requires that every activation has its own scale factor, rendering the fixed-point's benefits obsolete. All activations in a single layer should have the same scale factor, simplifying their arithmetic operations and minimizing required I/O.
+
+Hence, an experiment was conducted to find each layer's optimal activation scale factor, whose results are depicted in table \ref{tab:Theoretical-and-Practical-activations-bit-widths}, using AlexNet as a reference. The theoretical bit-width represents the maximum bits needed to represent the layer's output adequately and can be calculated using equation \ref{eqn:theoretical-activation-bit-width}.
+\begin{equation}
+	\label{eqn:theoretical-activation-bit-width}
+	Theoretical_{bitWidth} = input_{bitWidth} + weight_{bitWidth} + \lceil \log_2 \#Additions \rceil
+\end{equation}
+
+However, equation \ref{eqn:theoretical-activation-bit-width} calculates the maximum bit-width that could be generated after all operations, when all numbers are of max value, which is not the case. Therefore, the experiment includes a practical study of the maximum incurring bit-width, conducted by inferencing 2000 images and finding the maximum valued activation on each layer. Results of this experiment are depicted on column Practical bit-width of table \ref{tab:Theoretical-and-Practical-activations-bit-widths}.
 
 \begin{table}[H]
-	\caption{Scale and bit-width of input and activations}
-	\label{tab:scale-and-bit-width-of-input-and-activations}
+	\caption{Theoretical and Practical activations' bit-widths}
+	\label{tab:Theoretical-and-Practical-activations-bit-widths}
 	\centering
-	\begin{tabular}{llll}
+	\begin{tabular}{lll}
 		\toprule
-		\textbf{Layer} & \textbf{Scale} & \textbf{Theoretical bit-width} & \textbf{Practical bit-width}\\
+		\textbf{Layer} & \textbf{Theoretical bit-width} & \textbf{Practical bit-width}\\
 		\midrule
-			Input & 7 & 8 & 8\\
-			Conv1 & 5 & $16 + \lceil \log_2 3 * 11 * 11 \rceil = 25 $ & 17\\
-			Conv2 & 5 & $16 + \lceil \log_2 64 * 5 * 5 \rceil = 27$ & 14\\
-			Conv3 & 5 & $16 + \lceil \log_2 192 * 3 * 3 \rceil = 27$ & 15\\
-			Conv4 & 6 & $16 + \lceil \log_2 384 * 3 * 3 \rceil = 28$ & 15\\
-			Conv5 & 5 & $16 + \lceil \log_2 256 * 3 * 3 \rceil = 28$ & 17\\
-			FC1 & 5 & $16 + \lceil \log_2 9216 \rceil = 30$ & 17\\
-			FC2 & 6 & $16 + \lceil \log_2 4096 \rceil = 28$ & 17\\
-			FC3 & 6 & $16 + \lceil \log_2 4096 \rceil = 28$ & 17\\
+			Input & 8 & 8\\
+			Conv1 & $ 8 + 8 + \lceil \log_2 3 * 11 * 11 \rceil = 25 $ & 17\\
+			Conv2 & $ 8 + 8 + \lceil \log_2 64 * 5 * 5 \rceil = 27$ & 14\\
+			Conv3 & $ 8 + 8 + \lceil \log_2 192 * 3 * 3 \rceil = 27$ & 15\\
+			Conv4 & $ 8 + 8 + \lceil \log_2 384 * 3 * 3 \rceil = 28$ & 15\\
+			Conv5 & $ 8 + 8 + \lceil \log_2 256 * 3 * 3 \rceil = 28$ & 17\\
+			FC1 & $ 8 + 8 + \lceil \log_2 9216 \rceil = 30$ & 17\\
+			FC2 & $ 8 + 8 + \lceil \log_2 4096 \rceil = 28$ & 17\\
+			FC3 & $ 8 + 8 + \lceil \log_2 4096 \rceil = 28$ & 17\\
+		\bottomrule\\
+	\end{tabular}
+\end{table}
+
+As of table \ref{tab:Theoretical-and-Practical-activations-bit-widths}, the theoretical and practical bit-widths appear significant differences. Fortunately, the maximum theoretical bit-width is 30 bits, and consequently, all layers' activations can fit in 32-bit integer representations, before quantizing them.
+
+The scale factor after the quantization of the layer's activations can be calculated using equation \ref{eqn:activations-scale-factor}, where $Practical_{bitWidth}$ is the activations' maximum practical bit-width as shown in table \ref{tab:Theoretical-and-Practical-activations-bit-widths} and $RepBits$ is the bit-width of the representation after the quantization.
+
+\begin{equation}
+	\label{eqn:activations-scale-factor}
+	ScaleFactor = Practical_{bitWidth} - (\#RepBits - 1) + input_{scaleFactor} + weight_{scaleFactor}
+\end{equation}
+
+Table \ref{tab:Scale-Factor-per-layer} depicts the optimal scale factor for each layer's weights after their conversion from floating-point to 8-bit fixed-point as instructed by section \ref{sec:fixed-point}, and the scale factor of each layer's outputs.
+
+\begin{table}[H]
+	\caption{Scale Factor per layer}
+	\label{tab:Scale-Factor-per-layer}
+	\centering
+	\begin{tabular}{lll}
+		\toprule
+		\textbf{Layer} & \textbf{Weights Optimal Scale Factor} & \textbf{Output Scale Factor}\\
+		\midrule
+			Input & -7 & -\\
+			Conv1 & -5 & -2\\
+			Conv2 & -5 & 0\\
+			Conv3 & -5 & 3\\
+			Conv4 & -6 & 5\\
+			Conv5 & -5 & 10\\
+			FC1 & -5 & 15\\
+			FC2 & -6 & 19\\
+			FC3 & -6 & 23\\
 		\bottomrule\\
 	\end{tabular}
 \end{table}
