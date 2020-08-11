@@ -98,7 +98,8 @@
 \thesistitle{Design and Implementation of AlexNet Deep Learning Network using Reconfigurable Logic} % Your thesis title, this is used in the title and abstract, print it elsewhere with \ttitle
 \supervisor{Pr. Apostolos \textsc{Dollas}} % Your supervisor's name, this is used in the title page, print it elsewhere with \supname
 \examiner{} % Your examiner's name, this is not currently used anywhere in the template, print it elsewhere with \examname
-\degree{Electrical and Computer Engineer} % Your degree name, this is used in the title page and abstract, print it elsewhere with \degreename
+% \degree{Electrical and Computer Engineer} % Your degree name, this is used in the title page and abstract, print it elsewhere with \degreename
+\degree{DIPLOMA THESIS} % Your degree name, this is used in the title page and abstract, print it elsewhere with \degreename
 \author{Tzanis \textsc{Fotakis}} % Your name, this is used in the title page and abstract, print it elsewhere with \authorname
 \addresses{} % Your address, this is not currently used anywhere in the template, print it elsewhere with \addressname
 
@@ -217,8 +218,9 @@
 
 \begin{abstract}
 	\addchaptertocentry{\abstractname} % Add the abstract to the table of contents
-	% Todo: Add Abstract
-	The Thesis Abstract is written here (and usually kept to just this page). The page is kept centered vertically so can expand into the blank space above the title too\ldots
+
+	% Todo: Fill speedup results
+	Over the last few years, Convolutional Neural Networks have proved their abilities in several fields of study, with the research community continuing to surprise the world with new and paradoxical use cases, and even more exciting results. The rise of neural networks in general, and especially CNNs, creates a necessity for hardware acceleration of such computationally complex applications to achieve high-performance and energy-efficiency. Due to the fact that neural networks are highly parallelizable, they can exploit FPGA's hardware flexibility. This study presents a hardware platform targeted for FPGA devices for easy and structured implementation of neural network inference accelerators. It is designed with flexibility and versatility in mind, capable of being transferred to various FPGA devices. Furthermore, it is scalable for multi-FPGA implementations, using platforms such as the FORTH QFDB, a custom four-FPGA platform. In addition, it is extendable to enable for easy adding of new layer types and new layer accelerators. Moreover, it can run various CNN models' inference, but most importantly, it provides easy experimentation and development of neural networks hardware accelerator architectures. The proposed platform is implemented for accelerating AlexNet's inference, an award-winning CNN whose robustness analysis is carried out to investigate the FPGA's strengths and weaknesses, studying the computational workloads, memory access patterns, memory and bandwidth reduction, as well as algorithmic optimizations. A comparison in inference performance metrics is presented between the proposed platform, a CPU, a GPU, and other Xilinx developed neural network accelerator platforms. The implemented platform, running on a Xilinx ZCU102 Evaluation Kit, manages to achieve a x latency speedup, a x throughput speedup while retaining a x energy efficiency over an NVIDIA RTX-2060 Super GPU.
 \end{abstract}
 
 %----------------------------------------------------------------------------------------
@@ -227,8 +229,19 @@
 
 \begin{acknowledgements}
 	\addchaptertocentry{\acknowledgementname} % Add the acknowledgements to the table of contents
-	% Todo: Add Acknowledgements
-	The acknowledgments and the people to thank go here, don't forget to include your project advisor\ldots
+	First and foremost, I would like to thank my supervisor, Prof. Apostolos Dollas, for his invaluable support and guidance throughout both the course of my studies and the work of this thesis, being an inspiration in both professional and personal level, generously providing his expertise and experiences. I would also like to thank him for broadening my horizons and giving me the opportunity to become a part of the research community in the field of Artificial Intelligence and Hardware Architecture design.
+
+	Moreover, I would like to thank my thesis committee, Prof. Michail Lagoudakis, and Prof. Sotirios Ioannidis, for evaluating my work.
+
+	Furthermore, I would like to thank the CARV team in FORTH for their excellent collaboration and guidance throughout this work, even outside their working hours, including Dr. Christos Kozanitis and Dr. Aggelos Ioannou for their hardware design expertise, and Dr. Gregory Tsagkatakis for his Neural Networks expertise.
+
+	In addition, I would like to acknowledge the TUC MHL staff, including but not limited to Mr. Andreas Brokalakis, Mr. Pavlos Malagonakis, and Mr. Markos Kimionis, whose support was essential for the completion of this work.
+
+	I would also like to express my thankfulness to my fellow students and colleagues of TUC MHL, George Pitsis, now a Ph.D. candidate, Charisios Loukas, and Maria Argyriou for our collaboration.
+
+	Last but not least, I would like to express my deepest gratitude to the people who have always and unquestionably been there for me throughout the years of my studies, my family, Emmanouil Fotakis, Maria Ntavrani and Voula Fotaki, friends and colleagues. My sincerest thanks to all of you.
+
+	\begin{flushright}Tzanis Fotakis,\\ Chania, 2020\end{flushright}
 \end{acknowledgements}
 
 %----------------------------------------------------------------------------------------
