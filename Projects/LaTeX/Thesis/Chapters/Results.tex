@@ -1,8 +1,8 @@
 \chapter{Results}
-This work's implementation of the proposed platform is described in section \ref{sec:proposed-platform-implementation}. Its performance metrics, such as its latency, throughput, power, and energy consumption, are compared to the available alternative technologies and FPGA architectures.
+This work's implementation of the proposed platform is described in section \ref{sec:proposed-platform-implementation}. Its performance metrics, such as its latency, throughput, power, and energy consumption, are compared to the available alternative technologies and FPGA architectures. AlexNet is the selected CNN to be used as a benchmark for the various technologies compared.
 
 \section{Specifications of the Compared Platforms}
-The proposed platform is compared with an Intel i7 4710MQ CPU, an NVIDIA RTX 2060 Super 8GB GPU, a Xilinx CHaiDNN implementation, and a Xilinx DPU implementation both on the Xilinx ZCU102 Evaluation board.
+The proposed platform is compared with an Intel i7 4710MQ CPU, an NVIDIA RTX 2060 Super 8GB GPU, a Xilinx CHaiDNN implementation, and a Xilinx DPU implementation. All FPGA implementations, including this work's platform, use the Xilinx ZCU102 Evaluation board.
 
 \subsection{Intel i7 4710MQ}
 The Intel i7 4710MQ CPU \cite{Intel-i7-4710MQ-Processor}, released in 2014, is a mobile processor targeted for high-performance laptops. Its specifications are presented in table \ref{tab:Intel-i7-4710MQ-specs}.
@@ -20,8 +20,8 @@ The Intel i7 4710MQ CPU \cite{Intel-i7-4710MQ-Processor}, released in 2014, is a
 	\end{tabular}
 \end{table}
 
-\subsection{NVIDIA RTX 2060 Super 8GB}
-The NVIDIA RTX 2060 Super \cite{NVIDIA-RTX-2060-Super}, released in 2019, is a desktop GPU, and while targeted for raytraced gaming, it is also suitable for CNN inferencing due to its large and high-bandwidth memory. Its specifications are presented in table \ref{tab:NVIDIA-RTX-2060-Super-specs}.
+\subsection{NVIDIA RTX-2060 Super 8GB}
+The NVIDIA RTX-2060 Super \cite{NVIDIA-RTX-2060-Super}, released in 2019, is a desktop GPU, and while targeted for raytraced gaming, it is also suitable for CNN inferencing due to its large and high-bandwidth memory. Its specifications are presented in table \ref{tab:NVIDIA-RTX-2060-Super-specs}.
 
 \begin{table}[H]
 	\caption{NVIDIA RTX 2060 Super specifications}
@@ -36,9 +36,61 @@ The NVIDIA RTX 2060 Super \cite{NVIDIA-RTX-2060-Super}, released in 2019, is a d
 	\end{tabular}
 \end{table}
 
+\subsection{Xilinx CHaiDNN}
+% Todo: fill specs
+The Xilinx CHaiDNN accelerator library, presented in section \ref{sec:Xilinx-CHaiDNN}, was implemented for this work's comparisons. The resource utilization for its implementation is depicted in table \ref{tab:CHaiDNN-resource-usage}.
+
+% Todo: fill table
+\begin{table}[H]
+	\caption{Xilinx CHaiDNN resource usage}
+	\label{tab:CHaiDNN-resource-usage}
+	\centering
+	\begin{tabular}{p{2cm} p{2cm} p{2cm} p{2cm} p{2cm} p{2cm}}
+		\toprule
+		\textbf{Clock Frequency} & \textbf{LUT Usage (\%)} & \textbf{FF Usage (\%)} & \textbf{DSP Usage (\%)} & \textbf{BRAM Usage (\%)} & \textbf{BUFG}\\
+		\midrule
+			- & - & - & - & - & -\\
+		\bottomrule\\
+	\end{tabular}
+\end{table}
+
+\subsection{Xilinx DPU}
+% Todo: fill specs
+The Xilinx DPU accelerator library, presented in section \ref{sec:Xilinx-DPU}, was implemented for this work's comparisons. The resource utilization for its implementation is depicted in table \ref{tab:DPU-resource-usage}.
+
+% Todo: fill table
+\begin{table}[H]
+	\caption{Xilinx DPU resource usage}
+	\label{tab:DPU-resource-usage}
+	\centering
+	\begin{tabular}{p{2cm} p{2cm} p{2cm} p{2cm} p{2cm} p{2cm}}
+		\toprule
+		\textbf{Clock Frequency} & \textbf{LUT Usage (\%)} & \textbf{FF Usage (\%)} & \textbf{DSP Usage (\%)} & \textbf{BRAM Usage (\%)} & \textbf{BUFG}\\
+		\midrule
+			- & - & - & - & - & -\\
+		\bottomrule\\
+	\end{tabular}
+\end{table}
+
 \section{Proposed Platform}
 \label{sec:proposed-platform-implementation}
+This work's proposed platform can be implemented using several data types and accelerators. For this comparison, it was implemented based on AlexNet's requirements and characteristics, presented in Robustness Analysis chapter \ref{Chapter-Robustness-Analysis}. Both parameters and activations are represented as 8-bit fixed-points; hence, the accelerators use the same data type. There is a single accelerator instance per layer type, using their high-performance versions as presented in section \ref{sec:Platform-Accelerator-Architectures}. The serial execution scheduler (see section \ref{sec:Scheduler-Strategies}) was selected because the implemented accelerators do not support layer pipelining, and there are not multiple instances per layer type.
 
+The resource utilization for implementing the aforementioned configuration of the proposed platform is depicted in table \ref{tab:Proposed-platform-resource-usage}.
+
+% Todo: fill table
+\begin{table}[H]
+	\caption{Proposed platform resource usage}
+	\label{tab:Proposed-platform-resource-usage}
+	\centering
+	\begin{tabular}{p{2cm} p{2cm} p{2cm} p{2cm} p{2cm} p{2cm}}
+		\toprule
+		\textbf{Clock Frequency} & \textbf{LUT Usage (\%)} & \textbf{FF Usage (\%)} & \textbf{DSP Usage (\%)} & \textbf{BRAM Usage (\%)} & \textbf{BUFG}\\
+		\midrule
+			- & - & - & - & - & -\\
+		\bottomrule\\
+	\end{tabular}
+\end{table}
 
 \section{Power Consumption}
 Power consumption is defined as the energy consumed per unit time for accomplishing a specific task, from a chemical reaction and lifting materials using a crane, to emitting light through a light bulb and inferencing CNNs on electronic hardware. Average power consumption is always preferred to be as low as possible to increase the system's energy efficiency, minimizing energy losses. In addition, low power consumption leads to simpler system designs and lower building costs. It is usually measured in Watts (w) or kiloWatts (kW).
@@ -52,3 +104,30 @@ Throughput, defined in equation \ref{eqn:throughput}, is the number of tasks tha
 Latency, defined in equation \ref{eqn:latency}, is the time required for accomplishing a single task. It is preferred to be as low as possible to finish tasks as quickly as possible from the time they are issued.
 
 \section{Final Performance}
+The comparisons were conducted using the same dataset and AlexNet hyper-parameters across all technologies. The CPU and GPU use floating-point arithmetic for their parameters and activations, while CHaiDNN uses 6 and 8-bit quantization, DPU uses 8-bit quantization and pruning, and the proposed platform implementation, TUCNNPU, uses 8-bit fixed-point arithmetic.
+
+Table \ref{tab:Performance-results} depicts the comparison results of every technology.
+
+% Todo: fill table
+\begin{table}[H]
+	\caption{Performance results}
+	\label{tab:Performance-results}
+	\centering
+	\begin{tabular}{llllll}
+		\toprule
+		& \textbf{CPU} & \textbf{GPU} & \textbf{CHaiDNN} & \textbf{DPU} & \textbf{TUCNNPU}\\
+		\midrule
+			\textbf{Clock Frequency (MHz)} & 3500 & 1650 & 250/500 & 300/600 & 300\\
+			\textbf{Throughput (Images/s)} & - & - & 10 & 401 & -\\
+			\textbf{Throughput Speedup} & - & - & - & - & -\\
+			\textbf{Latency (s)} & - & - & - & - & -\\
+			\textbf{Latency Speedup} & - & - & - & - & -\\
+			\textbf{GFLOPS} & - & - & - & - & -\\
+			\textbf{Total On-Chip Power (Watt)} & - & - & - & - & -\\
+			\textbf{Power Efficiency} & - & - & - & - & -\\
+			\textbf{Energy Consumption (Joule)} & - & - & - & - & -\\
+			\textbf{Energy Efficiency} & - & - & - & - & -\\
+			\textbf{Images/Joule} & - & - & - & - & -\\
+		\bottomrule\\
+	\end{tabular}
+\end{table}
