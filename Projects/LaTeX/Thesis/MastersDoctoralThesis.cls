@@ -371,19 +371,18 @@ KOMA-script documentation for details.}]{fancyhdr}
 		#1%added to be able to have abstract more than one page long
 		\thispagestyle{plain}
 		\begin{center}
-			{\normalsize \MakeUppercase{\univname} \par}% University name in capitals
-			\bigskip
+			% {\normalsize \MakeUppercase{\univname} \par}% University name in capitals
+			% {\normalsize \facname \par}% Faculty name
+			% {\normalsize \deptname \par}% Department name
 			{\huge\textit{\abstractname} \par}
-			\bigskip
-			{\normalsize \facname \par}% Faculty name
-			{\normalsize \deptname \par}% Department name
-			\bigskip
-			{\normalsize \degreename\par}% Degree name
-			\bigskip
+			% \bigskip
+			% {\normalsize \degreename\par}% Degree name
+			{\normalsize Diploma Thesis\par}% Degree name
+			% \bigskip
 			{\normalsize\bfseries \@title \par}% Thesis title
-			\medskip
+			% \medskip
 			{\normalsize \byname{} \authorname \par}% Author name
-			\bigskip
+			% \bigskip
 		\end{center}
 	}
 	{
