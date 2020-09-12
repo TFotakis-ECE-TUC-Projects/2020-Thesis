@@ -27,7 +27,7 @@ Algorithm \ref{alg:Convolution-Layer} performs a 2-D Convolution on 3-D array in
 			\For{i:=1 \textbf{to} input.channels}
 				\For{j:=1 \textbf{to} input.height + 2 * padding}
 					\For{k:=1 \textbf{to} input.width + 2 * padding}
-						\If{j < padding || k < padding || j > image.height || k > image.height}
+						\If{j <= padding || k <= padding || j > image.height + padding || k > image.width + padding}
 							\State $arr(i, j, k) \gets 0$
 						\Else{}
 							\State $arr(i, j, k) \gets input(i, j - padding, k - padding)$
