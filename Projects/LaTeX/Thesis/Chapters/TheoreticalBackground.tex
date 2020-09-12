@@ -215,7 +215,7 @@ Let \emph{I} be the input with \emph{C} channels, \emph{H} height and \emph{W} w
 	\begin{split}
 		Out(k, i, j) = B(k) +
 		\sum_{c = 1}^{C} \sum_{kh = 1}^{KH} \sum_{kw = 1}^{KW}
-		I_{padded}(c, kh + i * KH, kw + j * KW) K(k, c, kh, kw),\\
+		I_{padded}(c, kh + (i - 1) * S, kw + (j - 1) * S) K(k, c, kh, kw),\\
 		\mbox{for k = 1, 2, ..., C},\\
 		\mbox{for i = 1, 2, ..., OH},\\
 		\mbox{for j = 1, 2, ..., OW}\\
