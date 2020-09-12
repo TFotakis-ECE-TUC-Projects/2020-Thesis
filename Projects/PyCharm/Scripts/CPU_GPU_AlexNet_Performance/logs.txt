@@ -1,0 +1,284 @@
+-----------------------------------------
+Running AlexNet on CPU
+Num of Workers: 8
+Batch Size 1
+
+---------------- Timings ----------------
+- Average Latency (ms):  34.43
+- Average Throughput (images/sec):  29.05
+- Total time (s):  86.06718230247498
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on CPU
+Num of Workers: 8
+Batch Size 2
+
+---------------- Timings ----------------
+- Average Latency (ms):  23.97
+- Average Throughput (images/sec):  41.72
+- Total time (s):  59.92490482330322
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on CPU
+Num of Workers: 8
+Batch Size 4
+
+---------------- Timings ----------------
+- Average Latency (ms):  21.98
+- Average Throughput (images/sec):  45.51
+- Total time (s):  54.93843340873718
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on CPU
+Num of Workers: 8
+Batch Size 8
+
+---------------- Timings ----------------
+- Average Latency (ms):  18.96
+- Average Throughput (images/sec):  52.75
+- Total time (s):  47.38999152183533
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on CPU
+Num of Workers: 8
+Batch Size 16
+
+---------------- Timings ----------------
+- Average Latency (ms):  16.04
+- Average Throughput (images/sec):  62.34
+- Total time (s):  40.103336572647095
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on CPU
+Num of Workers: 8
+Batch Size 32
+
+---------------- Timings ----------------
+- Average Latency (ms):  13.33
+- Average Throughput (images/sec):  75.01
+- Total time (s):  33.32742524147034
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on CPU
+Num of Workers: 8
+Batch Size 64
+
+---------------- Timings ----------------
+- Average Latency (ms):  11.86
+- Average Throughput (images/sec):  84.33
+- Total time (s):  29.645962715148926
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on CPU
+Num of Workers: 8
+Batch Size 128
+
+---------------- Timings ----------------
+- Average Latency (ms):  10.77
+- Average Throughput (images/sec):  92.87
+- Total time (s):  26.91940474510193
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on CPU
+Num of Workers: 8
+Batch Size 256
+
+---------------- Timings ----------------
+- Average Latency (ms):  11.01
+- Average Throughput (images/sec):  90.8
+- Total time (s):  27.53299641609192
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on CPU
+Num of Workers: 8
+Batch Size 512
+
+---------------- Timings ----------------
+- Average Latency (ms):  10.3
+- Average Throughput (images/sec):  97.05
+- Total time (s):  25.76075553894043
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on CPU
+Num of Workers: 8
+Batch Size 1024
+
+---------------- Timings ----------------
+- Average Latency (ms):  10.03
+- Average Throughput (images/sec):  99.75
+- Total time (s):  25.06293487548828
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on GPU
+Num of Workers: 1
+Batch Size 1
+
+---------------- Timings ----------------
+- Average Latency (ms):  0.86
+- Average Throughput (images/sec):  1168.43
+- Cuda time (s):  0.5866899490356445
+- Forward time (s):  1.5529372692108154
+- Total time (s):  2.13962721824646
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on GPU
+Num of Workers: 1
+Batch Size 2
+
+---------------- Timings ----------------
+- Average Latency (ms):  1.11
+- Average Throughput (images/sec):  1799.38
+- Cuda time (s):  0.527982234954834
+- Forward time (s):  0.8613884449005127
+- Total time (s):  1.3893706798553467
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on GPU
+Num of Workers: 1
+Batch Size 4
+
+---------------- Timings ----------------
+- Average Latency (ms):  1.46
+- Average Throughput (images/sec):  2735.91
+- Cuda time (s):  0.4564368724822998
+- Forward time (s):  0.4573347568511963
+- Total time (s):  0.9137716293334961
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on GPU
+Num of Workers: 1
+Batch Size 8
+
+---------------- Timings ----------------
+- Average Latency (ms):  2.12
+- Average Throughput (images/sec):  3765.78
+- Cuda time (s):  0.4205799102783203
+- Forward time (s):  0.24329233169555664
+- Total time (s):  0.663872241973877
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on GPU
+Num of Workers: 1
+Batch Size 16
+
+---------------- Timings ----------------
+- Average Latency (ms):  3.43
+- Average Throughput (images/sec):  4647.79
+- Cuda time (s):  0.41657400131225586
+- Forward time (s):  0.12131595611572266
+- Total time (s):  0.5378899574279785
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on GPU
+Num of Workers: 1
+Batch Size 32
+
+---------------- Timings ----------------
+- Average Latency (ms):  6.17
+- Average Throughput (images/sec):  5130.19
+- Cuda time (s):  0.4207003116607666
+- Forward time (s):  0.06661105155944824
+- Total time (s):  0.48731136322021484
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on GPU
+Num of Workers: 1
+Batch Size 64
+
+---------------- Timings ----------------
+- Average Latency (ms):  11.45
+- Average Throughput (images/sec):  5456.91
+- Cuda time (s):  0.4158954620361328
+- Forward time (s):  0.04223942756652832
+- Total time (s):  0.45813488960266113
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on GPU
+Num of Workers: 1
+Batch Size 128
+
+---------------- Timings ----------------
+- Average Latency (ms):  22.19
+- Average Throughput (images/sec):  5632.93
+- Cuda time (s):  0.4077644348144531
+- Forward time (s):  0.036054134368896484
+- Total time (s):  0.4438185691833496
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on GPU
+Num of Workers: 1
+Batch Size 256
+
+---------------- Timings ----------------
+- Average Latency (ms):  43.22
+- Average Throughput (images/sec):  5784.6
+- Cuda time (s):  0.3866441249847412
+- Forward time (s):  0.04553818702697754
+- Total time (s):  0.43218231201171875
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on GPU
+Num of Workers: 1
+Batch Size 512
+
+---------------- Timings ----------------
+- Average Latency (ms):  90.69
+- Average Throughput (images/sec):  5513.5
+- Cuda time (s):  0.37634921073913574
+- Forward time (s):  0.07708311080932617
+- Total time (s):  0.4534323215484619
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on GPU
+Num of Workers: 1
+Batch Size 1024
+
+---------------- Timings ----------------
+- Average Latency (ms):  172.81
+- Average Throughput (images/sec):  4822.3
+- Cuda time (s):  0.37515759468078613
+- Forward time (s):  0.14326739311218262
+- Total time (s):  0.5184249877929688
+-----------------------------------------
