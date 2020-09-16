@@ -1,5 +1,5 @@
 -----------------------------------------
-Running AlexNet on CPU
+Running AlexNet on AMD Ryzen 5 1400 CPU
 Num of Workers: 8
 Batch Size 1
 
@@ -11,7 +11,7 @@ Batch Size 1
 
 
 -----------------------------------------
-Running AlexNet on CPU
+Running AlexNet on AMD Ryzen 5 1400 CPU
 Num of Workers: 8
 Batch Size 2
 
@@ -23,7 +23,7 @@ Batch Size 2
 
 
 -----------------------------------------
-Running AlexNet on CPU
+Running AlexNet on AMD Ryzen 5 1400 CPU
 Num of Workers: 8
 Batch Size 4
 
@@ -35,7 +35,7 @@ Batch Size 4
 
 
 -----------------------------------------
-Running AlexNet on CPU
+Running AlexNet on AMD Ryzen 5 1400 CPU
 Num of Workers: 8
 Batch Size 8
 
@@ -47,7 +47,7 @@ Batch Size 8
 
 
 -----------------------------------------
-Running AlexNet on CPU
+Running AlexNet on AMD Ryzen 5 1400 CPU
 Num of Workers: 8
 Batch Size 16
 
@@ -59,7 +59,7 @@ Batch Size 16
 
 
 -----------------------------------------
-Running AlexNet on CPU
+Running AlexNet on AMD Ryzen 5 1400 CPU
 Num of Workers: 8
 Batch Size 32
 
@@ -71,7 +71,7 @@ Batch Size 32
 
 
 -----------------------------------------
-Running AlexNet on CPU
+Running AlexNet on AMD Ryzen 5 1400 CPU
 Num of Workers: 8
 Batch Size 64
 
@@ -83,7 +83,7 @@ Batch Size 64
 
 
 -----------------------------------------
-Running AlexNet on CPU
+Running AlexNet on AMD Ryzen 5 1400 CPU
 Num of Workers: 8
 Batch Size 128
 
@@ -95,7 +95,7 @@ Batch Size 128
 
 
 -----------------------------------------
-Running AlexNet on CPU
+Running AlexNet on AMD Ryzen 5 1400 CPU
 Num of Workers: 8
 Batch Size 256
 
@@ -107,7 +107,7 @@ Batch Size 256
 
 
 -----------------------------------------
-Running AlexNet on CPU
+Running AlexNet on AMD Ryzen 5 1400 CPU
 Num of Workers: 8
 Batch Size 512
 
@@ -119,7 +119,7 @@ Batch Size 512
 
 
 -----------------------------------------
-Running AlexNet on CPU
+Running AlexNet on AMD Ryzen 5 1400 CPU
 Num of Workers: 8
 Batch Size 1024
 
@@ -281,4 +281,158 @@ Batch Size 1024
 - Cuda time (s):  0.37515759468078613
 - Forward time (s):  0.14326739311218262
 - Total time (s):  0.5184249877929688
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on Intel i7 4710MQ CPU
+Num of Workers: 8
+Batch Size 1
+
+---------------- Timings ----------------
+- Average Latency (ms):  26.55
+- Average Throughput (images/sec):  37.67
+- Cuda time (s):  0.0016565322875976562
+- Forward time (s):  66.37066292762756
+- Total time (s):  66.37231945991516
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on Intel i7 4710MQ CPU
+Num of Workers: 8
+Batch Size 2
+
+---------------- Timings ----------------
+- Average Latency (ms):  55.39
+- Average Throughput (images/sec):  36.11
+- Cuda time (s):  0.0007889270782470703
+- Forward time (s):  69.2332136631012
+- Total time (s):  69.23400259017944
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on Intel i7 4710MQ CPU
+Num of Workers: 8
+Batch Size 4
+
+---------------- Timings ----------------
+- Average Latency (ms):  84.13
+- Average Throughput (images/sec):  47.54
+- Cuda time (s):  0.0004200935363769531
+- Forward time (s):  52.58319282531738
+- Total time (s):  52.58361291885376
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on Intel i7 4710MQ CPU
+Num of Workers: 8
+Batch Size 8
+
+---------------- Timings ----------------
+- Average Latency (ms):  138.14
+- Average Throughput (images/sec):  57.82
+- Cuda time (s):  0.0001819133758544922
+- Forward time (s):  43.23675179481506
+- Total time (s):  43.23693370819092
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on Intel i7 4710MQ CPU
+Num of Workers: 8
+Batch Size 16
+
+---------------- Timings ----------------
+- Average Latency (ms):  241.41
+- Average Throughput (images/sec):  65.96
+- Cuda time (s):  8.225440979003906e-05
+- Forward time (s):  37.90056395530701
+- Total time (s):  37.9006462097168
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on Intel i7 4710MQ CPU
+Num of Workers: 8
+Batch Size 32
+
+---------------- Timings ----------------
+- Average Latency (ms):  433.97
+- Average Throughput (images/sec):  72.92
+- Cuda time (s):  4.4345855712890625e-05
+- Forward time (s):  34.28360342979431
+- Total time (s):  34.283647775650024
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on Intel i7 4710MQ CPU
+Num of Workers: 8
+Batch Size 64
+
+---------------- Timings ----------------
+- Average Latency (ms):  791.18
+- Average Throughput (images/sec):  79.0
+- Cuda time (s):  2.5510787963867188e-05
+- Forward time (s):  31.647121906280518
+- Total time (s):  31.64714741706848
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on Intel i7 4710MQ CPU
+Num of Workers: 8
+Batch Size 128
+
+---------------- Timings ----------------
+- Average Latency (ms):  1446.28
+- Average Throughput (images/sec):  86.43
+- Cuda time (s):  1.1444091796875e-05
+- Forward time (s):  28.92550778388977
+- Total time (s):  28.925519227981567
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on Intel i7 4710MQ CPU
+Num of Workers: 8
+Batch Size 256
+
+---------------- Timings ----------------
+- Average Latency (ms):  2789.05
+- Average Throughput (images/sec):  89.64
+- Cuda time (s):  7.3909759521484375e-06
+- Forward time (s):  27.890493869781494
+- Total time (s):  27.890501260757446
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on Intel i7 4710MQ CPU
+Num of Workers: 8
+Batch Size 512
+
+---------------- Timings ----------------
+- Average Latency (ms):  5564.14
+- Average Throughput (images/sec):  89.86
+- Cuda time (s):  2.86102294921875e-06
+- Forward time (s):  27.820704460144043
+- Total time (s):  27.820707321166992
+-----------------------------------------
+
+
+-----------------------------------------
+Running AlexNet on Intel i7 4710MQ CPU
+Num of Workers: 8
+Batch Size 1024
+
+---------------- Timings ----------------
+- Average Latency (ms):  8786.39
+- Average Throughput (images/sec):  94.84
+- Cuda time (s):  1.1920928955078125e-06
+- Forward time (s):  26.359155893325806
+- Total time (s):  26.3591570854187
 -----------------------------------------
