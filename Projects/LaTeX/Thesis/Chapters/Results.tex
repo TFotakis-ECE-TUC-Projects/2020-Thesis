@@ -2,7 +2,7 @@
 This work's implementation of the proposed platform is described in section \ref{sec:proposed-platform-implementation}. Its performance metrics, such as its latency, throughput, power, and energy consumption, are compared to the available alternative technologies and FPGA architectures. AlexNet is the selected CNN to be used as a benchmark for the various technologies compared.
 
 \section{Specifications of the Compared Platforms}
-The proposed platform is compared with an Intel i7 4710MQ CPU, an NVIDIA RTX 2060 Super 8GB GPU, a Xilinx CHaiDNN implementation, and a Xilinx DPU implementation. All FPGA implementations, including this work's platform, use the Xilinx ZCU102 Evaluation board.
+The proposed platform is compared with an AMD Ryzen 5 1400 CPU, an NVIDIA RTX 2060 Super 8GB GPU, a Xilinx CHaiDNN implementation, and a Xilinx DPU implementation. All FPGA implementations, including this work's platform, use the Xilinx ZCU102 Evaluation board.
 
 \subsection{AMD Ryzen 5 1400}
 The AMD Ryzen 5 1400 CPU \cite{AMD-Ryzen-5-1400-Processor}, released in 2017, is a desktop processor targeted for mid-range productivity computers. Its specifications are presented in table \ref{tab:AMD-Ryzen-5-1400-specs}.
@@ -58,7 +58,7 @@ The NVIDIA RTX-2060 Super \cite{NVIDIA-RTX-2060-Super}, released in 2019, is a d
 \end{table}
 
 \subsection{Xilinx CHaiDNN}
-The Xilinx CHaiDNN accelerator library, presented in section \ref{sec:Xilinx-CHaiDNN}, was implemented for this work's comparisons. The resource utilization for its implementation is depicted in table \ref{tab:CHaiDNN-resource-usage}.
+The Xilinx CHaiDNN accelerator library, presented in section \ref{sec:Xilinx-CHaiDNN}, was implemented for this work's comparisons. The resource utilization for its implementation is depicted in table \ref{tab:CHaiDNN-resource-usage}. It should be noted that Double Pumped DSPs are used.
 
 \begin{table}[H]
 	\caption{Xilinx CHaiDNN resource usage}
@@ -66,7 +66,7 @@ The Xilinx CHaiDNN accelerator library, presented in section \ref{sec:Xilinx-CHa
 	\centering
 	\begin{tabular}{ll}
 		\toprule
-		\textbf{Clock Frequency} & 250/500 MHz\\
+		\textbf{PL/DSP Clock Frequency} & 250/500 MHz\\
 		\textbf{LUT Usage} & 59.1\%\\
 		\textbf{LUTRAM Usage} & -\\
 		\textbf{FF Usage} & 27.66\%\\
@@ -99,7 +99,7 @@ The Xilinx CHaiDNN accelerator library, presented in section \ref{sec:Xilinx-CHa
 
 \section{Proposed Platform}
 \label{sec:proposed-platform-implementation}
-This work's proposed platform can be implemented using several data types and accelerators. For this comparison, it was implemented based on AlexNet's requirements and characteristics, presented in Robustness Analysis chapter \ref{Chapter-Robustness-Analysis}. Both parameters and activations are represented as 8-bit fixed-points; hence, the accelerators use the same data type. There is a single accelerator instance per layer type, using their high-performance versions as presented in section \ref{sec:Platform-Accelerator-Architectures}. The serial execution scheduler (see section \ref{sec:Scheduler-Strategies}) was selected because the implemented accelerators do not support layer pipelining, and there are not multiple instances per layer type.
+This work's proposed platform can be implemented using several data types and accelerators. For this comparison, it was implemented based on AlexNet's requirements and characteristics, presented in chapter \ref{Chapter-Theoretical-Modeling-and-Robustness-Analysis}. Both parameters and activations are represented as 8-bit fixed-points; hence, the accelerators use the same data type. There is a single accelerator instance per layer type, using their high-performance versions as presented in section \ref{sec:Platform-Accelerator-Architectures}. The serial execution scheduler (see section \ref{sec:Scheduler-Strategies}) was selected because the implemented accelerators do not support layer pipelining, and there are not multiple instances per layer type.
 
 The resource utilization for implementing the aforementioned configuration of the proposed platform is depicted in table \ref{tab:Proposed-platform-resource-usage}.
 
@@ -131,8 +131,10 @@ Throughput, defined in equation \ref{eqn:throughput}, is the number of tasks tha
 
 Latency, defined in equation \ref{eqn:latency}, is the time required for accomplishing a single task. It is preferred to be as low as possible to finish tasks as quickly as possible from the time they are issued.
 
+
+
 \section{Final Performance}
-The comparisons were conducted using the same dataset and AlexNet hyper-parameters across all technologies. The CPU and GPU use floating-point arithmetic for their parameters and activations, while CHaiDNN uses 6 and 8-bit quantization, DPU uses 8-bit quantization and pruning, and the proposed platform implementation, TUCNNPU, uses 8-bit fixed-point arithmetic.
+The comparisons were conducted using the same dataset and AlexNet hyper-parameters across all technologies. The CPU and GPU use floating-point arithmetic for their parameters and activations, while CHaiDNN uses 6-bit quantization, and the proposed platform implementation, TUCNNPU, uses 8-bit fixed-point arithmetic.
 
 Table \ref{tab:Performance-results} depicts the comparison results of every technology.
 
