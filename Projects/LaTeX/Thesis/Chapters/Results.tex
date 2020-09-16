@@ -4,21 +4,39 @@ This work's implementation of the proposed platform is described in section \ref
 \section{Specifications of the Compared Platforms}
 The proposed platform is compared with an Intel i7 4710MQ CPU, an NVIDIA RTX 2060 Super 8GB GPU, a Xilinx CHaiDNN implementation, and a Xilinx DPU implementation. All FPGA implementations, including this work's platform, use the Xilinx ZCU102 Evaluation board.
 
-\subsection{Intel i7 4710MQ}
-The Intel i7 4710MQ CPU \cite{Intel-i7-4710MQ-Processor}, released in 2014, is a mobile processor targeted for high-performance laptops. Its specifications are presented in table \ref{tab:Intel-i7-4710MQ-specs}.
+\subsection{AMD Ryzen 5 1400}
+The AMD Ryzen 5 1400 CPU \cite{AMD-Ryzen-5-1400-Processor}, released in 2017, is a desktop processor targeted for mid-range productivity computers. Its specifications are presented in table \ref{tab:AMD-Ryzen-5-1400-specs}.
 
 \begin{table}[H]
-	\caption{Intel i7 4710MQ processor specifications}
-	\label{tab:Intel-i7-4710MQ-specs}
+	\caption{AMD Ryzen 5 1400 processor specifications}
+	\label{tab:AMD-Ryzen-5-1400-specs}
 	\centering
-	\begin{tabular}{p{2cm} p{3cm} p{1cm} p{3cm} p{3cm}}
+	\begin{tabular}{ll}
 		\toprule
-		\textbf{Cores / Threads} & \textbf{Max Turbo Frequency} & \textbf{TDP} & \textbf{Max Memory Bandwidth} & \textbf{Lithography}\\
-		\midrule
-			4/8 & 3.5GHz & 47W & 25.6GB/s & 22nm\\
+		\textbf{Cores / Threads} & 4/8\\
+		\textbf{Max Turbo Frequency} & 3.4GHz\\
+		\textbf{TDP} & 65W\\
+		\textbf{Max Memory Bandwidth} & 42.7GB/s\\
+		\textbf{Lithography} & 14nm\\
 		\bottomrule\\
 	\end{tabular}
 \end{table}
+
+% \subsection{Intel i7 4710MQ}
+% The Intel i7 4710MQ CPU \cite{Intel-i7-4710MQ-Processor}, released in 2014, is a mobile processor targeted for high-performance laptops. Its specifications are presented in table \ref{tab:Intel-i7-4710MQ-specs}.
+
+% \begin{table}[H]
+% 	\caption{Intel i7 4710MQ processor specifications}
+% 	\label{tab:Intel-i7-4710MQ-specs}
+% 	\centering
+% 	\begin{tabular}{p{2cm} p{3cm} p{1cm} p{3cm} p{3cm}}
+% 		\toprule
+% 		\textbf{Cores / Threads} & \textbf{Max Turbo Frequency} & \textbf{TDP} & \textbf{Max Memory Bandwidth} & \textbf{Lithography}\\
+% 		\midrule
+% 			4/8 & 3.5GHz & 47W & 25.6GB/s & 22nm\\
+% 		\bottomrule\\
+% 	\end{tabular}
+% \end{table}
 
 \subsection{NVIDIA RTX-2060 Super 8GB}
 The NVIDIA RTX-2060 Super \cite{NVIDIA-RTX-2060-Super}, released in 2019, is a desktop GPU, and while targeted for raytraced gaming, it is also suitable for CNN inferencing due to its large and high-bandwidth memory. Its specifications are presented in table \ref{tab:NVIDIA-RTX-2060-Super-specs}.
@@ -27,50 +45,57 @@ The NVIDIA RTX-2060 Super \cite{NVIDIA-RTX-2060-Super}, released in 2019, is a d
 	\caption{NVIDIA RTX 2060 Super specifications}
 	\label{tab:NVIDIA-RTX-2060-Super-specs}
 	\centering
-	\begin{tabular}{p{1cm} p{2cm} p{1cm} p{2cm} p{2.5cm} p{2.5cm}}
+	\begin{tabular}{ll}
 		\toprule
-		\textbf{CUDA Cores} & \textbf{GPU Memory} & \textbf{Boost Clock} & \textbf{Memory Interface} & \textbf{Memory Bandwidth} & \textbf{Power Consumption}\\
-		\midrule
-			2176 & 8GB GDDR6 & 1650 MHz & 256-bit & 448GB/s & 175W\\
+		\textbf{CUDA Cores} & 2176\\
+		\textbf{GPU Memory} & 8GB GDDR6\\
+		\textbf{Boost Clock} & 1650 MHz\\
+		\textbf{Memory Interface} & 256-bit\\
+		\textbf{Memory Bandwidth} & 448GB/s\\
+		\textbf{Power Consumption} & 175W\\
 		\bottomrule\\
 	\end{tabular}
 \end{table}
 
 \subsection{Xilinx CHaiDNN}
-% Todo: fill specs
 The Xilinx CHaiDNN accelerator library, presented in section \ref{sec:Xilinx-CHaiDNN}, was implemented for this work's comparisons. The resource utilization for its implementation is depicted in table \ref{tab:CHaiDNN-resource-usage}.
 
-% Todo: fill table
 \begin{table}[H]
 	\caption{Xilinx CHaiDNN resource usage}
 	\label{tab:CHaiDNN-resource-usage}
 	\centering
-	\begin{tabular}{p{2cm} p{2cm} p{2cm} p{2cm} p{2cm} p{2cm}}
+	\begin{tabular}{ll}
 		\toprule
-		\textbf{Clock Frequency} & \textbf{LUT Usage (\%)} & \textbf{FF Usage (\%)} & \textbf{DSP Usage (\%)} & \textbf{BRAM Usage (\%)} & \textbf{BUFG}\\
-		\midrule
-			- & - & - & - & - & -\\
+		\textbf{Clock Frequency} & 250/500 MHz\\
+		\textbf{LUT Usage} & 59.1\%\\
+		\textbf{LUTRAM Usage} & -\\
+		\textbf{FF Usage} & 27.66\%\\
+		\textbf{BRAM Usage} & 74.12\%\\
+		\textbf{DSP Usage} & 53.65\%\\
+		\textbf{BUFG Usage} & -\\
 		\bottomrule\\
 	\end{tabular}
 \end{table}
 
-\subsection{Xilinx DPU}
-% Todo: fill specs
-The Xilinx DPU accelerator library, presented in section \ref{sec:Xilinx-DPU}, was implemented for this work's comparisons. The resource utilization for its implementation is depicted in table \ref{tab:DPU-resource-usage}.
+% \subsection{Xilinx DPU}
+% The Xilinx DPU accelerator library, presented in section \ref{sec:Xilinx-DPU}, was implemented for this work's comparisons. The resource utilization for its implementation is depicted in table \ref{tab:DPU-resource-usage}.
 
-% Todo: fill table
-\begin{table}[H]
-	\caption{Xilinx DPU resource usage}
-	\label{tab:DPU-resource-usage}
-	\centering
-	\begin{tabular}{p{2cm} p{2cm} p{2cm} p{2cm} p{2cm} p{2cm}}
-		\toprule
-		\textbf{Clock Frequency} & \textbf{LUT Usage (\%)} & \textbf{FF Usage (\%)} & \textbf{DSP Usage (\%)} & \textbf{BRAM Usage (\%)} & \textbf{BUFG}\\
-		\midrule
-			- & - & - & - & - & -\\
-		\bottomrule\\
-	\end{tabular}
-\end{table}
+% \begin{table}[H]
+% 	\caption{Xilinx DPU resource usage}
+% 	\label{tab:DPU-resource-usage}
+% 	\centering
+% 	\begin{tabular}{ll}
+% 		\toprule
+% 		\textbf{Clock Frequency (MHz)} & 300/600\\
+% 		\textbf{LUT Usage (\%)} & 7.34\\
+% 		\textbf{LUTRAM Usage (\%)} & 2.05\\
+% 		\textbf{FF Usage (\%)} & 4.03\\
+% 		\textbf{BRAM Usage (\%)} & 7.51\\
+% 		\textbf{DSP Usage (\%)} & 1.9\\
+% 		\textbf{BUFG (\%)} & 0.25\\
+% 		\bottomrule\\
+% 	\end{tabular}
+% \end{table}
 
 \section{Proposed Platform}
 \label{sec:proposed-platform-implementation}
@@ -78,16 +103,19 @@ This work's proposed platform can be implemented using several data types and ac
 
 The resource utilization for implementing the aforementioned configuration of the proposed platform is depicted in table \ref{tab:Proposed-platform-resource-usage}.
 
-% Todo: fill table
 \begin{table}[H]
 	\caption{Proposed platform resource usage}
 	\label{tab:Proposed-platform-resource-usage}
 	\centering
-	\begin{tabular}{p{2cm} p{2cm} p{2cm} p{2cm} p{2cm} p{2cm}}
+	\begin{tabular}{ll}
 		\toprule
-		\textbf{Clock Frequency} & \textbf{LUT Usage (\%)} & \textbf{FF Usage (\%)} & \textbf{DSP Usage (\%)} & \textbf{BRAM Usage (\%)} & \textbf{BUFG}\\
-		\midrule
-			- & - & - & - & - & -\\
+		\textbf{Clock Frequency (MHz)} & 300MHz\\
+		\textbf{LUT Usage} & 7.34\%\\
+		\textbf{LUTRAM Usage} & 2.05\%\\
+		\textbf{FF Usage} & 4.03\%\\
+		\textbf{BRAM Usage} & 7.51\%\\
+		\textbf{DSP Usage} & 1.9\%\\
+		\textbf{BUFG (\%)} & 0.25\%\\
 		\bottomrule\\
 	\end{tabular}
 \end{table}
@@ -108,26 +136,25 @@ The comparisons were conducted using the same dataset and AlexNet hyper-paramete
 
 Table \ref{tab:Performance-results} depicts the comparison results of every technology.
 
-% Todo: fill table
 \begin{table}[H]
 	\caption{Performance results}
 	\label{tab:Performance-results}
 	\centering
-	\begin{tabular}{llllll}
+	\begin{tabular}{lllll}
 		\toprule
-		& \textbf{CPU} & \textbf{GPU} & \textbf{CHaiDNN} & \textbf{DPU} & \textbf{TUCNNPU}\\
+		& \textbf{CPU} & \textbf{GPU} & \textbf{CHaiDNN} & \textbf{TUCNNPU}\\
 		\midrule
-			\textbf{Clock Frequency (MHz)} & 3500 & 1650 & 250/500 & 300/600 & 300\\
-			\textbf{Throughput (Images/s)} & - & - & 10 & 401 & -\\
-			\textbf{Throughput Speedup} & - & - & - & - & -\\
-			\textbf{Latency (s)} & - & - & - & - & -\\
-			\textbf{Latency Speedup} & - & - & - & - & -\\
-			\textbf{GFLOPS} & - & - & - & - & -\\
-			\textbf{Total On-Chip Power (Watt)} & - & - & - & - & -\\
-			\textbf{Power Efficiency} & - & - & - & - & -\\
-			\textbf{Energy Consumption (Joule)} & - & - & - & - & -\\
-			\textbf{Energy Efficiency} & - & - & - & - & -\\
-			\textbf{Images/Joule} & - & - & - & - & -\\
+			\textbf{Clock Frequency (MHz)} & 3500 & 1650 & 250/500 & 300\\
+			\textbf{Throughput (Images/s)} & 99.75 & 5784.6 & 10.07 & 0.0927\\
+			\textbf{Throughput Speedup} & 1x & 57.9909x & 0.1009x & 0.0009x\\
+			\textbf{Latency (s)} & 0.01003 & 0.00086 & 0.0993 & 10.783\\
+			\textbf{Latency Speedup} & 1x & 11.6627x & 0.101x & 0.00093x\\
+			% \textbf{GFLOPS} & - & - & - & -\\
+			\textbf{Total On-Chip Power (Watt)} & 65 & 175 & 19.3 & 4.559\\
+			\textbf{Power Efficiency} & 1x & 0.3714x & 3.367x & 14.257x\\
+			\textbf{Energy Cons./Image (Joule)} & 0.6519 & 0.1505 & 1.9164 & 49.1596\\
+			\textbf{Energy Efficiency} & 1x & 4.3315x & 0.3401x & 0.0132x\\
+			\textbf{Images/Joule} & 1.533 & 6.644 & 0.521 & 0.02\\
 		\bottomrule\\
 	\end{tabular}
 \end{table}
