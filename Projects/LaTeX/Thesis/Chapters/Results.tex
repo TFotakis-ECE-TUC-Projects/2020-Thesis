@@ -2,41 +2,43 @@
 This work's implementation of the proposed platform is described in section \ref{sec:proposed-platform-implementation}. Its performance metrics, such as its latency, throughput, power, and energy consumption, are compared to the available alternative technologies and FPGA architectures. AlexNet is the selected CNN to be used as a benchmark for the various technologies compared.
 
 \section{Specifications of the Compared Platforms}
-The proposed platform is compared with an AMD Ryzen 5 1400 CPU, an NVIDIA RTX 2060 Super 8GB GPU, a Xilinx CHaiDNN implementation, and a Xilinx DPU implementation. All FPGA implementations, including this work's platform, use the Xilinx ZCU102 Evaluation board.
+The proposed platform is compared with an Intel i7 4710MQ CPU, an NVIDIA RTX 2060 Super 8GB GPU, a Xilinx CHaiDNN implementation, and a Xilinx DPU implementation. All FPGA implementations, including this work's platform, use the Xilinx ZCU102 Evaluation board.
 
-\subsection{AMD Ryzen 5 1400}
-The AMD Ryzen 5 1400 CPU \cite{AMD-Ryzen-5-1400-Processor}, released in 2017, is a desktop processor targeted for mid-range productivity computers. Its specifications are presented in table \ref{tab:AMD-Ryzen-5-1400-specs}.
+% \subsection{AMD Ryzen 5 1400}
+% The AMD Ryzen 5 1400 CPU \cite{AMD-Ryzen-5-1400-Processor}, released in 2017, is a desktop processor targeted for mid-range productivity computers. Its specifications are presented in table \ref{tab:AMD-Ryzen-5-1400-specs}.
+
+% \begin{table}[H]
+% 	\caption{AMD Ryzen 5 1400 processor specifications}
+% 	\label{tab:AMD-Ryzen-5-1400-specs}
+% 	\centering
+% 	\begin{tabular}{ll}
+% 		\toprule
+% 		\textbf{Cores / Threads} & 4/8\\
+% 		\textbf{Max Turbo Frequency} & 3.4GHz\\
+% 		\textbf{TDP} & 65W\\
+% 		\textbf{Max Memory Bandwidth} & 42.7GB/s\\
+% 		\textbf{Lithography} & 14nm\\
+% 		\bottomrule\\
+% 	\end{tabular}
+% \end{table}
+
+\subsection{Intel i7 4710MQ}
+The Intel i7 4710MQ CPU \cite{Intel-i7-4710MQ-Processor}, released in 2014, is a mobile processor targeted for high-performance laptops. Its specifications are presented in table \ref{tab:Intel-i7-4710MQ-specs}.
 
 \begin{table}[H]
-	\caption{AMD Ryzen 5 1400 processor specifications}
-	\label{tab:AMD-Ryzen-5-1400-specs}
+	\caption{Intel i7 4710MQ processor specifications}
+	\label{tab:Intel-i7-4710MQ-specs}
 	\centering
 	\begin{tabular}{ll}
 		\toprule
 		\textbf{Cores / Threads} & 4/8\\
-		\textbf{Max Turbo Frequency} & 3.4GHz\\
-		\textbf{TDP} & 65W\\
-		\textbf{Max Memory Bandwidth} & 42.7GB/s\\
-		\textbf{Lithography} & 14nm\\
+		\textbf{Max Turbo Frequency} & 3.5GHz\\
+		\textbf{TDP} & 47W\\
+		\textbf{Max Memory Bandwidth} & 25.6GB/s\\
+		\textbf{Lithography} & 22nm\\
 		\bottomrule\\
 	\end{tabular}
 \end{table}
-
-% \subsection{Intel i7 4710MQ}
-% The Intel i7 4710MQ CPU \cite{Intel-i7-4710MQ-Processor}, released in 2014, is a mobile processor targeted for high-performance laptops. Its specifications are presented in table \ref{tab:Intel-i7-4710MQ-specs}.
-
-% \begin{table}[H]
-% 	\caption{Intel i7 4710MQ processor specifications}
-% 	\label{tab:Intel-i7-4710MQ-specs}
-% 	\centering
-% 	\begin{tabular}{p{2cm} p{3cm} p{1cm} p{3cm} p{3cm}}
-% 		\toprule
-% 		\textbf{Cores / Threads} & \textbf{Max Turbo Frequency} & \textbf{TDP} & \textbf{Max Memory Bandwidth} & \textbf{Lithography}\\
-% 		\midrule
-% 			4/8 & 3.5GHz & 47W & 25.6GB/s & 22nm\\
-% 		\bottomrule\\
-% 	\end{tabular}
-% \end{table}
 
 \subsection{NVIDIA RTX-2060 Super 8GB}
 The NVIDIA RTX-2060 Super \cite{NVIDIA-RTX-2060-Super}, released in 2019, is a desktop GPU, and while targeted for raytraced gaming, it is also suitable for CNN inferencing due to its large and high-bandwidth memory. Its specifications are presented in table \ref{tab:NVIDIA-RTX-2060-Super-specs}.
@@ -147,16 +149,15 @@ Table \ref{tab:Performance-results} depicts the comparison results of every tech
 		& \textbf{CPU} & \textbf{GPU} & \textbf{CHaiDNN} & \textbf{TUCNNPU}\\
 		\midrule
 			\textbf{Clock Frequency (MHz)} & 3500 & 1650 & 250/500 & 300\\
-			\textbf{Throughput (Images/s)} & 99.75 & 5784.6 & 10.07 & 0.0927\\
-			\textbf{Throughput Speedup} & 1x & 57.9909x & 0.1009x & 0.0009x\\
-			\textbf{Latency (s)} & 0.01003 & 0.00086 & 0.0993 & 10.783\\
-			\textbf{Latency Speedup} & 1x & 11.6627x & 0.101x & 0.00093x\\
-			% \textbf{GFLOPS} & - & - & - & -\\
-			\textbf{Total On-Chip Power (Watt)} & 65 & 175 & 19.3 & 4.559\\
-			\textbf{Power Efficiency} & 1x & 0.3714x & 3.367x & 14.257x\\
-			\textbf{Energy Cons./Image (Joule)} & 0.6519 & 0.1505 & 1.9164 & 49.1596\\
-			\textbf{Energy Efficiency} & 1x & 4.3315x & 0.3401x & 0.0132x\\
-			\textbf{Images/Joule} & 1.533 & 6.644 & 0.521 & 0.02\\
+			\textbf{Throughput (Images/s)} & 94.84 & 5784.6 & 10.07 & 0.0927\\
+			\textbf{Throughput Speedup} & 1.0000x & 60.9933x & 0.1062x & 0.0010x\\
+			\textbf{Latency (s)} & 0.0266 & 0.0009 & 0.0993 & 10.783\\
+			\textbf{Latency Speedup} & 1.0000x & 29.5556x & 0.2679x & 0.0025x\\
+			\textbf{Total On-Chip Power (Watt)} & 47 & 175 & 19.3 & 4.559\\
+			\textbf{Power Efficiency} & 1.0000x & 0.2686x & 2.4352x & 10.3093x\\
+			\textbf{Energy Cons./Image (Joule)} & 1.2502 & 0.1575 & 1.9165 & 49.1597\\
+			\textbf{Energy Efficiency} & 1.0000x & 7.9378x & 0.6523x & 0.0254x\\
+			\textbf{Images/Joule} & 2.0179 & 33.0549 & 0.5218 & 0.0203\\
 		\bottomrule\\
 	\end{tabular}
 \end{table}
