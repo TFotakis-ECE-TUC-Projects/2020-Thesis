@@ -1,4 +1,4 @@
-\chapter{Robustness Analysis}
+\chapter{Theoretical Modeling and Robustness Analysis}
 
 \label{Chapter-Robustness-Analysis}
 
@@ -324,7 +324,7 @@ As mentioned in the Related Work section, memory bandwidth needs can become a se
 Using AlexNet as a reference, various data types have been tested to achieve the best performance to accuracy ratio. From double, single, and half-precision floating-point (IEEE standard) representations to fixed-point from 64 down to 8-bit representations have been tested. This experiment's baseline uses a single-precision floating-point, as it is the pre-trained model's data type. After inferencing 2500 images using every data type, each image classification Top-1 result was compared to the baseline's result. The Top-1 error rates for each data type are presented in tables \ref{tab:floats-error-rates} and \ref{tab:fixed-error-rates}.
 
 \subsection{Floating Point}
-It is worth noting that a MATLAB implementation of the network had to be used in this investigation, due to the fact that, at the time of writing, neither PyTorch nor C/C++ support half-precision floating-point arithmetic. Unfortunately, MATLAB inference was really slow compared to PyTorch, and even slower when using half-precision (see table \ref{tab:floats-error-rates} Avg. inference time column). The half-precision floating-point slowdown was caused because there is no hardware acceleration on the test CPU (Intel i7 4710MQ) for such data type, forcing the mathematical operations to be calculated using software emulation.
+It is worth noting that a MATLAB implementation of the network had to be used in this investigation, due to the fact that, at the time of writing, neither PyTorch nor C/C++ support half-precision floating-point arithmetic. Unfortunately, MATLAB inference was really slow compared to PyTorch, and even slower when using half-precision (see table \ref{tab:floats-error-rates} Avg. inference time column). The half-precision floating-point slowdown was caused because there is no hardware acceleration on the test CPU (Intel i7 4710MQ \cite{Intel-i7-4710MQ-Processor}) for such data type, forcing the mathematical operations to be calculated using software emulation.
 
 Before every test, the network's parameters were converted from the given single-precision floating-point pre-trained model to the corresponding data type. Also, the same data type was used for the layers' activations during inference. While converting single-precision to double-precision does not result in higher arithmetic accuracy, experiments with doubles were conducted for completeness, as shown in table \ref{tab:floats-error-rates}.
 
@@ -547,19 +547,19 @@ Table \ref{tab:Scale-Factor-per-layer} depicts the optimal scale factor for each
 	\caption{Scale Factor per layer}
 	\label{tab:Scale-Factor-per-layer}
 	\centering
-	\begin{tabular}{lll}
+	\begin{tabular}{llll}
 		\toprule
-		\textbf{Layer} & \textbf{Weights Optimal Scale Factor} & \textbf{Output Scale Factor}\\
+		\textbf{Layer} & \textbf{Weights} & \textbf{Bias} & \textbf{Output}\\
 		\midrule
-			Input & -7 & -\\
-			Conv1 & -5 & -2\\
-			Conv2 & -5 & 0\\
-			Conv3 & -5 & 3\\
-			Conv4 & -6 & 5\\
-			Conv5 & -5 & 10\\
-			FC1 & -5 & 15\\
-			FC2 & -6 & 19\\
-			FC3 & -6 & 23\\
+			Input & -7 & - & -\\
+			Conv1 & -7 & -5 & -2\\
+			Conv2 & -5 & -7 & 0\\
+			Conv3 & -7 & -7 & 3\\
+			Conv4 & -8 & -6 & 5\\
+			Conv5 & -9 & -5 & 10\\
+			FC1 & -10 & -10 & 15\\
+			FC2 & -10 & -9 & 19\\
+			FC3 & -9 & -9 & 23\\
 		\bottomrule\\
 	\end{tabular}
 \end{table}
