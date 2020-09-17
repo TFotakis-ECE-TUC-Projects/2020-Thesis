@@ -7,8 +7,7 @@ Over the last few years, Convolutional Neural Networks have proved to be capable
 
 This thesis' purpose was to create an FPGA accelerator for CNN inference, using AlexNet as the base network and benchmark. However, a whole platform was created for easy and structured implementation of such accelerators not only for CNNs but neural networks in general. The implementation of this thesis' proposed platform is used to accelerate AlexNet's inference, whose robustness analysis was carried out to investigate the FPGA's strengths and weaknesses. Computational workloads, memory access patterns, memory and bandwidth reduction, as well as algorithmic optimizations, were studied to exploit the FPGA's parallelism capabilities and strengths.
 
-% Todo: Fill speedup results
-While the proposed platform's implementation was based on the Xilinx ZCU102 Evaluation Kit, it can be transferred and scaled accordingly to other FPGA devices, such as the FORTH QFDB, a custom four-FPGA platform. The implemented platform managed to achieve a x latency speedup, a x throughput speedup, while retaining a x energy efficiency over an NVIDIA RTX-2060 Super GPU.
+While the proposed platform's implementation was based on the Xilinx ZCU102 Evaluation Kit, it can be transferred and scaled accordingly to other FPGA devices, such as the FORTH QFDB, a custom four-FPGA platform. Although, there were no performance benefits using an FPGA over an NVIDIA RTX-2060 Super GPU, a potential for performance improvements appears with further development, focusing on the convolution accelerator, which exploits the platform's ease of use, extendability and expandability.
 
 \section{Future Work}
 This thesis' proposed platform is by design easily expandable for future use and development, creating several opportunities for its expansion and CNN accelerators' optimization. Some of them are presented below.
