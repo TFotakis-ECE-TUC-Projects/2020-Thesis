@@ -54,7 +54,14 @@ On the contrary, Field Programmable Gate Arrays (FPGAs) are bridging the gap bet
 
 In this work, the FPGAs' benefits are being utilized to create a hardware accelerator that can speed up the inference of Convolutional Neural Networks (CNNs), a branch of Deep Neural Networks (DNNs), which is a subfield of Machine Learning. FPGA based CNN inference accelerators are not only targeting High-Performance Computing (HPC) systems like data-centers \cite{CNN-based-high-performance-computing-for-real-time-image-processing-on-GPU}, but also embedded systems \cite{MobileNets-Efficient-Convolutional-Neural-Networks-for-Mobile-Vision-Applications} like mobile phones and aerospace, where low-power, low-energy and low-latency are of great interest.
 
-\section{Scientific Contributions}
+\section{Scientific Goals and Contributions}
+Initially, this diploma thesis's goal was to design and implement a CNN inference FPGA accelerator, specifically for AlexNet, an award-winning CNN, and create a performance benefit over CPUs and GPUs. However, AlexNet, VGG, and many other CNNs use the same neural network layers, with differences in layer organization and hyper-parameter configuration. Therefore, a generalized CNN inference FPGA accelerator was designed and implemented to run any network that uses convolution, max-pooling, ReLU, and fully-connected layers. AlexNet is used as a reference for CNNs with similar characteristics, and as a benchmark for this thesis proposed platform.
+
+This study presents a hardware platform targeted for FPGA devices for easy and structured implementation of neural network inference accelerators. It is designed with flexibility and versatility in mind, capable of being transferred to various FPGA devices. Furthermore, it is scalable for multi-FPGA implementations, using platforms such as the FORTH QFDB, a custom four-FPGA platform. In addition, it is extendable to enable for easy adding of new layer types and new layer accelerators, but most importantly, it provides easy experimentation and development of neural networks hardware accelerator architectures.
+
+The theoretical modeling and robustness analysis has been conducted using AlexNet as a reference to investigate the FPGA's strengths and weaknesses, study the computational workloads, memory access patterns, and investigate and develop memory and bandwidth reduction techniques, including double, single, and half floating-points, and fixed-points with various bit-widths representations for both activations and parameters, as well as algorithmic optimizations.
+
+A comparison in inference performance metrics is presented between the proposed platform, a CPU, a GPU, and other Xilinx developed neural network accelerator platforms. Although there were no performance benefits using an FPGA over a modern GPU, a potential for performance improvements appears with further development, focusing on the convolution accelerator, which exploits the platform's ease of use, extendability, and expandability.
 
 \section{Thesis Outline}
 \begin{itemize}
