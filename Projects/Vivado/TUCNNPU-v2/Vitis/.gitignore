@@ -1,0 +1,13 @@
+/*.*
+!.gitignore
+
+# # Project sources
+/*/*
+!/*/*.prj
+!/*/*.sprj
+!/*/src
+# !/*/src/*.c
+# !/*/src/*.h
+# !/*/src/*.cpp
+# !/*/src/*.hpp
+# !/*/src/*.ld
