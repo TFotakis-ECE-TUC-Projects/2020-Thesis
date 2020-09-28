@@ -7,7 +7,7 @@ The basic building blocks of this platform consists of its volatile and non-vola
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[width=\textwidth]{Images/Platform/platform.png}
+	\includegraphics[width=\textwidth]{../Images/Platform/platform.png}
 	\decoRule
 	\caption[The platform's block diagram]{The platform's block diagram.}
 	\label{fig:platform-block-diagram}
@@ -107,7 +107,7 @@ A simplified flowchart of the platform's software execution can be seen in figur
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[width=\textwidth]{Images/Platform/PlatformFlowchart.png}
+	\includegraphics[width=\textwidth]{../Images/Platform/PlatformFlowchart.png}
 	\decoRule
 	\caption[The platform's flowchart]{The platform's flowchart.}
 	\label{fig:platform-flowchart}
@@ -126,7 +126,7 @@ A baseline schedule was created using a serial execution strategy, as shown in f
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[width=\textwidth]{Images/Scheduling/Serial.png}
+	\includegraphics[width=\textwidth]{../Images/Scheduling/Serial.png}
 	\decoRule
 	\caption[AlexNet serial execution]{AlexNet serial execution: Convolution layers consume 90\% of total clock cycles needed for a full inference.}
 	\label{fig:serial-execution}
@@ -139,7 +139,7 @@ Another scheduling strategy is applying pipelining within the layers. In this st
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[width=\textwidth]{Images/Scheduling/Pipelined-1x.png}
+	\includegraphics[width=\textwidth]{../Images/Scheduling/Pipelined-1x.png}
 	\decoRule
 	\caption[AlexNet layer-pipelined execution]{AlexNet layer-pipelined execution: There is a speedup of almost 3 times compared to the serial strategy.}
 	\label{fig:layer-pipelined-execution}
@@ -155,7 +155,7 @@ Convolutional and max-pooling layers need to process their inputs in a way that 
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[width=\textwidth]{Images/Scheduling/Conv5-output-creation-time.png}
+	\includegraphics[width=\textwidth]{../Images/Scheduling/Conv5-output-creation-time.png}
 	\decoRule
 	\caption[Convolutional and Max-Pooling layer output order for layer-pipelining]{Convolutional and Max-Pooling layer output order for layer-pipelining: Outputs colored in blue are generated before the red ones.}
 	\label{fig:output-generation-order}
@@ -167,7 +167,7 @@ However, layer-pipelining for convolutional and max-pooling layers significantly
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[width=\textwidth]{Images/Scheduling/Conv5-pixel-frequency.png}
+	\includegraphics[width=\textwidth]{../Images/Scheduling/Conv5-pixel-frequency.png}
 	\decoRule
 	\caption[Convolutional and Max-Pooling layer input pixel usage frequency using a stride of one]{Convolutional and Max-Pooling layer input pixel usage frequency a stride of one: Blue inputs are rarely used, while red ones are used frequently.}
 	\label{fig:Conv5-pixel-frequency}
@@ -177,7 +177,7 @@ Figure \ref{fig:Conv1-pixel-frequency} depicts the input usage frequency for a c
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[width=\textwidth]{Images/Scheduling/Conv1-pixel-frequency.png}
+	\includegraphics[width=\textwidth]{../Images/Scheduling/Conv1-pixel-frequency.png}
 	\decoRule
 	\caption[Convolutional and Max-Pooling layer input pixel usage frequency using a stride of four]{Convolutional and Max-Pooling layer input pixel usage frequency using a stride of four: Blue inputs are rarely used, while red ones are used frequently.}
 	\label{fig:Conv1-pixel-frequency}
@@ -247,7 +247,7 @@ The convolution accelerator is the most complex, requiring lots of BRAM slices a
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[width=\textwidth]{Images/Platform/Conv_core_serial.png}
+	\includegraphics[width=\textwidth]{../Images/Platform/Conv_core_serial.png}
 	\decoRule
 	\caption[Convolutional layer serial accelerator]{Convolutional layer serial accelerator.}
 	\label{fig:conv-core-serial}
@@ -261,7 +261,7 @@ The \emph{accumulator} component, shown in figure \ref{fig:accumulator-component
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[scale=0.4]{Images/Platform/Accumulator_component.png}
+	\includegraphics[scale=0.4]{../Images/Platform/Accumulator_component.png}
 	\decoRule
 	\caption[Accumulator component]{Accumulator component.}
 	\label{fig:accumulator-component}
@@ -271,7 +271,7 @@ The \emph{ReLU} component, shown in figure \ref{fig:relu-component}, applies the
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[scale=0.4]{Images/Platform/ReLU_component.png}
+	\includegraphics[scale=0.4]{../Images/Platform/ReLU_component.png}
 	\decoRule
 	\caption[ReLU component]{ReLU component.}
 	\label{fig:relu-component}
@@ -281,7 +281,7 @@ Figure \ref{fig:conv-core-row-parallel} depicts the high performance version of 
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[width=\textwidth]{Images/Platform/Conv_core_row_parallel.png}
+	\includegraphics[width=\textwidth]{../Images/Platform/Conv_core_row_parallel.png}
 	\decoRule
 	\caption[Convolutional layer kernel-row-parallel accelerator]{Convolutional layer kernel-row-parallel accelerator.}
 	\label{fig:conv-core-row-parallel}
@@ -294,7 +294,7 @@ The max-pooling accelerator is the lightest, requiring little BRAM and external 
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[width=\textwidth]{Images/Platform/MaxPool_core_serial.png}
+	\includegraphics[width=\textwidth]{../Images/Platform/MaxPool_core_serial.png}
 	\decoRule
 	\caption[Max-Pooling layer serial accelerator]{Max-Pooling layer serial accelerator.}
 	\label{fig:max-pool-core-serial}
@@ -306,7 +306,7 @@ The \emph{max} component, shown in figure \ref{fig:max-component}, outputs the m
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[scale=0.4]{Images/Platform/Max_component.png}
+	\includegraphics[scale=0.4]{../Images/Platform/Max_component.png}
 	\decoRule
 	\caption[Max component]{Max component.}
 	\label{fig:max-component}
@@ -316,7 +316,7 @@ The max-pooling accelerator's high performance version architecture is depicted 
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[width=\textwidth]{Images/Platform/MaxPool_core_kernel_parallel.png}
+	\includegraphics[width=\textwidth]{../Images/Platform/MaxPool_core_kernel_parallel.png}
 	\decoRule
 	\caption[Max-Pooling layer kernel-parallel accelerator]{Max-Pooling layer kernel-parallel accelerator.}
 	\label{fig:max-pool-core-kernel-parallel}
@@ -328,7 +328,7 @@ The \emph{max tree} component, shown in figure \ref{fig:max-tree-component}, is 
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[width=\textwidth]{Images/Platform/MaxTree_component.png}
+	\includegraphics[width=\textwidth]{../Images/Platform/MaxTree_component.png}
 	\decoRule
 	\caption[MaxTree component]{MaxTree component.}
 	\label{fig:max-tree-component}
@@ -341,7 +341,7 @@ Figure \ref{fig:linear-core-serial} shows the simple version of the fully-connec
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[width=\textwidth]{Images/Platform/Linear_core_serial.png}
+	\includegraphics[width=\textwidth]{../Images/Platform/Linear_core_serial.png}
 	\decoRule
 	\caption[Fully-Connected layer serial accelerator]{Fully-Connected layer serial accelerator.}
 	\label{fig:linear-core-serial}
@@ -353,7 +353,7 @@ A more optimized architecture can be seen in figure \ref{fig:linear-core-partial
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[width=\textwidth]{Images/Platform/Linear_core_partial_outputs.png}
+	\includegraphics[width=\textwidth]{../Images/Platform/Linear_core_partial_outputs.png}
 	\decoRule
 	\caption[Fully-Connected layer accelerator with partial outputs]{Fully-Connected layer accelerator with partial outputs.}
 	\label{fig:linear-core-partial-outputs}

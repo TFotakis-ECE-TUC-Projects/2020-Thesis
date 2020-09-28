@@ -142,7 +142,7 @@ A Python script was created to measure the CPU and GPU inference performance reg
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[width=\textwidth]{Images/Results/CPU-GPU-Inference-Latency.png}
+	\includegraphics[width=\textwidth]{../Images/Results/CPU-GPU-Inference-Latency.png}
 	\decoRule
 	\caption[CPU vs GPU Inference Latency]{CPU vs GPU Inference Latency: Latency increases while batch size increases on both platforms.}
 	\label{fig:CPU-vs-GPU-Inference-Latency}
@@ -154,7 +154,7 @@ Figure \ref{fig:CPU-vs-GPU-Inference-Throughput} depicts the inference throughpu
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[width=\textwidth]{Images/Results/CPU-GPU-Inference-Throughput.png}
+	\includegraphics[width=\textwidth]{../Images/Results/CPU-GPU-Inference-Throughput.png}
 	\decoRule
 	\caption[CPU vs GPU Inference Throughput]{CPU vs GPU Inference Throughput: Throughput increases while batch size increases on CPU, while the GPU reaches its maximum throughput on 256 batch size.}
 	\label{fig:CPU-vs-GPU-Inference-Throughput}
@@ -176,7 +176,7 @@ The Energy Consumption/Image metric is calculated as shown on equation \ref{eqn:
 The Images/Joule metric is calculated, as shown in equation \ref{eqn:images-per-joule}.
 \begin{equation}
 	\label{eqn:images-per-joule}
-	\frac{Images}{Joule} = \max \{\frac{1}{TotalPower * Latency}, \frac{Throughput}{TotalPower}\}
+	\frac{../Images}{Joule} = \max \{\frac{1}{TotalPower * Latency}, \frac{Throughput}{TotalPower}\}
 \end{equation}
 
 The throughput and latency speedups, and the power and energy efficiencies for every platform are calculated compared to the CPU.
@@ -198,7 +198,7 @@ The throughput and latency speedups, and the power and energy efficiencies for e
 			\textbf{Power Efficiency} & 1x & 0.2686x & 2.4352x & 10.3093x\\
 			\textbf{Energy Cons./Image (Joule)} & 1.2502 & 0.1575 & 1.9165 & 49.1597\\
 			\textbf{Energy Efficiency} & 1x & 7.9378x & 0.6523x & 0.0254x\\
-			\textbf{Images/Joule} & 2.0179 & 33.0549 & 0.5218 & 0.0203\\
+			\textbf{../Images/Joule} & 2.0179 & 33.0549 & 0.5218 & 0.0203\\
 		\bottomrule
 	\end{tabular}
 \end{table}
@@ -207,7 +207,7 @@ The final results of the various performance metrics are also depicted using bar
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[width=\textwidth]{Images/Results/Final-Results-charts.png}
+	\includegraphics[width=\textwidth]{../Images/Results/Final-Results-charts.png}
 	\decoRule
 	\caption[Final Results Charts]{Final Results Charts: While requiring the highest amount of power, the GPU stands out in every other performance metric.}
 	\label{fig:Final-Results-charts}
