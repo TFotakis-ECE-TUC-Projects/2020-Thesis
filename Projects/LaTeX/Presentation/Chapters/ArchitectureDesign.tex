@@ -1,0 +1,87 @@
+\setlength{\parskip}{\baselineskip}
+\section{Architecture Design}
+
+\begin{frame}
+	\huge Architecture Design
+\end{frame}
+
+\begin{frame}{Platform Block Diagram}
+	\centering
+	\includegraphics[width=0.9\textwidth]{../Images/Platform/platform-legend-right.png}\\
+\end{frame}
+
+\begin{frame}{Platform Flowchart}
+	\centering
+	\includegraphics[width=0.5\textwidth]{../Images/Platform/PlatformFlowchart.png}\\
+\end{frame}
+
+\begin{frame}{Scheduler: Serial}
+	\centering
+	\includegraphics[width=0.6\textwidth]{../Images/Scheduling/Serial.png}\\
+\end{frame}
+
+\begin{frame}{Scheduler: Layer Pipelining}
+	\centering
+	\includegraphics[width=0.6\textwidth]{../Images/Scheduling/Pipelined-1x.png}\\
+\end{frame}
+
+\begin{frame}{Output Pixel Creation Time}
+	\centering
+	\includegraphics[width=0.6\textwidth]{../Images/Scheduling/Conv5-output-creation-time.png}\\
+\end{frame}
+
+\begin{frame}{Pixel Usage Frequency}
+	\centering
+	\includegraphics[width=0.5\textwidth]{../Images/Scheduling/Conv5-pixel-frequency.png}
+	\includegraphics[width=0.5\textwidth]{../Images/Scheduling/Conv1-pixel-frequency.png}\\
+\end{frame}
+
+\begin{frame}{Scheduler: Multi-Inference}
+
+\end{frame}
+
+\begin{frame}{Scheduler: Image-Pipelining}
+
+\end{frame}
+
+\begin{frame}{Convolution Accelerator}
+	\centering
+	\includegraphics[width=0.7\textwidth]{../Images/Platform/Conv_core_serial.png}\\
+\end{frame}
+
+\begin{frame}{Convolution Accelerator}
+	\centering
+	\includegraphics[width=0.5\textwidth]{../Images/Platform/Conv_core_row_parallel.png}\\
+\end{frame}
+
+\begin{frame}{ReLU component}
+	\centering
+	\includegraphics[width=0.4\textwidth]{../Images/Platform/ReLU_component.png}\\
+\end{frame}
+
+\begin{frame}{Max-Pooling Accelerator}
+	\centering
+	\includegraphics[width=0.9\textwidth]{../Images/Platform/MaxPool_core_serial.png}\\
+\end{frame}
+
+\begin{frame}{Max-Pooling Accelerator}
+	\centering
+	\includegraphics[width=0.9\textwidth]{../Images/Platform/MaxPool_core_kernel_parallel.png}\\
+\end{frame}
+
+\begin{frame}{Max component}
+	\centering
+	\includegraphics[width=0.2\textwidth]{../Images/Platform/Max_component.png}
+	\hspace{0.5cm}
+	\includegraphics[width=0.7\textwidth]{../Images/Platform/MaxTree_component.png}\\
+\end{frame}
+
+\begin{frame}{Fully-Connected Accelerator}
+	\centering
+	\includegraphics[width=0.9\textwidth]{../Images/Platform/Linear_core_serial.png}\\
+\end{frame}
+
+\begin{frame}{Fully-Connected Accelerator}
+	\centering
+	\includegraphics[width=0.9\textwidth]{../Images/Platform/Linear_core_partial_outputs.png}\\
+\end{frame}
