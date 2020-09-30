@@ -24,10 +24,11 @@
 		+ Easy development\\
 		+ High clock frequency\\
 		+ Advanced Vector Extensions (AVX)\\
-		+ Streaming SIMD Extensions (SSE)\\
+		+ Streaming SIMD Extensions (SSE)\\\\
 		- Costly\\
 		- Non-scalable\\
-		- Energy inefficient
+		- Energy inefficient\\
+		- Traditional Low Bandwidth Memory - up to 50 GB/s
 	\end{minipage}
 \end{frame}
 
@@ -39,8 +40,11 @@
 	\end{minipage}%
 	\begin{minipage}{0.6\textwidth}
 		+ Relatively easy development\\
-		+ Very high parallelism\\
-		+ High Bandwidth Memory\\\\
+		+ Very high parallelism - Thousands of cores\\
+		+ Specialized Tensor Cores\\
+		+ Vector processing - Streaming Multiprocessors\\
+		+ High Bandwidth Memory - up to 750 GB/s\\
+		+ Multiple GPUs in a system\\\\
 		- Very power hungry\\
 		- Costly to scale up\\
 		- Increased latency
@@ -56,9 +60,10 @@
 	\begin{minipage}{0.6\textwidth}
 		+ Best parallelism\\
 		+ Lowest power \& energy consumption\\
-		+ High Bandwidth Memory\\\\
+		+ High Bandwidth Memory\\
 		- Extremely expensive to design and produce\\
-		- Serve a single purpose
+		- Serve a single purpose\\
+		- Can become deprecated fast - AI field is still developing
 	\end{minipage}
 \end{frame}
 
@@ -77,4 +82,16 @@
 		- Difficult to develop\\
 		- Constrained resources\\
 	\end{minipage}
+\end{frame}
+
+\begin{frame}{What is Reconfigurable Logic}
+	\begin{itemize}
+		\item Look-Up Tables (LUTs)
+		\item Flip-Flops (FFs)
+		\item Block-RAM (BRAM)
+		\item Ultra-RAM (URAM)
+		\item Digital Signal Processing (DSP) blocks
+		\item Hard Processor cores (SoC/MPSoC devices)
+		\item DDR \& HBM (modern FPGAs)
+	\end{itemize}
 \end{frame}
