@@ -5,16 +5,31 @@
 	\huge Conclusions \& Future Work
 \end{frame}
 
+\begin{frame}{Conclusions}
+	\begin{itemize}
+		\item Neural Networks need hardware acceleration
+		\item Proposed platform provides an easy and structured methodology for scalable \& expandable accelerator implementation
+		\item Memory reduction is a necessity
+		\item Further development $\rightarrow$ higher performance
+	\end{itemize}
+\end{frame}
+
 \begin{frame}{Future Work}
 	\begin{itemize}
-		\item Quantization techniques for both parameters and activations should be further investigated to achieve better classification accuracy using 8-bit or even lower representations. Techniques such as K-Means clustering, Lloyd's, Pair and Quad compression, and SLC found in George Pitsis' thesis could be a great start.
-		\item Similar to integrating the ReLU activation function into the Convolutional and Fully-Connected layers' accelerators, integrating the pooling layer into the convolutional layer's accelerator could be beneficial both latency and throughput by reducing the network's overall memory I/O and avoiding the separate accelerator's initialization.
-		\item The platform's scalability should be exploited not only by implementing it in bigger FPGA devices but also in multiple interconnected FPGAs using platforms such as the FORTH QFDB or CRDB. Multiple accelerator instances could be incorporated using such platforms, creating opportunities for higher throughput and lower latency, as well as new scheduler strategies that might not be presented in the FPGA Implementation chapter.
-		\item Pruning enabled accelerators could bring not only lower latency and high throughput but also higher energy efficiency since there are less required operations for a single inference.
-		\item There are works, such as the Xilinx DPU, which use systolic arrays as their main compute engine. Systolic arrays, while being relatively complicated, could improve latency and memory bandwidth due to their design. They could be used to implement a matrix multiplier for the convolutional layer's operation requirements. Although implementing variable padding and stride is not an obvious task, it should be feasible with careful data scheduling. Also, systolic arrays could be designed to implement n-dimensional convolutions to expand the accelerator's use cases.
-		\item Monte Carlo Dropout during inference could also be consolidated to increase the confidence of the classification results. Multiple instances of the same network could be run with the same inputs in parallel, using multiple accelerator instances and even multiple FPGA devices. Weight could be zeroed out randomly on each iteration in hardware using a linear feedback shift register as a random number generator.
-		\item Layer-Pipelining, as presented in section, could further decrease the network's overall latency. While implementing it as presented is a complex task, it could be simplified by implementing a memory address generator that produces addresses in the specified order.
-		\item During some experimentation with Xilinx's tools, it was observed that implementing the same functionality designs using pure VHDL and Xilinx HLS leads to very different performance and especially resource utilization. Although implementing a design using pure VHDL requires much more working hours on its development and testing compared to using Xilinx HLS, it could create better performance results and new opportunities.
-		\item CPU-FPGA partitioning should also be further studied to exploit the CPU's higher clock speeds, avoiding wasting FPGA resources for tasks that CPUs can already handle. In the case of Xilinx ZCU102, all six cores could be utilized to contribute to the overall network inference.
+		\item Quantization: better classification accuracy, K-Means clustering, Lloyd's, Pair and Quad compression, and Second Level Codebook
+		\item Integrating the pooling layer into the convolution layer
+		\item Pruning enabled accelerators
+		\item Systolic arrays as their main compute engine
+		\item Multiple accelerator instances
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Future Work}
+	\begin{itemize}
+		\item Layer-Pipelining
+		\item Bigger FPGA devices \& multiple interconnected FPGAs (FORTH QFDB \& CRDB).
+		\item Monte Carlo Dropout for increased confidence of classification results
+		\item Designs using VHDL \& Verilog for resource \& performance optimization
+		\item CPU-FPGA partitioning
 	\end{itemize}
 \end{frame}

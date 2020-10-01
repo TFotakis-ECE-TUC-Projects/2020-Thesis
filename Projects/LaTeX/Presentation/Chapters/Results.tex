@@ -5,7 +5,8 @@
 	\huge Results
 \end{frame}
 
-\begin{frame}{Compared Platforms: Intel i7 4710MQ CPU}
+\begin{frame}{Compared Platforms: CPU}
+	\center{\large{Intel i7 4710MQ}}
 	\begin{table}[H]
 		\centering
 		\begin{tabular}{ll}
@@ -20,12 +21,14 @@
 	\end{table}
 \end{frame}
 
-\begin{frame}{Compared Platforms: NVIDIA RTX-2060 Super 8GB GPU}
+\begin{frame}{Compared Platforms: GPU}
+	\center{\large{NVIDIA RTX-2060 Super 8GB}}
 	\begin{table}[H]
 		\centering
 		\begin{tabular}{ll}
 			\toprule
 			\textbf{CUDA Cores}        & 2176      \\
+			\textbf{Tensor Cores}      & 32        \\
 			\textbf{GPU Memory}        & 8GB GDDR6 \\
 			\textbf{Boost Clock}       & 1650 MHz  \\
 			\textbf{Memory Interface}  & 256-bit   \\
@@ -36,7 +39,8 @@
 	\end{table}
 \end{frame}
 
-\begin{frame}{Compared Platforms: Xilinx CHaiDNN FPGA PLatform}
+\begin{frame}{Compared Platforms: FPGA}
+	\center{\large{Xilinx CHaiDNN}}
 	\begin{table}[H]
 		\centering
 		\begin{tabular}{ll}
@@ -53,7 +57,8 @@
 	\end{table}
 \end{frame}
 
-\begin{frame}{Compared Platforms: Proposed FPGA Platform}
+\begin{frame}{Compared Platforms: FPGA}
+	\center{\large{Proposed Platform}}
 	\begin{table}[H]
 		\centering
 		\begin{tabular}{ll}
@@ -64,18 +69,26 @@
 			\textbf{FF Usage}              & 4.03\% \\
 			\textbf{BRAM Usage}            & 7.51\% \\
 			\textbf{DSP Usage}             & 1.9\%  \\
-			\textbf{BUFG (\%)}             & 0.25\% \\
+			% \textbf{BUFG (\%)}             & 0.25\% \\
 			\bottomrule
 		\end{tabular}
 	\end{table}
 \end{frame}
 
-\begin{frame}{CPU vs GPU Inference Latency}
+\begin{frame}{CPU \& GPU Performance}
+	\begin{itemize}
+		\item Inference 2500 images
+		\item Use all worker \& batch-size combinations
+		\item PyTorch pre-built pre-trained AlexNet
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{CPU \& GPU Performance: Latency}
 	\centering
 	\includegraphics[width=0.7\textwidth]{../Images/Results/CPU-GPU-Inference-Latency.png}\\
 \end{frame}
 
-\begin{frame}{CPU vs GPU Inference Throughput}
+\begin{frame}{CPU \& GPU Performance: Throughput}
 	\centering
 	\includegraphics[width=0.7\textwidth]{../Images/Results/CPU-GPU-Inference-Throughput.png}\\
 \end{frame}
@@ -96,7 +109,7 @@
 			\textbf{Power Efficiency}           & 1x           & 0.2686x      & 2.4352x          & 10.3093x                   \\
 			\textbf{Energy Cons./Image (Joule)} & 1.2502       & 0.1575       & 1.9165           & 49.1597                    \\
 			\textbf{Energy Efficiency}          & 1x           & 7.9378x      & 0.6523x          & 0.0254x                    \\
-			\textbf{../Images/Joule}            & 2.0179       & 33.0549      & 0.5218           & 0.0203                     \\
+			\textbf{Images/Joule}               & 2.0179       & 33.0549      & 0.5218           & 0.0203                     \\
 			\bottomrule
 		\end{tabular}
 	\end{table}
