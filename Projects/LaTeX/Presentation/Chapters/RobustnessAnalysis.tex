@@ -6,18 +6,42 @@
 \end{frame}
 
 \begin{frame}{PyTorch, C/C++, MATLAB}
+	PyTorch $\rightarrow$ pure Python $\rightarrow$ C/C++ \& MATLAB
 	\begin{itemize}
-		\item
+		\item Replicate PyTorch functionality
+		\item Evaluation using PyTorch
+		\item PyTorch pre-build \& pretrained AlexNet as a reference
+		\item 2500 images of Kaggle cats \& dogs database
+		\item Better understanding of underlining algorithms
+		\item Explore Hardware implementation opportunities
+		\item Quantization techniques $\rightarrow$ reduce memory footprint
+		\item Algorithmic optimizations
+		\item Minimize hardware resources and optimize performance using various tools
 	\end{itemize}
 \end{frame}
 
 \begin{frame}{Algorithms}
 	\begin{itemize}
-		\item
+		\item Convolution Layer
+		\item Max-Pooling Layer
+		\item Fully-Connected Layer
+		\item ReLU
+		\item SoftMax
 	\end{itemize}
 \end{frame}
 
-\begin{frame}{Memory Footprint: AlexNet Parameters}
+\begin{frame}
+	\center{\huge Memory Footprint}
+	\begin{itemize}
+		\item Classic hardware architectures $\rightarrow$ Compute bound
+		\item ASICs \& FPGAs $\rightarrow$ Memory bound
+		\item Highest benefit: Memory requirements fit into BRAM (order of MBs)
+		\item Otherwise, external memory used $\rightarrow$ latency \& IO stalls
+		\item Goal: Minimize memory footprint \& bandwidth
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Memory Footprint: AlexNet Parameters (float32)}
 	\begin{table}[H]
 		\centering
 		\begin{tabular}{llll}
@@ -39,7 +63,7 @@
 	\end{table}
 \end{frame}
 
-\begin{frame}{Memory Footprint: AlexNet Data Stages}
+\begin{frame}{Memory Footprint: AlexNet Data Stages (float32)}
 	\begin{table}[H]
 		\small
 		\centering
@@ -70,17 +94,34 @@
 
 \begin{frame}{Memory Footprint Reduction}
 	\begin{itemize}
-		\item
+		\item Data type bit-width shortening (float64-float16)
+		\item Simpler data types (fixed-point/integers)
+		\item Binary
+		\item Quantization
+		\item Quantization aware training
+		\item Compression
+		\item K-Means clustering
+		\item Second Level Codebook
 	\end{itemize}
+\end{frame}
+
+\begin{frame}{Memory Footprint Reduction}
+	\center{\huge Trading accuracy to performance.}
 \end{frame}
 
 \begin{frame}{Memory Footprint Reduction: Evaluation}
 	\begin{itemize}
-		\item
+		\item Baseline: PyTorch pre-trained pre-build AlexNet model
+		\item Inferencing 2500 pre-transformed Kaggle cats \& dogs images
+		\item Top-1 error rate
+		\item MATLAB implementation used
+		\item PyTorch \& C/C++ do not support half-floating point
 	\end{itemize}
 \end{frame}
 
 \begin{frame}{Memory Footprint Reduction: Floating Point}
+	\centering
+	\large{Convert 32-bit floats to their closest representation.}
 	\begin{table}[H]
 		\centering
 		\begin{tabular}{p{2cm} p{2cm} p{3cm} p{3cm}}
@@ -97,12 +138,23 @@
 	\end{table}
 \end{frame}
 
-\begin{frame}{Memory Footprint Reduction: Fixed Point}
+\begin{frame}{Memory Footprint Reduction: Fixed Point Parameters}
+	\begin{itemize}
+		\item Convert 32-bit float number sets to fixed-point
+		\item Select best radix-point position to most accurately represent the number set
+		\item Use same scale factor on whole set
+		\item Every layer has its own scale factor
+	\end{itemize}
+	\center{$Position = argmin_{i=0}^{W}[\frac{\sum_{j=1}^{size(S)} |S_j - FixPtConvert(S_j, W, i)| }{size(S)}]$}
+\end{frame}
+
+\begin{frame}{Memory Footprint Reduction: Fixed Point Parameters}
 	\begin{table}[H]
 		\centering
 		\begin{tabular}{p{2cm} p{2cm} p{3cm} p{3cm}}
 			\toprule
 			\textbf{Tool} & \textbf{Data type} & \textbf{Top-1 Error rate (\%)} & \textbf{Avg. inference time (sec)} \\
+			\midrule
 			MATLAB        & fixed64            & 0                              & 7.318                              \\
 			MATLAB        & fixed32            & 0                              & 7.692                              \\
 			MATLAB        & fixed16            & 22                             & 6.650                              \\
@@ -115,26 +167,186 @@
 	\end{table}
 \end{frame}
 
+\begin{frame}{Memory Footprint Reduction: Fixed Point Parameters}
+	\begin{minipage}{0.6\textwidth}
+		\centering
+		\includegraphics[width=0.95\textwidth]{../Images/Weights-distributions/original-vs-fixed8/weight-distribution-conv2.png}\\
+	\end{minipage}%
+	\begin{minipage}{0.4\textwidth}
+		\large Histogram limits significantly altered\\
+	\end{minipage}
+\end{frame}
+
+\begin{frame}{Memory Footprint Reduction: Fixed Point Parameters}
+	\begin{minipage}{0.6\textwidth}
+		\centering
+		\includegraphics[width=0.95\textwidth]{../Images/Weights-distributions/original-vs-fixed8/weight-distribution-conv5.png}\\
+	\end{minipage}%
+	\begin{minipage}{0.4\textwidth}
+		\large Significant spiking\\
+	\end{minipage}
+\end{frame}
+
+\begin{frame}{Memory Footprint Reduction: Fixed Point Parameters}
+	\begin{minipage}{0.6\textwidth}
+		\centering
+		\includegraphics[width=0.95\textwidth]{../Images/Weights-distributions/original-vs-fixed8/weight-distribution-FC1.png}\\
+	\end{minipage}%
+	\begin{minipage}{0.4\textwidth}
+		\large Severe subsampling\\
+	\end{minipage}
+\end{frame}
+
+\begin{frame}{Memory Footprint Reduction: Fixed Point Parameters}
+	\large{Use Mean Square Error (MSE)}\\
+	$Position = argmin_{i=0}^{32}[\frac{\sum_{j=1}^{size(S)} |S_j - FixPtConvert(S_j, W, i)|^2 }{size(S)}]$
+
+	\large{Use Mean Quarted Error (MQE)}\\
+	$Position = argmin_{i=0}^{32}[\frac{\sum_{j=1}^{size(S)} |S_j - FixPtConvert(S_j, W, i)|^4 }{size(S)}]$
+\end{frame}
+
 \begin{frame}{Memory Footprint Reduction: Fixed Point MQE}
 	\begin{table}[H]
 		\centering
 		\begin{tabular}{lll}
 			\toprule
-			\textbf{Tool} & \textbf{Data type} & \textbf{Top-1 Error rate (\%)}\\
+			\textbf{Tool} & \textbf{Data type} & \textbf{Top-1 Error rate (\%)} \\
 			\midrule
-				MATLAB 	& fixed64	& 0 	\\
-				MATLAB 	& fixed32	& 0 	\\
-				MATLAB 	& fixed16	& 4.42 	\\
-				MATLAB 	& fixed14	& 17.59 \\
-				MATLAB 	& fixed12	& 48.11 \\
-				MATLAB 	& fixed10	& 86.91	\\
-				MATLAB 	& fixed8	& 99.3 	\\
+			MATLAB        & fixed64            & 0                              \\
+			MATLAB        & fixed32            & 0                              \\
+			MATLAB        & fixed16            & 4.42                           \\
+			MATLAB        & fixed14            & 17.59                          \\
+			MATLAB        & fixed12            & 48.11                          \\
+			MATLAB        & fixed10            & 86.91                          \\
+			MATLAB        & fixed8             & 99.3                           \\
 			\bottomrule
 		\end{tabular}
 	\end{table}
 \end{frame}
 
+\begin{frame}{Memory Footprint Reduction: Fixed Point Parameters}
+	\begin{minipage}{0.6\textwidth}
+		\centering
+		\includegraphics[width=0.95\textwidth]{../Images/Weights-distributions/original-vs-fixed8/weight-distribution-conv2-MQE.png}\\
+	\end{minipage}%
+	\begin{minipage}{0.4\textwidth}
+		\large Histogram limits identical\\
+	\end{minipage}
+\end{frame}
+
+\begin{frame}{Memory Footprint Reduction: Fixed Point Parameters}
+	\begin{minipage}{0.6\textwidth}
+		\centering
+		\includegraphics[width=0.95\textwidth]{../Images/Weights-distributions/original-vs-fixed8/weight-distribution-conv5-MQE.png}\\
+	\end{minipage}%
+	\begin{minipage}{0.4\textwidth}
+		\large Slight spiking\\
+	\end{minipage}
+\end{frame}
+
+\begin{frame}{Memory Footprint Reduction: Fixed Point Parameters}
+	\begin{minipage}{0.6\textwidth}
+		\centering
+		\includegraphics[width=0.95\textwidth]{../Images/Weights-distributions/original-vs-fixed8/weight-distribution-FC1-MQE.png}\\
+	\end{minipage}%
+	\begin{minipage}{0.4\textwidth}
+		\large No subsampling, but spiking\\
+	\end{minipage}
+\end{frame}
+
 \begin{frame}{Memory Footprint Reduction: All data types tested}
+	\begin{minipage}{0.6\textwidth}
+		\centering
+		\includegraphics[width=0.9\textwidth]{../Images/Weights-distributions/data-types-accuracy-chart.png}\\
+	\end{minipage}%
+	\begin{minipage}{0.4\textwidth}
+		\begin{itemize}
+			\item Accuracy degradation is expected
+			\item Model dependent
+			\item Training dependent
+		\end{itemize}
+	\end{minipage}
+\end{frame}
+
+\begin{frame}{Memory Footprint Reduction: Fixed Point Activations}
+	\begin{itemize}
+		\item Floating-point arithmetic scales automatically
+		\item Fixed-point activations may overflow
+		\item Quantize every layer outputs
+		\item Keep the upper N most significant bits to retain accuracy
+		\item Finding on runtime the uppermost on is computationally intensive $\rightarrow$ any fixed-point benefits get obsolete
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Memory Footprint Reduction: Fixed Point Activations}
 	\centering
-	\includegraphics[width=0.7\textwidth]{../Images/Weights-distributions/data-types-accuracy-chart.png}\\
+	\large{Calculate optimal activation scale factor per layer.}
+	\newline
+	\newline
+	$Theoretical_{bitWidth} = input_{bitWidth} + weight_{bitWidth} + \lceil \log_2 \#Additions \rceil$
+\end{frame}
+
+\begin{frame}{Memory Footprint Reduction: Fixed Point Activations}
+	\begin{minipage}{0.6\textwidth}
+		\centering
+		\begin{table}[H]
+			\centering
+			\begin{tabular}{lp{2cm}p{2cm}}
+				\toprule
+				\textbf{Layer} & \textbf{Theoretical bit-width} & \textbf{Practical bit-width} \\
+				\midrule
+				Input          & 8                              & 8                            \\
+				Conv1          & 25                             & 17                           \\
+				Conv2          & 27                             & 14                           \\
+				Conv3          & 27                             & 15                           \\
+				Conv4          & 28                             & 15                           \\
+				Conv5          & 28                             & 17                           \\
+				FC1            & 30                             & 17                           \\
+				FC2            & 28                             & 17                           \\
+				FC3            & 28                             & 17                           \\
+				\bottomrule
+			\end{tabular}
+		\end{table}
+	\end{minipage}%
+	\begin{minipage}{0.4\textwidth}
+		\begin{itemize}
+			\item Theoretical worse case scenario significantly differs from practical
+			\item Inference 2000 images, find maximum absolute valued activation per layer
+			\item Maximum theoretical bit-width is 30-bits $\rightarrow$ all activations fit in 32-bit integers before quantization
+		\end{itemize}
+	\end{minipage}
+\end{frame}
+
+\begin{frame}{Memory Footprint Reduction: Fixed Point Activations}
+	\begin{minipage}{0.6\textwidth}
+		\centering
+		\begin{table}
+			\centering
+			\begin{tabular}{llll}
+				\toprule
+				\textbf{Layer} & \textbf{Weights} & \textbf{Bias} & \textbf{Output} \\
+				\midrule
+				Input          & -7               & -             & -               \\
+				Conv1          & -7               & -5            & -2              \\
+				Conv2          & -5               & -7            & 0               \\
+				Conv3          & -7               & -7            & 3               \\
+				Conv4          & -8               & -6            & 5               \\
+				Conv5          & -9               & -5            & 10              \\
+				FC1            & -10              & -10           & 15              \\
+				FC2            & -10              & -9            & 19              \\
+				FC3            & -9               & -9            & 23              \\
+				\bottomrule
+			\end{tabular}
+		\end{table}
+	\end{minipage}%
+	\begin{minipage}{0.4\textwidth}
+		\large{Optimal scale factor per layer.}
+	\end{minipage}
+\end{frame}
+
+\begin{frame}
+	\center{\large Weight Pruning}
+	\begin{itemize}
+		\item
+	\end{itemize}
 \end{frame}
