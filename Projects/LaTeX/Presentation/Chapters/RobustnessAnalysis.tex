@@ -347,6 +347,80 @@
 \begin{frame}
 	\center{\large Weight Pruning}
 	\begin{itemize}
-		\item
+		\item Biological brain phase from birth until mid-20s
+		\item Network compression
+		\item Weak weights get pruned $\rightarrow$ $w \epsilon [-f, f] = 0$, f: pruning factor
+		\item Calculations can get skipped
+		\item Higher memory \& power efficiency \& inference performance
+		\item Accuracy-Performance tradeoff
+		\item Weight pruning amount varies per network
+		\item Global pruning factor: Not a good idea!
 	\end{itemize}
+\end{frame}
+
+\begin{frame}{Weight Pruning}
+	\begin{table}[H]
+		\centering
+		\begin{tabular}{llll llll}
+			\toprule
+			\textbf{Layer}         & \textbf{Test 1} & \textbf{Test 2} & \textbf{Test 3} & \textbf{Test 4} & \textbf{Test 5} & \textbf{Test 6} & \textbf{Test 7} \\
+			\midrule
+			Conv1 (\%)             & 7.15            & 13.66           & 91.3            & 91.3            & 0               & 0               & 0               \\
+			Conv2 (\%)             & 13.82           & 26.9            & 95.83           & 95.83           & 0               & 0               & 0               \\
+			Conv3 (\%)             & 13.54           & 26.63           & 98.62           & 98.62           & 0               & 0               & 0               \\
+			Conv4 (\%)             & 15.32           & 29.99           & 93.14           & 93.14           & 0               & 0               & 0               \\
+			Conv5 (\%)             & 15.55           & 30.53           & 94.02           & 94.02           & 0               & 0               & 0               \\
+			FC1 (\%)               & 41.23           & 41.23           & 41.23           & 94.48           & 41.23           & 71.89           & 96.61           \\
+			FC2 (\%)               & 36.69           & 36.69           & 36.69           & 90.61           & 36.69           & 62.52           & 90.61           \\
+			FC3 (\%)               & 27.27           & 27.27           & 27.27           & 89.68           & 27.27           & 47.74           & 75.56           \\
+			\midrule
+			\textbf{Total (\%)}    & 37.97           & 38.54           & 41.22           & 93.11           & 37.38           & 64.79           & 89.65           \\
+			\midrule
+			\textbf{Accuracy (\%)} & 91.74           & 80.8            & 0               & 0               & 90.87           & 71.77           & 15.06           \\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+\end{frame}
+
+\begin{frame}{Weight Pruning}
+	\begin{minipage}{0.6\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{../Images/Weights-distributions/pruned/pruning-amount-vs-accuracy-chart.png}\\
+	\end{minipage}%
+	\begin{minipage}{0.4\textwidth}
+		\begin{itemize}
+			\item Less Pruning $\rightarrow$ Higher Accuracy
+			\item Convolution layers more prone to error
+			\item Pruning also denoises - Low valued weights act as noise
+		\end{itemize}
+	\end{minipage}
+\end{frame}
+
+\begin{frame}{Weight Pruning}
+	\begin{minipage}{0.6\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{../Images/Weights-distributions/pruned/41.22/weight-distribution-conv1.png}\\
+	\end{minipage}%
+	\begin{minipage}{0.4\textwidth}
+		\begin{itemize}
+			\item Aggressive pruning
+			\item High concentration of zeroes
+			\item High compression factor
+			\item Severe absence of near-to-zero valued weights
+		\end{itemize}
+	\end{minipage}
+\end{frame}
+
+\begin{frame}{Weight Pruning}
+	\begin{minipage}{0.6\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{../Images/Weights-distributions/pruned/37.97/weight-distribution-conv1.png}\\
+	\end{minipage}%
+	\begin{minipage}{0.4\textwidth}
+		\begin{itemize}
+			\item Fine-tuned pruning
+			\item Normal concentration of zeroes
+			\item No discontinuation
+		\end{itemize}
+	\end{minipage}
 \end{frame}
