@@ -2167,7 +2167,7 @@ void setup_platform(char *greeting_message) {
 	printf("%s", greeting_message);
 	setup_cache();
 	setup_interrupt();
-	setup_accelerator(ScuGic);
+	setup_accelerator();
 }
 
 void cleanup_accelerator() {
