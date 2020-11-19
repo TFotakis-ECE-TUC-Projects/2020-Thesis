@@ -56,8 +56,8 @@ typedef struct LayerConf_t {
 	u32 resSize;
 	matrix_t *weightsAddr;
 	matrix_t *biasAddr;
-	matrix_t *(*hw_func)();
-	matrix_t *(*sw_func)();
+	matrix_t *(*hw_func)(struct LayerConf_t, matrix_t *);
+	matrix_t *(*sw_func)(struct LayerConf_t, matrix_t *);
 } LayerConf;
 
 typedef struct {
@@ -202,7 +202,7 @@ matrix_t *createMatrix(u32 dim) {
  * @returns the pointer of the allocated and initialized FloatMatrix
  */
 matrix_t *zeroMatrix(u32 dim) {
-	matrix_t *res = calloc(dim, sizeof(matrix_t));
+	matrix_t *res = (matrix_t *) calloc(dim, sizeof(matrix_t));
 	if (res == NULL) {
 		printf("%sError. Not enough memory for zeroMatrix." KRED, KNRM);
 		exit(XST_FAILURE);
@@ -977,7 +977,7 @@ void Conv_core_init(Core *core) {
 		exit(XST_FAILURE);
 	}
 	int status = XConv_core_Initialize(
-		core->InstancePtr, Conv_core_device_ids[core->InstanceId]);
+		(XConv_core*) core->InstancePtr, Conv_core_device_ids[core->InstanceId]);
 	if (status != XST_SUCCESS) {
 		printf("%sError%s\n", KRED, KNRM);
 		exit(XST_FAILURE);
@@ -1034,14 +1034,14 @@ int Conv_core_wait_int(Core *core) {
 	while (!Conv_core_result_avail[core->InstanceId]) continue;
 	Conv_core_result_avail[core->InstanceId] = 0;
 	eraseCharactersTerminal(10);
-	int status = XConv_core_Get_return(core->InstancePtr);
+	int status = XConv_core_Get_return((XConv_core*) core->InstancePtr);
 	return status;
 }
 
 matrix_t *Conv_core_process(LayerConf lc, matrix_t *x) {
 	Core *core = get_Conv_core();
-	matrix_t *res = Conv_core_setup(core->InstancePtr, lc, x);
-	Conv_core_start(core->InstancePtr);
+	matrix_t *res = Conv_core_setup((XConv_core*) core->InstancePtr, lc, x);
+	Conv_core_start((XConv_core*) core->InstancePtr);
 	Conv_core_wait_int(core);
 	free(x);
 	return res;
@@ -1351,7 +1351,7 @@ void Maxpool_core_init(Core *core) {
 		exit(XST_FAILURE);
 	}
 	int status = XMaxpool_core_Initialize(
-		core->InstancePtr, Maxpool_core_device_ids[core->InstanceId]);
+		(XMaxpool_core*) core->InstancePtr, Maxpool_core_device_ids[core->InstanceId]);
 	if (status != XST_SUCCESS) {
 		printf("%sError%s\n", KRED, KNRM);
 		exit(XST_FAILURE);
@@ -1404,15 +1404,15 @@ void Maxpool_core_start(void *InstancePtr) {
 int Maxpool_core_wait_int(Core *core) {
 	while (!Maxpool_core_result_avail[core->InstanceId]) continue;
 	Maxpool_core_result_avail[core->InstanceId] = 0;
-	int status = XMaxpool_core_Get_return(core->InstancePtr);
+	int status = XMaxpool_core_Get_return((XMaxpool_core*) core->InstancePtr);
 	eraseCharactersTerminal(10);
 	return status;
 }
 
 matrix_t *Maxpool_core_process(LayerConf lc, matrix_t *x) {
 	Core *core = get_Maxpool_core();
-	matrix_t *res = Maxpool_core_setup(core->InstancePtr, lc, x);
-	Maxpool_core_start(core->InstancePtr);
+	matrix_t *res = Maxpool_core_setup((XMaxpool_core*) core->InstancePtr, lc, x);
+	Maxpool_core_start((XMaxpool_core*) core->InstancePtr);
 	Maxpool_core_wait_int(core);
 	free(x);
 	return res;
@@ -1647,7 +1647,7 @@ void Linear_core_init(Core *core) {
 		exit(XST_FAILURE);
 	}
 	int status = XLinear_core_Initialize(
-		core->InstancePtr, Linear_core_device_ids[core->InstanceId]);
+		(XLinear_core *) core->InstancePtr, Linear_core_device_ids[core->InstanceId]);
 	if (status != XST_SUCCESS) {
 		printf("%sError%s\n", KRED, KNRM);
 		exit(XST_FAILURE);
@@ -1698,15 +1698,15 @@ void Linear_core_start(void *InstancePtr) {
 int Linear_core_wait_int(Core *core) {
 	while (!Linear_core_result_avail[core->InstanceId]) continue;
 	Linear_core_result_avail[core->InstanceId] = 0;
-	int status = XLinear_core_Get_return(core->InstancePtr);
+	int status = XLinear_core_Get_return((XLinear_core *) core->InstancePtr);
 	eraseCharactersTerminal(10);
 	return status;
 }
 
 matrix_t *Linear_core_process(LayerConf lc, matrix_t *x) {
 	Core *core = get_Linear_core();
-	matrix_t *res = Linear_core_setup(core->InstancePtr, lc, x);
-	Linear_core_start(core->InstancePtr);
+	matrix_t *res = Linear_core_setup((XLinear_core *) core->InstancePtr, lc, x);
+	Linear_core_start((XLinear_core *) core->InstancePtr);
 	Linear_core_wait_int(core);
 	free(x);
 	return res;
