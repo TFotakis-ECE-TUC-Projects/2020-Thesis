@@ -1,6 +1,10 @@
 # Diploma Thesis
-![Technical-University-of-Crete-TUC-logo](https://raw.githubusercontent.com/TFotakis/Thesis/master/Projects/LaTeX/Images/TUC_logo.png)  
-[Technical University of Crete][tucPage]
+<!-- ![Technical-University-of-Crete-TUC-logo](https://raw.githubusercontent.com/TFotakis/Thesis/master/Projects/LaTeX/Images/TUC_logo.png =200x100)  
+[Technical University of Crete][tucPage] -->
+
+<a href="https://www.tuc.gr">
+  <img src="https://raw.githubusercontent.com/TFotakis/Thesis/master/Projects/LaTeX/Images/TUC_logo.png" alt="tuc_logo" width="200"/>
+</a>
 
 **Analysis and design methodology of convolutional neural networks mapping on reconfigurable logic**  
 
