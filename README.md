@@ -6,7 +6,7 @@
   <img src="https://raw.githubusercontent.com/TFotakis/Thesis/master/Projects/LaTeX/Images/TUC_logo.png" alt="tuc_logo" width="200"/>
 </a>
 
-**Analysis and design methodology of convolutional neural networks mapping on reconfigurable logic**  
+### Analysis and design methodology of convolutional neural networks mapping on reconfigurable logic
 
 Author:  
 [Tzanis Fotakis][tzanisPage]
@@ -19,11 +19,11 @@ Thesis Committee:
 *A thesis submitted in fulfillment of the requirements for the Diploma of Electrical and Computer Engineering in the [Microprocessor and Hardware Lab][mhlPage] of [School of Electrical and Computer Engineering][ecePage]*
 
 <!-- Todo: Add Date Here -->
-# Abstract
+## Abstract
 Over the last few years, Convolutional Neural Networks have proved their abilities in several fields of study, with the research community continuing to surprise the world with new and paradoxical use cases, and even more exciting results. The rise of neural networks in general, and especially CNNs, creates a necessity for hardware acceleration of such computationally complex applications to achieve high-performance and energy-efficiency. Due to the fact that neural networks are highly parallelizable, they can exploit FPGA's hardware flexibility. This study presents a hardware platform targeted for FPGA devices for easy and structured implementation of neural network inference accelerators. It is designed with flexibility and versatility in mind, capable of being transferred to various FPGA devices. Furthermore, it is extendable to enable for easy adding of new layer types and new layer accelerators. In addition, it is scalable for multi-FPGA implementations, using platforms such as the FORTH QFDB, a custom four-FPGA platform. Moreover, it can run various CNN models' inference, but most importantly, it provides easy experimentation and development of neural networks hardware accelerator architectures. The proposed platform is implemented for accelerating AlexNet's inference, an award-winning CNN whose robustness analysis is carried out to investigate the FPGA's strengths and weaknesses, studying the computational workloads, memory access patterns, memory and bandwidth reduction, as well as algorithmic optimizations. A comparison in inference performance metrics is presented between the proposed platform, a CPU, a GPU, and other Xilinx developed neural network accelerator platforms. Although there are no performance benefits of using an FPGA over a modern GPU, a potential for performance improvements appears with further development, focusing on the convolution accelerator, which exploits the platform's ease of use, extendability, and expandability.
 
 
-Technologies used:  
+### Technologies used:  
 • Xilinx Vivado IDE  
 • Xilinx Vivado HLS  
 • Xilinx Vitis IDE  
